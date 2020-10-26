@@ -1,7 +1,5 @@
 var toc = document.getElementById('toc')
 
-var container = document.querySelector('.container')
-container.style.marginLeft = '10%'
 if (toc != null) {
 	window.addEventListener("scroll", scrollcatelogHandler);
 	var tocPosition = toc.offsetTop;
