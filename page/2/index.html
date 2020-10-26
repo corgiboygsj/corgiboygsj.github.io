@@ -141,14 +141,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -249,12 +249,15 @@ Exception和Error的区别：Exception是一种可以提前预想到的异常情
             线程中断
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍了线程中断的作用，以及如何响应中断。
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+一个运行中的线程如何停止它呢，我们可能会想到stop方法，但是stop方法已经被弃用了。因为stop方法会强制释放掉线程的锁资源，给数据的一致性带来问题。stop是一种独占模式，直接将线程杀死，而中断是一种协作模式。
+
+
+什么是线程中断
+每个线程都维护了一个boolean类型的中断状态，通过调用该线程的interrupt方法，将这个线程设置为中断状态，后续该线程可以isInterrupte......
         </div>
     </a>
     
@@ -280,12 +283,17 @@ Exception和Error的区别：Exception是一种可以提前预想到的异常情
             Redis哨兵模式
         </h2>
         <h3 class="post-subtitle">
-            
+            本文Redis哨兵模式故障发现、故障转移的原理
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+Redis主从模式就是为了提高Redis的可用性，但是正常的Redis主从模式无法进行故障的及时发现和自动的故障转移等操作，为了保证高可用就出现了Redis Sentinel。
+
+
+为什么需要Redis Sentinel
+一个主从结构的Redis服务，当Master故障之后都要做什么？
+1、要挑选出一个slave节点手动设置为master节点。
+2、改变其他slave节点的master指向......
         </div>
     </a>
     
@@ -311,12 +319,17 @@ Exception和Error的区别：Exception是一种可以提前预想到的异常情
             Redis主从复制
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍了Redis主从复制的原理
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+为了解决单点问题，实现故障恢复、数据备份、负载均衡，所以需要多个数据相同的redis节点，在节点挂掉的时候，其他节点拥有相同的数据可以服务或者实现多个节点分摊负载的功能，就出现了redis主从复制，这是解决redis高可用的基础。
+
+
+主从复制
+在节点上执行slaveof命令可以将节点指定为某个节点的从节点，slaveof同样可以取消某个节点的主从关系。
+指定主从关系
+slaveof ho......
         </div>
     </a>
     
@@ -342,12 +355,17 @@ Exception和Error的区别：Exception是一种可以提前预想到的异常情
             Redis持久化
         </h2>
         <h3 class="post-subtitle">
-            
+            本文Redis中aof、rdb两种持久化的原理，以及它们的区别。
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+Redis持久化是为了防止内存中的数据在Redis重启后丢失，所以生成了一个持久化文件，用来保存在内存中的数据，当redis重启之后通过持久化文件恢复内存中的数据。
+Redis提供了两种持久化方式，分别是RDB和AOF。
+
+
+RDB
+RDB是如何进行的
+RDB方式是通过生成redis内存快照文件的方式来进行持久化的，rdb文件是一个二进制文件。一共有两个命令，分别是save个bgsave。......
         </div>
     </a>
     
@@ -404,12 +422,17 @@ Exception和Error的区别：Exception是一种可以提前预想到的异常情
             BIO、NIO、AIO模型区别
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍IO模型以及它们的区别
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+什么是IO，一般典型的如网络，磁盘文件等带有输入输出的，需要从程序到操作系统的数据传输等都算是IO，本文主要讲解几种IO模型的对比，以及举例帮助理解不同IO模型的差别，并没有大篇幅说集中模型的详细使用。
+
+
+Java IO模型
+想要理解IO模型首先要先明白同步、异步、阻塞、非阻塞他们的意思以及他们之间的区别，因为IO模型无非是他们四个之间的两两组合。
+同步与异步
+同步： 多个操作按照顺序处......
         </div>
     </a>
     
@@ -435,12 +458,15 @@ Exception和Error的区别：Exception是一种可以提前预想到的异常情
             AbstractQueuedSynchronizer源码分析
         </h2>
         <h3 class="post-subtitle">
-            
+            本文详细解读了AQS框架控制并发的原理，以及基于AQS怎么实现不同的锁
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+Java并发包中的锁工具都是基于AQS来实现的。AQS是并发包的核心，它是一个加强版的CLH队列，它实现了线程阻塞唤醒、取消节点、支持重入、支持独占、共享锁等多种基础功能，其他并发工具直接基于AQS实现自己的特殊的功能即可。
+
+
+什么是CLH队列
+CLH队列是一个先进先出队列，本质是通过队列与节点的状态控制节点的阻塞与唤醒。其中每一个线程代表队列中的一个节点，它不断自旋监听前驱节点的状态（......
         </div>
     </a>
     
@@ -466,12 +492,19 @@ Exception和Error的区别：Exception是一种可以提前预想到的异常情
             Synchronized关键字原理
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍Synchronized关键字的实现原理，以及Java对它的优化
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+在多线程情况下，共享资源的写操作可能会出现数据不准确的问题，锁是控制并发情况下资源访问的重要工具。本文讲述我个人理解的Synchronized的原理。
+
+
+Synchronized的使用
+
+同步代码块
+
+12345public void doSomething()&#123;	synchronized(obj)&#123;		//doSomething...	&#125;&#125;
+用于......
         </div>
     </a>
     
@@ -590,11 +623,11 @@ Java数据类型
             
         
             
-            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
+            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
+            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
             
         
     </div>
@@ -627,7 +660,7 @@ Java数据类型
 
             
                 <li>
-                    <a target="_blank"  href="https://github.com/guoshoujing">
+                    <a target="_blank"  href="https://github.com/corgiboygsj">
                         <span class="fa-stack fa-lg">
                             <i class="fa fa-circle fa-stack-2x"></i>
                             <i class="fa fa-github fa-stack-1x fa-inverse"></i>
@@ -718,7 +751,7 @@ Java数据类型
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>

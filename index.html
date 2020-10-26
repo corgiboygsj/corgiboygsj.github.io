@@ -141,14 +141,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -253,12 +253,15 @@ https://juejin.im/post/6844903946155212813
             InnoDB-索引
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍InnoDB索引的原理
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+查询数据的时候，如果没有一种好的查询方式，直接进行数据的遍历筛选的话是十分慢的，尤其在数据量庞大的情况之下。所以需要一种组织数据的方式，可以让我们快速的定位到想要查询的数据行，这就是索引。
+
+什么是索引
+索引是一种数据的组织方式，类似于字典的目录，可以直接定位到要查的东西的大概位置或者准确位置。在InnoDB中，索引通过B+树结构进行数据的组织，通过根节点依次下找可以快速定位数据。
+有索引......
         </div>
     </a>
     
@@ -284,12 +287,15 @@ https://juejin.im/post/6844903946155212813
             InnoDB-数据页
         </h2>
         <h3 class="post-subtitle">
-            
+            介绍InnoDB数据页面的组织方式
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条读取到内存修改后再刷新回去的话，效率是十分底下的。InnoDB通过大小为16kb的数据页来管理数据行。数据页是InnoDB和磁盘交互的基本单位，一次最少读取一个数据页，同步磁盘也是最少一个数据页。
+
+页结构
+
+这里我们只关心行记录部分。infimun+supermum部分是数据页自带的。UserRecords部分存储用户操作的数据......
         </div>
     </a>
     
@@ -348,7 +354,7 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
             分布式锁
         </h2>
         <h3 class="post-subtitle">
-            
+            本文主要讲解基于数据库、Zookeeper、Redis三种中间件实现分布式锁的操作，以及它们的比较。
         </h3>
         <div class="post-content-preview">
             
@@ -381,12 +387,15 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
             对象逃逸分析
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍为什么对象不全都是分配到堆上的。
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+Java对象是否都分配到堆上？答案是否定的，通过逃逸分析可以将不会被外界引用的对象分配在栈上，可以随着栈一起被回收，同时减少了堆的压力也就减少了gc次数，达到了优化程序执行时间的目的。
+
+
+什么是逃逸分析
+逃逸分析通过分析对象的作用域来判断对象是否会被分配方法之外的地方所引用和持有。逃逸分析可以有效的减少线程同步开销和堆内存分配的压力。通过分析如果发现了没有发生逃逸的对象，则可以将对象直接......
         </div>
     </a>
     
@@ -412,12 +421,14 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
             InnoDB-数据行
         </h2>
         <h3 class="post-subtitle">
-            
+            本文简单介绍InnoDB数据行的构成
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说一次将16kb的数据刷到磁盘或者从磁盘读取16kb数据到内存，数据页中包含的就是数据行。InnoDB一共提供了四种行结构，分别是Compact、Redundant、Dynamic和Compressed行格式，现在mysql从5.7之后默认使用的行结构是Dynamic。
+
+行结构
+一行数据是由两个部分组成：实际数据、记录额外信......
         </div>
     </a>
     
@@ -443,12 +454,20 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
             线程池
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍了线程池的执行流程，并且基于源码解析了不同种类线程池的区别。
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+因为线程是珍惜资源，无论创建还是销毁都很消耗时间和资源，所以出现线程池来管理线程，执行完任务不会销毁，而是等待新的任务或者处理别的任务。
+1、线程池解决了线程的频繁创建和销毁的代价。
+2、线程池可以对线程进行管理和监控。
+3、线程池处理新任务响应速度快，因为可以不用创建新线程。
+
+
+线程池参数
+
+corePoolSize：核心线程数量
+maximumPoolSize：核心线程数量+非核心线......
         </div>
     </a>
     
@@ -474,12 +493,18 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
             ConcurrentHashMap源码解析
         </h2>
         <h3 class="post-subtitle">
-            
+            本文解读了JDK8中ConcurrentHashMap源码，如何保证并发安全，并且探究了其设计的精妙之处。
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+之前我们说过HashMap无论是1.7还是1.8，在并发情况下都会出现各种各样的问题。虽然JDK中提供了同步集合包装器和HashTable，但是他们都是简单的对方法进行上锁，锁的粒度很粗，因此他们在高并发下的性能都不会很好。本文章都是围绕JDK1.8来说的。
+
+
+Java中如何使用线程安全的Map
+HashTable
+
+HashTable不支持null的key和value。
+HashTab......
         </div>
     </a>
     
@@ -505,12 +530,16 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
             Java动态代理
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍动态代理模式的设计，以及动态代理在实际项目的应用
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+代理就是给对象的方法增加新的逻辑。代理类代替委托类接受请求，但是实际处理请求的还是委托类，在委托类处理的前后可以添加新的逻辑以达到对对象行为的增强。
+比如我希望给一个对象或者某一类的对象的方法记录执行的时间，这时可以使用代理模式。代理模式分为静态代理和动态代理。
+
+
+静态代理
+静态代理是由程序员手动编写代理类，在程序编译之后这个代理类的class文件已经确实的存在了。下面例子是需要记录一个......
         </div>
     </a>
     
@@ -581,11 +610,11 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
             
         
             
-            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
+            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
+            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
             
         
     </div>
@@ -618,7 +647,7 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
 
             
                 <li>
-                    <a target="_blank"  href="https://github.com/guoshoujing">
+                    <a target="_blank"  href="https://github.com/corgiboygsj">
                         <span class="fa-stack fa-lg">
                             <i class="fa fa-circle fa-stack-2x"></i>
                             <i class="fa fa-github fa-stack-1x fa-inverse"></i>
@@ -709,7 +738,7 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>

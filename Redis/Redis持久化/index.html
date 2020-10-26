@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/article_header/article_bg.jpg')
+            background-image: url('/img/header_img/栅栏 短发女孩子插画 天空 夕阳4k动漫壁纸_彼岸图网.jpg')
             /*post*/
         
     }
@@ -92,7 +92,7 @@
                             
                         </div>
                         <h1>Redis持久化</h1>
-                        <h2 class="subheading"></h2>
+                        <h2 class="subheading">本文Redis中aof、rdb两种持久化的原理，以及它们的区别。</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
                             2019-12-03
@@ -149,14 +149,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,12 +208,71 @@
 
             <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <hr>
-<h2 id="">{}</h2>
+                <blockquote>
+<p>Redis持久化是为了防止内存中的数据在Redis重启后丢失，所以生成了一个持久化文件，用来保存在内存中的数据，当redis重启之后通过持久化文件恢复内存中的数据。<br>
+Redis提供了两种持久化方式，分别是RDB和AOF。</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="rdb">RDB</h1>
+<h2 id="rdb是如何进行的">RDB是如何进行的</h2>
+<p>RDB方式是通过生成redis内存快照文件的方式来进行持久化的，rdb文件是一个二进制文件。一共有两个命令，分别是save个bgsave。save命令阻塞住redis进程直到完成持久化，如果这个时候redis中的数据很多的话，就会造成后边的命令无法执行。所以出现了bgsave命令，这个命令会使得redis进程fork出一个子进程，而主进程只会阻塞到子进程fork完毕就会结束阻塞，随后通过这个子进程完成redis的持久化操作，bgsave的流程如下：</p>
+<ul>
+<li>redis接收到bgsave命令，检查当前是否有正在持久化的AOF和RDB进程，如果有的话就直接返回了。</li>
+<li>否则话redis主线程会阻塞进行子进程的fork操作，当子进程fork结束之后，子进程返回成功。</li>
+<li>主线程停止阻塞，继续处理队列中的后续任务。</li>
+<li>子进程生成redis的内存数据快照，之后原子性替换现有的rdb文件。</li>
+<li>子进程结束之后通知主线程持久化结束，主线程更新自己相关信息。</li>
+</ul>
+<h2 id="手动自动">手动/自动</h2>
+<p>RDB持久化方式分为手动执行和自动执行，手动执行就是save和bgsave命令，但是在以下情况也会触发自动执行：</p>
+<ul>
+<li>配置文件的save m n（redis在m秒内如果出现了n次修改，就自动进行bgsave）</li>
+<li>从节点进行全量复制时，主节点会触发bgsave，之后将文件同步给从节点。</li>
+<li>debug reload时会触发bgsave</li>
+<li>在进行shutdown命令时，如果没开启aof也会自动bgsave。</li>
+</ul>
+<h2 id="优缺点">优缺点</h2>
+<ul>
+<li>RBD是二进制文件，在redis恢复时使用rbd文件比aof快很多。但是rbd不能做到实时的持久化，所以可能会丢失数据。</li>
+</ul>
+<p>可以通过redis配置开启rdb文件压缩，可以节省内存，而且在主节点和从节点之间同步rdb文件时可以减少网络传输。</p>
+<h1 id="aof">AOF</h1>
+<h2 id="aof是如何进行持久化的">AOF是如何进行持久化的</h2>
+<p>所有的写命令都会先追加到缓冲区中，当到达了redis配置的刷盘时机，就会触发aof缓冲区刷入aof文件的同步磁盘操作。</p>
+<h2 id="aof文件写入的三种时机">aof文件写入的三种时机</h2>
+<ul>
+<li>每次写入都进行刷盘：会大大降低Redis的性能，因为每次写操作都要同步磁盘，但是安全性最高，不会丢失数据。</li>
+<li>每秒进行一次刷盘：每一秒都会执行fsync命令将缓冲区数据追加到aof文件中，但是如果这时宕机了就会丢失一秒钟的数据。</li>
+<li>不刷盘：不主动刷盘。通过操作系统自动进行刷盘，可能会丢很多数据但是效率高。</li>
+</ul>
+<h2 id="aof文件重写">AOF文件重写</h2>
+<p>aof文件会越来越大，这时当大小到达了阙值就会触发aof文件重写的操作，通过合并命令和删除无效命令来减小aof文件，流程如下：</p>
+<ul>
+<li>redis主进程fork出一个子进程，这个期间redis是阻塞的，子进程fork出来之后主进程解除阻塞。</li>
+<li>子进程将文件进行重写，这个过程中主进程继续进行正常的刷盘操作，但是新的命令还会存储到另一个缓冲区（aof重写缓冲区）</li>
+<li>当子进程结束重写后会通知主进程，之后主进程将aof重写缓冲区数据刷入aof文件，之后完成重写。</li>
+</ul>
+<h2 id="aof存储">AOF存储</h2>
+<p>AOF中保存的命令是文本协议的，当重新加载时通过重新执行aof文件的命令来恢复数据，所以重写也可以减少重新加载的时间。<br>
+AOF保存文本协议是一方面是为了可读性，一方面不用进行命令的转化造成二次开销。<br>
+AOF缓冲区的作用是防止每次写入都进行刷盘，这样redis的性能就会大幅度受到磁盘io的影响。</p>
+<h1 id="redis加载持久化文件过程">Redis加载持久化文件过程</h1>
+<ul>
+<li>1、先判断是否开启了aof持久化，如果没有开启走步骤2，否则走3。</li>
+<li>2、检查是否开启rdb持久化，如果开启了，则进行rdb的数据加载。</li>
+<li>3、通过aof文件进行数据加载。</li>
+</ul>
+<h1 id="rdb和aof对比">RDB和AOF对比</h1>
+<ul>
+<li>RDB文件存储的是二进制数据，aof存储的文本数据。</li>
+<li>rdb是通过复制内存快照方式持久化，aof是将执行的写命令保存到aof文件。</li>
+<li>rdb不适合实时持久化，aof适合实时持久化。</li>
+<li>rdb的数据恢复速度要大于aof。</li>
+</ul>
 
                 
 
@@ -271,10 +330,22 @@
             <!-- Tabe of Content -->
             <!-- Table of Contents -->
 
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#rdb"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">RDB</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#rdb是如何进行的"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">RDB&#x662F;&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x7684;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#手动自动"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x624B;&#x52A8;/&#x81EA;&#x52A8;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#优缺点"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">&#x4F18;&#x7F3A;&#x70B9;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#aof"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">AOF</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#aof是如何进行持久化的"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">AOF&#x662F;&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x6301;&#x4E45;&#x5316;&#x7684;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#aof文件写入的三种时机"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">aof&#x6587;&#x4EF6;&#x5199;&#x5165;&#x7684;&#x4E09;&#x79CD;&#x65F6;&#x673A;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#aof文件重写"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">AOF&#x6587;&#x4EF6;&#x91CD;&#x5199;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#aof存储"><span class="toc-nav-number">2.4.</span> <span class="toc-nav-text">AOF&#x5B58;&#x50A8;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redis加载持久化文件过程"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">Redis&#x52A0;&#x8F7D;&#x6301;&#x4E45;&#x5316;&#x6587;&#x4EF6;&#x8FC7;&#x7A0B;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#rdb和aof对比"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">RDB&#x548C;AOF&#x5BF9;&#x6BD4;</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
                 
             <!-- Sidebar Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 sidebar-container">
 
@@ -385,7 +456,7 @@
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>

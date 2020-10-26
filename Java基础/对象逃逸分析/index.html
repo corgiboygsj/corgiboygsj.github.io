@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/article_header/article_bg.jpg')
+            background-image: url('/img/header_img/home.jpg')
             /*post*/
         
     }
@@ -92,7 +92,7 @@
                             
                         </div>
                         <h1>对象逃逸分析</h1>
-                        <h2 class="subheading"></h2>
+                        <h2 class="subheading">本文介绍为什么对象不全都是分配到堆上的。</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
                             2020-08-11
@@ -149,14 +149,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,12 +208,39 @@
 
             <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <hr>
-<h2 id="">{}</h2>
+                <blockquote>
+<p>Java对象是否都分配到堆上？答案是否定的，通过逃逸分析可以将不会被外界引用的对象分配在栈上，可以随着栈一起被回收，同时减少了堆的压力也就减少了gc次数，达到了优化程序执行时间的目的。</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="什么是逃逸分析">什么是逃逸分析</h1>
+<p>逃逸分析通过分析对象的作用域来判断对象是否会被分配方法之外的地方所引用和持有。逃逸分析可以有效的减少线程同步开销和堆内存分配的压力。通过分析如果发现了没有发生逃逸的对象，则可以将对象直接分配到栈上，而不是分配到堆上，这样可以让对象随着线程栈一起被释放，可以减少堆的内存占用以及触发垃圾回收的次数和时间的开销。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//发生了逃逸，如果有其他代码调用这个方法，那么返回的sb就会发生方法逃逸逃逸出这个方法。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> StringBuffer <span class="title">craeteStringBuffer</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">   StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">   sb.append(s1);</span><br><span class="line">   sb.append(s2);</span><br><span class="line">   <span class="keyword">return</span> sb;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//这样sb对象就不会发生逃逸，那么可以讲StringBUffer分配到栈上，因为栈是线程私有并且这个对象不会被其他地方调用。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">createStringBuffer</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">   StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">   sb.append(s1);</span><br><span class="line">   sb.append(s2);</span><br><span class="line">   <span class="keyword">return</span> sb.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="逃逸分析可以做什么">逃逸分析可以做什么</h1>
+<ul>
+<li>锁消除</li>
+<li>将对象分配到栈上</li>
+<li>分配对象的标量替换</li>
+</ul>
+<h2 id="锁消除">锁消除</h2>
+<p>Java6中synchronized的锁优化就是使用到了逃逸分析，通过判断synchronized的作用范围、代码块中是否有多线程竞争条件、锁对象是否是共享的等条件判断是否可以不加synchronized。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//分析发现锁对象不是共享的，只能被当前线程访问，则可以将synchronized消除，可以减少同步开销。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Object hollis = <span class="keyword">new</span> Object();</span><br><span class="line">    <span class="keyword">synchronized</span>(hollis) &#123;</span><br><span class="line">        System.out.println(hollis);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="对象分配到栈上">对象分配到栈上</h2>
+<p>分析方法中的对象如果不会发生逃逸，则可以讲对象直接分配到栈上，让其随着线程栈的释放而释放，达到减少堆内存回收压力以及gc次数的目的，可以优化性能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//调用alloc方法分配一百万个User对象，如果关闭了逃逸分析，则所有的对象都会创建在堆上。如果开启了逃逸分析就会发现只有一小部分的对象分配在了堆上。</span></span><br><span class="line"><span class="comment">//因为在alloc中User对象没有发生方法逃逸，所以可以直接分配到栈上。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">long</span> a1 = System.currentTimeMillis();</span><br><span class="line">   <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000000</span>; i++) &#123;</span><br><span class="line">       alloc();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">// 查看执行时间</span></span><br><span class="line">   <span class="keyword">long</span> a2 = System.currentTimeMillis();</span><br><span class="line">   System.out.println(<span class="string">"cost "</span> + (a2 - a1) + <span class="string">" ms"</span>);</span><br><span class="line">   <span class="comment">// 为了方便查看堆内存中对象个数，线程sleep</span></span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">       Thread.sleep(<span class="number">100000</span>);</span><br><span class="line">   &#125; <span class="keyword">catch</span> (InterruptedException e1) &#123;</span><br><span class="line">       e1.printStackTrace();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">alloc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   User user = <span class="keyword">new</span> User();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="对象标量替换">对象标量替换</h2>
+<p>标量是java中无法继续拆解的最小数据，比如基本数据类型就是标量。而对象这种通过基本数据类型进行聚合的就可以拆分成很多的标量。如果发现对象没有发生逃逸，对象不会被外界访问的话则可以将对象拆分成标量。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//下面Point对象还有两个标量成员x和y都是int类型，alloc分配一个Point对象。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">   alloc();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">alloc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   Point point = <span class="keyword">new</span> Point（<span class="number">1</span>,<span class="number">2</span>）;</span><br><span class="line">   System.out.println(<span class="string">"point.x="</span>+point.x+<span class="string">"; point.y="</span>+point.y);</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> x;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>经过逃逸分析，可以将Point对象拆分为x和y两个标量。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将point对象拆分为x和y两个基本类型，这样可以减少对象的分配，也达到了减少堆内存占用的目的。</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">alloc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   <span class="keyword">int</span> x = <span class="number">1</span>;</span><br><span class="line">   <span class="keyword">int</span> y = <span class="number">2</span>;</span><br><span class="line">   System.out.println(<span class="string">"point.x="</span>+point.x+<span class="string">"; point.y="</span>+point.y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="参考">参考</h1>
+<ul>
+<li><a href="https://www.hollischuang.com/archives/2583" target="_blank" rel="noopener">https://www.hollischuang.com/archives/2583</a></li>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzI3NzE0NjcwMg==&amp;mid=2650121307&amp;idx=1&amp;sn=5526473d0248cca8385d2a18ba6b25af&amp;chksm=f36bb97ac41c306c354ebf0335cd2fd77cac03f3434894e4e5b44a01754a5494b04350d26d14&amp;scene=21#wechat_redirect" target="_blank" rel="noopener">https://mp.weixin.qq.com/s?__biz=MzI3NzE0NjcwMg==&amp;mid=2650121307&amp;idx=1&amp;sn=5526473d0248cca8385d2a18ba6b25af&amp;chksm=f36bb97ac41c306c354ebf0335cd2fd77cac03f3434894e4e5b44a01754a5494b04350d26d14&amp;scene=21#wechat_redirect</a></li>
+</ul>
 
                 
 
@@ -271,10 +298,22 @@
             <!-- Tabe of Content -->
             <!-- Table of Contents -->
 
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#什么是逃逸分析"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;&#x9003;&#x9038;&#x5206;&#x6790;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#逃逸分析可以做什么"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x9003;&#x9038;&#x5206;&#x6790;&#x53EF;&#x4EE5;&#x505A;&#x4EC0;&#x4E48;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#锁消除"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x9501;&#x6D88;&#x9664;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#对象分配到栈上"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">&#x5BF9;&#x8C61;&#x5206;&#x914D;&#x5230;&#x6808;&#x4E0A;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#对象标量替换"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">&#x5BF9;&#x8C61;&#x6807;&#x91CF;&#x66FF;&#x6362;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#参考"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x53C2;&#x8003;</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
                 
             <!-- Sidebar Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 sidebar-container">
 
@@ -385,7 +424,7 @@
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>

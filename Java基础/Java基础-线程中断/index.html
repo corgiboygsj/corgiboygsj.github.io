@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/article_header/article_bg.jpg')
+            background-image: url('/img/header_img/wf_T3ZuuB4U.jpg')
             /*post*/
         
     }
@@ -92,7 +92,7 @@
                             
                         </div>
                         <h1>线程中断</h1>
-                        <h2 class="subheading"></h2>
+                        <h2 class="subheading">本文介绍了线程中断的作用，以及如何响应中断。</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
                             2020-05-15
@@ -149,14 +149,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,12 +208,52 @@
 
             <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <hr>
-<h2 id="">{}</h2>
+                <blockquote>
+<p>一个运行中的线程如何停止它呢，我们可能会想到stop方法，但是stop方法已经被弃用了。因为stop方法会强制释放掉线程的锁资源，给数据的一致性带来问题。stop是一种独占模式，直接将线程杀死，而中断是一种协作模式。</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="什么是线程中断">什么是线程中断</h1>
+<p>每个线程都维护了一个boolean类型的中断状态，通过调用该线程的interrupt方法，将这个线程设置为中断状态，后续该线程可以isInterrupted方法检查自己的中断状态并对其进行响应，或者根本不理会。中断是一种协作机制，而不是一种独占机制，所以被中断线程可以自己选择如何处理中断。</p>
+<h1 id="为什么stop方法被弃用了">为什么stop方法被弃用了</h1>
+<p>因为stop方法会强制的释放线程身上的锁资源，并且会将线程强制杀掉。这样的话就会造成数据不一致的情况，比如A获得了锁要进行转账操作，但是A被stop后（A未完成全部操作），锁就释放了，这时钱这个公共资源就不是安全的了，可能出现不一致情况。</p>
+<h1 id="interruptedexception异常">InterruptedException异常</h1>
+<p>当调用目标线程的interrupt方法设置中断时会出现两种情况。一种是直接将目标线程的中断状态设置为true之后返回，另一种是目标线程正处于一个sleep、wait、join等阻塞状态的时候，这时在目标线程调用阻塞的位置就会抛出InterrupedException异常，并且线程的中断状态会被取消为false。抛出中断异常代表线程响应了中断请求或者该线程中有阻塞方法响应了中断请求。</p>
+<h1 id="为什么阻塞方法被中断时要抛出异常">为什么阻塞方法被中断时要抛出异常</h1>
+<p>因为阻塞方法一般都是等待某个阻塞时间、某个外部状态等事件完成后才能解除阻塞，那么这个时间之内就必须阻塞而无法取消阻塞，所以可以解除阻塞的阻塞方法就显得很有用处了。所以当线程阻塞的时候被中断就抛出InterruptedException异常就可以解除阻塞状态。InterrupedException表示被中断线程通知外面自己被中断了，外部良好的异常处理可以使得线程良好的取消操作，而不会因为异常而影响响应。</p>
+<h1 id="如何处理interrupedexception">如何处理InterrupedException</h1>
+<ul>
+<li>
+<p>抛出给调用者/自己进行额外处理后抛出<br>
+这种行为使得被中断线程无法在阻塞被中断后进行一些自己的操作，比如清除资源，其他逻辑处理等操作。<br>
+比如在线匹配玩家的游戏，一个用户先就绪等待其他用户，但是某个用户点了拒绝，给就绪用户发送了中断请求，就绪用户处于阻塞那么就会抛出异常。如果这个时候想要将已就绪的用户重新放入匹配队列中，就需要被中断线程自己处理异常，之后选择再次抛出或者不做其他处理。</p>
+</li>
+<li>
+<p>自己进行处理不抛出<br>
+比如Runnable实现的线程，自己内部调用了阻塞方法，但是被中断后出现异常并不想抛出。这个时候也不该生吞异常不做处理，最少应该catch中重新设置自己的中断标记，保留住自己的中断状态，这样其他线程知道它是中断的。</p>
+</li>
+</ul>
+<h1 id="实现取消运行中的任务">实现取消运行中的任务</h1>
+<p>一个可取消任务并不需要立即对中断做出响应，对于循环任务，都是在一遍循环开始的时候进行中断状态的检查。如果一个循环执行时间很长，那么可以多进行几次检查。但是检查次数很多会降低程序的效率。检查次数少会降低程序对中断的响应速度。</p>
+<h1 id="不可以中断的阻塞方法">不可以中断的阻塞方法</h1>
+<p>对于java的io标准输入输出流，都不可以进行中断。但是网络的socket可以进行中断，会抛出SocketException。nio也不支持，但是可以在通道和选择器上做中断，java的原生锁发生的阻塞不可以进行中断，但是并发包的锁可以进行阻塞的取消。</p>
+<h1 id="自问自答">自问自答</h1>
+<h2 id="什么是线程中断">什么是线程中断？</h2>
+<p>Java的线程中断是多线程协作的表现，每个线程维护一个boolean类型的中断状态。当状态为false的时候被其他线程发出中断请求，则会出现两种情况，一种是当线程处于sleep、wait状态时会在阻塞处抛出中断异常并将中断状态置为false，另一种是将boolean改变为true，之后通过被中断线程自己轮询来进行处理。<br>
+interrupt方法可以设置线程中断状态、isInterrupted方法返回线程的中断状态，interrpted方法会返回中断状态但是会取消中断状态。</p>
+<h2 id="你说结束自己的工作那为什么不使用stop方法">你说结束自己的工作，那为什么不使用stop方法？</h2>
+<p>因为stop方法会强制的将线程身上的锁释放掉，并且杀掉线程。这样的话就会在非原子性的更新操作时被杀掉而造成数据不一致的情况，所以需要一种灵活安全的方式结束线程。而java的中断请求方式可以极大的提高结束线程任务的灵活性，因为被中断的线程可以自己对中断请求选择处理或者忽略，这一种安全而灵活的取消任务的方式，这是一种协作式的，而不是抢占式的。</p>
+<h2 id="你说了中断异常那么中断异常有什么用">你说了中断异常，那么中断异常有什么用？</h2>
+<p>中断异常表示线程响应了中断请求，另一方面在线程执行中可能会因为等待外部的状态、时间等因素进入阻塞状态，这时线程的结束时间将变得不可预测，如果可以取消阻塞结束任务将会十分灵活，所以在sleep、wait这类java提供的阻塞方法调用后阻塞结束前，如果线程被中断，则这些方法会直接抛出中断异常并结束阻塞。</p>
+<h2 id="那中断异常如何处理是怎么考虑的">那中断异常如何处理是怎么考虑的？</h2>
+<ul>
+<li>直接抛出，让调用者处理。一般在调用者知道这个方法是一个阻塞方法并且会响应中断，那么调用者自己对中断进行处理。</li>
+<li>内部捕获，释放资源后再重新抛出。这种情况在于程序内部有一些资源的释放，比如将一些资源归还到队列中去，之后抛出让调用者进行处理。</li>
+<li>内部捕获，重置中断状态。这种情况在于自己的程序中调用了阻塞方法，比如实现一个runanble接口要开启任务其中调用了阻塞方法，我不需要别人处理我的中断，但是要重新设置中断让跟高层的调用者知道线程中断了。</li>
+</ul>
 
                 
 
@@ -271,10 +311,22 @@
             <!-- Tabe of Content -->
             <!-- Table of Contents -->
 
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#什么是线程中断"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;&#x7EBF;&#x7A0B;&#x4E2D;&#x65AD;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#为什么stop方法被弃用了"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x4E3A;&#x4EC0;&#x4E48;stop&#x65B9;&#x6CD5;&#x88AB;&#x5F03;&#x7528;&#x4E86;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#interruptedexception异常"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">InterruptedException&#x5F02;&#x5E38;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#为什么阻塞方法被中断时要抛出异常"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x4E3A;&#x4EC0;&#x4E48;&#x963B;&#x585E;&#x65B9;&#x6CD5;&#x88AB;&#x4E2D;&#x65AD;&#x65F6;&#x8981;&#x629B;&#x51FA;&#x5F02;&#x5E38;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#如何处理interrupedexception"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x5982;&#x4F55;&#x5904;&#x7406;InterrupedException</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#实现取消运行中的任务"><span class="toc-nav-number">6.</span> <span class="toc-nav-text">&#x5B9E;&#x73B0;&#x53D6;&#x6D88;&#x8FD0;&#x884C;&#x4E2D;&#x7684;&#x4EFB;&#x52A1;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#不可以中断的阻塞方法"><span class="toc-nav-number">7.</span> <span class="toc-nav-text">&#x4E0D;&#x53EF;&#x4EE5;&#x4E2D;&#x65AD;&#x7684;&#x963B;&#x585E;&#x65B9;&#x6CD5;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#自问自答"><span class="toc-nav-number">8.</span> <span class="toc-nav-text">&#x81EA;&#x95EE;&#x81EA;&#x7B54;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#什么是线程中断"><span class="toc-nav-number">8.1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;&#x7EBF;&#x7A0B;&#x4E2D;&#x65AD;&#xFF1F;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#你说结束自己的工作那为什么不使用stop方法"><span class="toc-nav-number">8.2.</span> <span class="toc-nav-text">&#x4F60;&#x8BF4;&#x7ED3;&#x675F;&#x81EA;&#x5DF1;&#x7684;&#x5DE5;&#x4F5C;&#xFF0C;&#x90A3;&#x4E3A;&#x4EC0;&#x4E48;&#x4E0D;&#x4F7F;&#x7528;stop&#x65B9;&#x6CD5;&#xFF1F;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#你说了中断异常那么中断异常有什么用"><span class="toc-nav-number">8.3.</span> <span class="toc-nav-text">&#x4F60;&#x8BF4;&#x4E86;&#x4E2D;&#x65AD;&#x5F02;&#x5E38;&#xFF0C;&#x90A3;&#x4E48;&#x4E2D;&#x65AD;&#x5F02;&#x5E38;&#x6709;&#x4EC0;&#x4E48;&#x7528;&#xFF1F;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#那中断异常如何处理是怎么考虑的"><span class="toc-nav-number">8.4.</span> <span class="toc-nav-text">&#x90A3;&#x4E2D;&#x65AD;&#x5F02;&#x5E38;&#x5982;&#x4F55;&#x5904;&#x7406;&#x662F;&#x600E;&#x4E48;&#x8003;&#x8651;&#x7684;&#xFF1F;</span></a></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
+
                 
             <!-- Sidebar Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 sidebar-container">
 
@@ -385,7 +437,7 @@
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>

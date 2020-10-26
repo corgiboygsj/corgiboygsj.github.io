@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/article_header/article_bg.jpg')
+            background-image: url('/img/header_img/archives-widget.jpg')
             /*post*/
         
     }
@@ -92,7 +92,7 @@
                             
                         </div>
                         <h1>InnoDB-数据页</h1>
-                        <h2 class="subheading"></h2>
+                        <h2 class="subheading">介绍InnoDB数据页面的组织方式</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
                             2020-09-29
@@ -149,14 +149,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,12 +208,41 @@
 
             <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <hr>
-<h2 id="">{}</h2>
+                <blockquote>
+<p>InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条读取到内存修改后再刷新回去的话，效率是十分底下的。InnoDB通过大小为16kb的数据页来管理数据行。数据页是InnoDB和磁盘交互的基本单位，一次最少读取一个数据页，同步磁盘也是最少一个数据页。</p>
+</blockquote>
+<h1 id="页结构">页结构</h1>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/数据页组成.jpg" width="50%">
+这里我们只关心行记录部分。infimun+supermum部分是数据页自带的。UserRecords部分存储用户操作的数据行。当要插入新记录的时候就会从Free Space中开辟一条记录的空间将新的记录插入。当空间满了的时候就开辟新的数据页。
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/多数据页.jpg">
+<h1 id="数据页维护">数据页维护</h1>
+<p>看一下InnoDB是怎么维护数据页中的多行数据的，一个页面内的数据排列如下图：<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/数据页内部.jpg"></p>
+<p>可以看到数据是通过前文提到的行结构的记录头进行维护的，介绍一下记录头信息。</p>
+<ul>
+<li>delete_mask：标记行是否被删除，逻辑删除防止删除数据时要重新调整页结构。</li>
+<li>heap_no：表示数据行在页面中的位置信息，也就是第几个，这里是从2开始，那么0和1去哪了，这个就是前面页结构上涉及的infimum和supermum，这俩记录分别是0和1。</li>
+<li>min_rec_mask：每个B+的每层非叶子节点的最小记录都会被这个字段标识。</li>
+<li>record_type：记录类型字段，一共有四种类型，0代表普通的记录，1代表B+树非叶子节点记录，2是最小记录，3是最大记录。</li>
+<li>next_record：表示该记录下一条记录的位置。</li>
+</ul>
+<p>了解记录头了，就可以了解页结构了。首先每个页都会有两条默认的记录（infimum和supermum，分别叫做最小记录和最大记录），这两条记录的heap_no分别是0和1，这就是为什么上图中第一条记录的heap_no是从2开始的。<br>
+之后InnoDB会将页面中的数据按照记录的主键值从小到大进行排序，之后通过记录头的next_record依次向后指将他们连接起来构成链表。结果如下图。<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/最大最小记录.jpg"><br>
+当删除记录的时候，不会将记录从页中移除，而是将被删除记录的记录头的delete_mask设置为1，之后将前一条数据的next_record指向被删除记录的下一条，也就是标准的链表节点删除操作。结果如下图<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/数据页行删除.jpg"><br>
+当再插入数据的时候，如果新插入记录位置如果刚好在被删除记录的位置，那么新纪录就会替换掉被删除的记录，之后重新调整记录之间的指向，也就是链表中插入节点的操作。</p>
+<h2 id="数据页内如何查找记录">数据页内如何查找记录？</h2>
+<h3 id="页目录">页目录</h3>
+<p>在数据页中的查询记录的方式并不是从头到尾遍历链表，这样效率很低。所以InnoDB会为每一个数据页生成页目录（这里说的查找都是说通过主键进行查找，如果不是主键只能通过遍历整个页面了）。</p>
+<p>前面介绍过InnoDB会按照主键大小给页中的数据进行排序，所以页面中的记录是有序的。之后会将记录进行分组，每个分组页称之为槽，这个槽就是目录项。每个槽都包含几条记录（最小记录独自占一个槽，其他槽最多装4条记录，拥有最大记录的槽可以装1-8条记录），每个槽都指向槽中的最后一条记录。槽指向的是自己分组中的第一条记录，也就是排序最小的那条记录。如下图所示。<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/页面内数据查找.jpg"><br>
+接下来说一下怎么查找。查找是通过二分查找的方式，先定位中间槽。因为槽指向的是槽中排序最小的那条数据，所以可以知道整个槽中的数据是大于还是小于要查找的主键键值，也就可以知道要查找的记录在槽前还是槽后。之后继续根据二分查找定位，最后定位到某个槽之后，通过遍历槽中的数据就可以找到要查找的数据。<br>
+比如要查找id为5的记录，就是先定位到中间槽2，之后发现槽中第一个记录8大于5，那么就在槽2之前进行二分，定位到 槽1，之后发现第一条id为4小于5。因为槽1和槽2相差为1所以无法继续二分，而且槽1指向的是槽1中的最大值，那么下一个就是槽2的最小记录，所以直接遍历槽2中的记录就可以找到id为5的记录。</p>
 
                 
 
@@ -271,10 +300,22 @@
             <!-- Tabe of Content -->
             <!-- Table of Contents -->
 
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#页结构"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x9875;&#x7ED3;&#x6784;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#数据页维护"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x6570;&#x636E;&#x9875;&#x7EF4;&#x62A4;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#数据页内如何查找记录"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x6570;&#x636E;&#x9875;&#x5185;&#x5982;&#x4F55;&#x67E5;&#x627E;&#x8BB0;&#x5F55;&#xFF1F;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#页目录"><span class="toc-nav-number">2.1.1.</span> <span class="toc-nav-text">&#x9875;&#x76EE;&#x5F55;</span></a></li></ol></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
+
                 
             <!-- Sidebar Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 sidebar-container">
 
@@ -385,7 +426,7 @@
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>

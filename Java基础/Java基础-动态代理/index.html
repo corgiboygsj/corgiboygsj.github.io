@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/article_header/article_bg.jpg')
+            background-image: url('/img/header_img/山湖泊倒影风景5K高清壁纸_彼岸图网.jpg')
             /*post*/
         
     }
@@ -92,7 +92,7 @@
                             
                         </div>
                         <h1>Java动态代理</h1>
-                        <h2 class="subheading"></h2>
+                        <h2 class="subheading">本文介绍动态代理模式的设计，以及动态代理在实际项目的应用</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
                             2020-06-28
@@ -149,14 +149,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,12 +208,48 @@
 
             <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <hr>
-<h2 id="">{}</h2>
+                <blockquote>
+<p>代理就是给对象的方法增加新的逻辑。代理类代替委托类接受请求，但是实际处理请求的还是委托类，在委托类处理的前后可以添加新的逻辑以达到对对象行为的增强。<br>
+比如我希望给一个对象或者某一类的对象的方法记录执行的时间，这时可以使用代理模式。代理模式分为静态代理和动态代理。</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="静态代理">静态代理</h1>
+<p>静态代理是由程序员手动编写代理类，在程序编译之后这个代理类的class文件已经确实的存在了。下面例子是需要记录一个方法执行的时间。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 这是委托类，它的方法需要被增强</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyClass</span> <span class="keyword">implements</span> <span class="title">MyInterface</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">saySomething</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"say:"</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"do:"</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 这是一个代理类，它代替MyClass接收了请求，但是内部实际操作还是交给了MyClass对象处理，它只负责在操作前后增强功能</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyProxy</span> <span class="keyword">implements</span> <span class="title">MyInterface</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> MyInterface myInterface;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyProxy</span><span class="params">(MyInterface myInterface)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.myInterface = myInterface;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">saySomething</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> beginTime = System.currentTimeMillis();</span><br><span class="line">        </span><br><span class="line">        myInterface.saySomething(msg);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> endTime = System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">"耗时："</span> + (endTime - beginTime));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> beginTime = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        myInterface.doSomething(msg);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> endTime = System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">"耗时："</span> + (endTime - beginTime));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        MyInterface myInterface = <span class="keyword">new</span> MyProxy(<span class="keyword">new</span> MyClass());</span><br><span class="line">        myInterface.saySomething(<span class="string">"hello"</span>);</span><br><span class="line">        myInterface.doSomething(<span class="string">"homework"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//输出结果</span></span><br><span class="line">say:hello</span><br><span class="line">耗时：<span class="number">0</span></span><br><span class="line"><span class="keyword">do</span>:homework</span><br><span class="line">耗时：<span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>上面Test类main方法也可以通过如下工厂方法隐藏代理类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInterfaceProxyFactory</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> MyInterface <span class="title">getInstance</span><span class="params">(MyInterface myInterface)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MyProxy(myInterface);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        MyInterface myClass = MyInterfaceProxyFactory.getInstance(<span class="keyword">new</span> MyClass());</span><br><span class="line">        myClass.saySomething(<span class="string">"hello"</span>);</span><br><span class="line">        myClass.doSomething(<span class="string">"homework"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="静态代理总结">静态代理总结</h2>
+<p>通过上面例子我们可以发现几个问题</p>
+<ul>
+<li>一个代理类只能为某一种类型的类进行服务（代理类实现了接口）。这样就会导致如果我们有很多不同接口的类需要进行增强，那我们就需要定义更多的代理类。比如我们都是需要进行添加记录执行时间的操作，那么就要因为不同的接口而实现不同的代理类。</li>
+<li>如果接口发生改动，比如添加或者删除新的方法。那么所有的代理类也需要跟着进行修改。</li>
+</ul>
+<h1 id="动态代理">动态代理</h1>
+<p>动态代理在程序的运行之前是不知道代理类的，代理类是在程序运行过程中生成的。在运行之前需要定义的是方法的增强逻辑，之后通过程序创建代理类并在其中通过反射机制调用委托类的方法实现增强。</p>
+<p>动态代理通过定义一个增强行为之后就可以为不同类的对象进行增强，而且因为代理类是运行过程中生成的所以不需要在意接口的变动，参考下面例子进行理解。</p>
+<p>Java的动态代理需要借助Proxy类和InvocationHandler接口进行实现，其中InvocationHandler接口就是增强的定义或者说是代理方法的模版，Proxy类用于生成代理类。</p>
+<p>下面代码通过定义一个增强行为，通过传参并且根据获取参数类型通过反射创建代理类，这样就实现了可以给所有类型的类进行统一的代理，而不需要对应每个类定义代理类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 代理类生成器</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Object obj;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TimeHandler</span><span class="params">(Object obj)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.obj = obj;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getProxy</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Proxy.newProxyInstance(obj.getClass().getClassLoader(), obj.getClass().getInterfaces(), <span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> beginTime = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//反射调用代理类的方法，其他代码为增强逻辑</span></span><br><span class="line">        Object invoke = method.invoke(obj, args);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> endTime = System.currentTimeMillis();</span><br><span class="line">        System.out.println(obj.getClass().getSimpleName() + <span class="string">":"</span> + method.getName() + <span class="string">"方法---耗时："</span> + (endTime - beginTime));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> invoke;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//通过传参给对应类生成代理类</span></span><br><span class="line">        TimeHandler timeHandler = <span class="keyword">new</span> TimeHandler(<span class="keyword">new</span> MyClass());</span><br><span class="line"></span><br><span class="line">        MyInterface proxy = (MyInterface)timeHandler.getProxy();</span><br><span class="line">        proxy.saySomething(<span class="string">"hello"</span>);</span><br><span class="line">        proxy.doSomething(<span class="string">"homework"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//执行结果</span></span><br><span class="line">say:hello</span><br><span class="line">MyClass:saySomething方法---耗时：<span class="number">1</span></span><br><span class="line"><span class="keyword">do</span>:homework</span><br><span class="line">MyClass:doSomething方法---耗时：<span class="number">0</span></span><br></pre></td></tr></table></figure>
+<h2 id="动态代理总结">动态代理总结</h2>
+<p>动态代理可以通过定义一个增强行为后在运行时动态创建代理类，实现给所有类型进行增强。</p>
+<p>但是也有局限性存在，那就是Java提供的动态代理需要委托类必须实现了某个接口，因为Java动态代理代理的其实是接口。</p>
+<h1 id="动态代理的应用">动态代理的应用</h1>
+<p>因为代理给予了方法增强功能的能力，所以可以联想到日志记录、接口鉴权、耗时记录、异常处理、Spring事物处理、AOP思想。<br>
+提到AOP，Spring给出了两种实现方案，一种是Java提供的上述原生基于接口的代理，另外为了解决无接口对象的代理出现了cglib这类通过修改字节码生成新的代理类的方式。</p>
+<h2 id="java动态代理原理-cglib原理">Java动态代理原理、cglib原理</h2>
+<ul>
+<li>Java动态代理会创建一个新的实现了需要代理的接口的类作为代理类。</li>
+<li>cglib通过字节码技术生成一个继承委托类的类作为代理类。</li>
+</ul>
+<h1 id="总结">总结</h1>
+<p>因为我们使用的语言是面向对象的语言，因为抽象，所以每个类都被包装成一个个体，但是这样恰恰对于类之间的通用逻辑变得不好进行控制。这时代理就可以发挥作用，代理很适合做一些通用逻辑的增强工作。</p>
 
                 
 
@@ -271,10 +307,22 @@
             <!-- Tabe of Content -->
             <!-- Table of Contents -->
 
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#静态代理"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x9759;&#x6001;&#x4EE3;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#静态代理总结"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x9759;&#x6001;&#x4EE3;&#x7406;&#x603B;&#x7ED3;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#动态代理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x52A8;&#x6001;&#x4EE3;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#动态代理总结"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x52A8;&#x6001;&#x4EE3;&#x7406;&#x603B;&#x7ED3;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#动态代理的应用"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x52A8;&#x6001;&#x4EE3;&#x7406;&#x7684;&#x5E94;&#x7528;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#java动态代理原理-cglib原理"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">Java&#x52A8;&#x6001;&#x4EE3;&#x7406;&#x539F;&#x7406;&#x3001;cglib&#x539F;&#x7406;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#总结"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x603B;&#x7ED3;</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
                 
             <!-- Sidebar Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 sidebar-container">
 
@@ -385,7 +433,7 @@
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>

@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/article_header/article_bg.jpg')
+            background-image: url('/img/header_img/美国队长 仇者队长 冬季士兵队长 电影海报4k壁纸_彼岸图网.jpg')
             /*post*/
         
     }
@@ -92,7 +92,7 @@
                             
                         </div>
                         <h1>InnoDB-索引</h1>
-                        <h2 class="subheading"></h2>
+                        <h2 class="subheading">本文介绍InnoDB索引的原理</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
                             2020-09-29
@@ -149,14 +149,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,12 +208,91 @@
 
             <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <hr>
-<h2 id="">{}</h2>
+                <blockquote>
+<p>查询数据的时候，如果没有一种好的查询方式，直接进行数据的遍历筛选的话是十分慢的，尤其在数据量庞大的情况之下。所以需要一种组织数据的方式，可以让我们快速的定位到想要查询的数据行，这就是索引。</p>
+</blockquote>
+<h1 id="什么是索引">什么是索引</h1>
+<p>索引是一种数据的组织方式，类似于字典的目录，可以直接定位到要查的东西的大概位置或者准确位置。在InnoDB中，索引通过B+树结构进行数据的组织，通过根节点依次下找可以快速定位数据。</p>
+<h1 id="有索引之前的数据查找方式">有索引之前的数据查找方式</h1>
+<h2 id="单个页面查找">单个页面查找</h2>
+<ul>
+<li>通过主键查找<br>
+通过主键进行查找很简单，先使用数据页目录项通过二分查找定位到对应的槽，之后在槽中遍历链表找到记录。</li>
+<li>通过其他字段查找<br>
+根据其他字段查找就很悲惨了，因为记录是按照主键进行排序的，所以通过其他字段查询就无法通过目录二分查找这种方式了。那么就只能从第一条记录开始，依次向后进行扫描查找符合条件的记录。</li>
+</ul>
+<h2 id="多个页面的查找">多个页面的查找</h2>
+<p>大部分情况下，数据库表中记录的总大小一定是大于16kb的，也就是说一个页面存不下，那么就需要多个数据页进行存储，并且在多个数据页中进行查询。<br>
+在这种情况下无论是不是通过主键查找都不能确定数据在哪一个数据页中，很显然需要从遍历每一个数据页在能找到满足条件的数据。</p>
+<h1 id="索引方案">索引方案</h1>
+<p>为了解决查找效率，出现了索引这个东西，回顾一下一个数据页是什么样子，如下图。<br>
+![IMAGE](quiver-image-url/2D3F6EC987D0FDB4F16B511DF93C8C2E.jpg =706x402)<br>
+当多个数据页组合在一起时，变成了如下结构。<br>
+![IMAGE](quiver-image-url/F488EA93366208768E09297B82FF0D18.jpg =1595x369)<br>
+数据页与数据页之间的连接是双向的，这样可以向前向后找数据，而数据页内的记录连接是单向的。</p>
+<p>现在的问题在于如何定位待查数据所在数据页，只要定位到数据页了就可以使用之前文章说的页内查找方式。所以可以想办法给数据页们也建立一个目录，用来快速的定位数据页。因为每个页面中的数据是按照主键排好序的，所以我们可以将每一个页面最小id的那行数据的id拿出来组成在一起（暂且叫做目录项）。这样就会形成一个区间的概念，也就是说一个目录项指向一个数据页，目录项指向的数据页中的数据的id一定都小于后一个目录项的值，也就是下图这个样子。<br>
+![IMAGE](quiver-image-url/C1CE45B181C28CAA7F2F4BAFD4903FF8.jpg =1311x684)</p>
+<p>上面将每个数据页的目录项拿出来了，但是目录项也很多，如何定位目录项又成了问题。InnoDB存储记录都是用数据页存储的，所以就将目录项作为数据行都存储在数据页中。结构就如下图。<br>
+![IMAGE](quiver-image-url/5BEF36F5450ECF84B6EE63231D55C5EA.jpg =1385x623)</p>
+<p>现在的结构就变成了存储数据的数据页都拿出来了自己页最小的记录作为目录项，这个目录项指向自己所在的数据页（就相当于一本书的页数），之后将他们统一放在一个目录的数据页中去。变成了一个简单的b+树结构，叶子节点为实际数据页，非叶子节点为目录项页。<br>
+现在比如要查找一个主键为20的数据行，首先从页30这个目录数据页进行二分法页内查找，发现20大于12小于209，定位到这行在页9中，之后找到页9在数据页内部使用二分查找找到20这条记录。</p>
+<p>当叶子节点过多，目录项就会很多，之后一个页面存不下目录项了，就会变成多个目录数据页如下图。<br>
+![IMAGE](quiver-image-url/BE505EBCB2BBA34BAA33A3EB758FF655.jpg =1596x636)<br>
+这样就需要跟之前一样，给目录数据页再搞出来一个目录页用来定位目录数据页的，如图。<br>
+![IMAGE](quiver-image-url/F88E4E0A629AE72C4FCED4E49143C60D.jpg =1437x778)<br>
+当数据量越来越多，就会重复上面的操作，最后变成下图。<br>
+![IMAGE](quiver-image-url/6D7D94E3850FA2DFFB6C0E9745760E4A.jpg =1275x591)<br>
+至此完成了一个B+树，这时再进行查询就可以从根节点看数据在哪个目录页，之后再通过定位到的目录页继续查找数据在哪个数据页中。</p>
+<p>简单总结一下B+树索引的结构：</p>
+<ul>
+<li>非叶子节点都是目录项数据页，叶子节点是实际数据页。</li>
+<li>目录项会有一个指针指向它所代表的数据页。</li>
+<li>数据页与数据页之间通过双链表连接，数据页内通过单链表连接。</li>
+<li>目录项是数据页最小记录的键值和它所指向的页面地址，其实还会有一个主键id作为目录行的唯一标识（这个是在二级索引中的）</li>
+</ul>
+<h2 id="注意">注意</h2>
+<p>其实InnoDB的B+树生成方式不是上述的流程，只是为了帮助理解才自底向上的生成B+树。其实B+树一开始是有一个根节点，通过不断的分裂产生新的页面，但是根节点一直都是那个根节点，子节点都是后生成的，是一种自上而下的生成方式。</p>
+<h2 id="数据量">数据量</h2>
+<p>假设一个数据页可以存放100条，目录数据页可以存放1000条的话。<br>
+如果树有一层，那么能存放的数据量为100 = 100；<br>
+如果树有两层，那么能存放的数据量为1000 * 100 = 100000；十万<br>
+如果树有三层，那么能存放的数据量为1000 * 1000 * 100 = 100000000； 一亿</p>
+<p>所以B+树能存的数据是很多的，而且树的高度很低，所以查询的数据很快，因为不需要几次的定位就可以找到最下层的数据。</p>
+<h2 id="索引结构总结">索引结构总结</h2>
+<ul>
+<li>索引是一个B+树结构。</li>
+<li>索引的节点是数据页，分为目录项数据页、实际记录数据页。</li>
+<li>数据页与数据页之间通过双向链表相连。</li>
+<li>叶子节点时实际记录页，非叶子节点都是目录项页。</li>
+</ul>
+<h1 id="聚簇索引">聚簇索引</h1>
+<p>聚簇索引就是通过主键进行排序的索引，前面说的索引方案都是基于主键说的。它通过主键大小排序，而且叶子节点中的数据行存储的是整条记录的数据。</p>
+<p>数据行那篇提到过数据库的主键创建原则，也就是说每个表都会有主键，我们上面画的那些索引图就是聚簇索引。</p>
+<p>结构就是：叶子节点数据页数据行存储的是整条记录，非叶子节点数据行存储的是下层数据页的最小记录的主键值和页号。</p>
+<h1 id="二级索引">二级索引</h1>
+<p>现在可以通过主键快速的查找数据了，但是有时查询的条件是其他的列，那么如何快速查询呢？可以同理在这些列上也建立索引就好了。</p>
+<h2 id="二级索引的结构">二级索引的结构</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE INDEX index_name ON table_name (column_name1,column_name2,column_name3);</span><br></pre></td></tr></table></figure>
+<p>上面就是一条创建二级索引的sql语句。二级索引可以指定多个数据列，并且按照声明列的顺序按照列数据的大小进行排序建立B+树。但是这个B+树的存储和聚簇索引有些不同，叶子节点的数据行只存储索引列的值和这条记录的主键值，如下图。<br>
+![IMAGE](quiver-image-url/690B3CA4D1E2CF560E5E4D201C0D2AB5.jpg =1405x739)<br>
+只存储键值而不存储其他列的数据，可以大大减小索引的大小，同时保留数据行的主键id是为了找到记录后，拿着主键再回到聚簇索引中查询，获取记录其他部分的数据，这个操作就叫做回表查询。所以说一次走二级索引的查询，一共会走两次索引，先走二级索引拿到数据的主键值，再走聚簇索引拿到其他该行的其他数据，但是如果查询可以使用到覆盖索引的查询方式就只需要走一次二级索引就可以了，这个以后会讲。</p>
+<h2 id="联合索引">联合索引</h2>
+<p>联合索引并不是一种新结构的索引类型，他就是一个二级索引，只不过它不是只对一个列建立索引，而是对于多个列，上面的sql就是联合索引的建立。在索引中两条数据的排序规则就是先比较column_name1，再比较column_name2，再比较column_name3。</p>
+<h2 id="覆盖索引">覆盖索引</h2>
+<p>覆盖索引不是一种新型的索引类型，只是一种查询方式。只是说如果二级索引的数据满足查询了，可以避免一次回表操作，节省时间。比如通过a列和b列创建了联合索引，查找的时候也只需要返回a和b的值，那么就不需要再拿主键值回表查询了，因为索引已经包含了这两个列的值，只需要直接返回二级索引a和b列就可以了。</p>
+<h1 id="索引的实际形成过程">索引的实际形成过程</h1>
+<p>索引并不是像上面一样从下而上的生成的，而是一开始就有一个根节点，数据先存储在根节点里，当根节点满了就会造成页分裂，创建出两个子节点（a和b）并且将数据分散放到子节点中，之后根节点还是根结点，只是变成了目录数据页。<br>
+再有新的数据插入，就会按照大小插入到a或者b中，当a或者b满了就会再进行页分裂，之后将新分裂出来的页的目录项插入到根节点中。<br>
+当根节点再满了根节点又会创建两个新节点，将目录项分散，之后再次上提根节点。</p>
+<h1 id="内节点的唯一性">内节点的唯一性</h1>
+<p>因为普通的二级索引列不具备唯一性，所以可能会有很多数据相同的列，那么再插入相同索引数据的时候，就不知道插入到哪里去了，情形如下图。<br>
+![IMAGE](quiver-image-url/3A13A971B6917DF5868BFDB2A3C0CAF9.jpg =777x727)<br>
+这时如果再插入一个1，就不知道插入到页4还是页5了，所以目录项数据行也添加上主键值，这样就可以在相同的时候比较主键大小了，因为主键具有唯一性，就知道数据插入到哪个页面中了。<br>
+![IMAGE](quiver-image-url/698052DF097A1D6746502BB7CCE300CA.jpg =627x574)</p>
 
                 
 
@@ -271,10 +350,22 @@
             <!-- Tabe of Content -->
             <!-- Table of Contents -->
 
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#什么是索引"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;&#x7D22;&#x5F15;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#有索引之前的数据查找方式"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x6709;&#x7D22;&#x5F15;&#x4E4B;&#x524D;&#x7684;&#x6570;&#x636E;&#x67E5;&#x627E;&#x65B9;&#x5F0F;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#单个页面查找"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x5355;&#x4E2A;&#x9875;&#x9762;&#x67E5;&#x627E;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#多个页面的查找"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">&#x591A;&#x4E2A;&#x9875;&#x9762;&#x7684;&#x67E5;&#x627E;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#索引方案"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x7D22;&#x5F15;&#x65B9;&#x6848;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#注意"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">&#x6CE8;&#x610F;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#数据量"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">&#x6570;&#x636E;&#x91CF;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#索引结构总结"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">&#x7D22;&#x5F15;&#x7ED3;&#x6784;&#x603B;&#x7ED3;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#聚簇索引"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x805A;&#x7C07;&#x7D22;&#x5F15;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#二级索引"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x4E8C;&#x7EA7;&#x7D22;&#x5F15;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#二级索引的结构"><span class="toc-nav-number">5.1.</span> <span class="toc-nav-text">&#x4E8C;&#x7EA7;&#x7D22;&#x5F15;&#x7684;&#x7ED3;&#x6784;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#联合索引"><span class="toc-nav-number">5.2.</span> <span class="toc-nav-text">&#x8054;&#x5408;&#x7D22;&#x5F15;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#覆盖索引"><span class="toc-nav-number">5.3.</span> <span class="toc-nav-text">&#x8986;&#x76D6;&#x7D22;&#x5F15;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#索引的实际形成过程"><span class="toc-nav-number">6.</span> <span class="toc-nav-text">&#x7D22;&#x5F15;&#x7684;&#x5B9E;&#x9645;&#x5F62;&#x6210;&#x8FC7;&#x7A0B;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#内节点的唯一性"><span class="toc-nav-number">7.</span> <span class="toc-nav-text">&#x5185;&#x8282;&#x70B9;&#x7684;&#x552F;&#x4E00;&#x6027;</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
                 
             <!-- Sidebar Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 sidebar-container">
 
@@ -385,7 +476,7 @@
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>

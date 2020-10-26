@@ -141,14 +141,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -217,13 +217,20 @@
             HashMap源码分析
         </h2>
         <h3 class="post-subtitle">
-            
+            本文解析JDK8的HashMap的源码
         </h3>
         <div class="post-content-preview">
             
-{}
-现在来看第二件事，怎么将元素重hash到新的数组上。这里的操作十分巧妙，且往下看。
-12345678910111213141516171819202122232425262728293031323334353637383940414243444546//判断老数组是否为null，为空也就代表数组上没有元素，也就不需要重新hash了。if (oldTab != null) &#123;......
+HashMap是平时使用非常广泛的集合工具之一。其内部的数据结构是哈希表，哈希表的查找效率是O（1），效率很高。本文通过增删改查的顺序阅读源码，并且分析了一下并发情况的问题和其他的拓展。JDK版本是1.8。
+
+
+HashMap数据结构
+解决哈希冲突的方式
+
+开放定址法
+链地址法
+
+HashMap内部是一个哈希表的数据结构，存储的是键值对，通过key的hash值与数组长度取模计算出value......
         </div>
     </a>
     
@@ -253,8 +260,10 @@
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+ArrayList是平时特别常用的java集合类，非常适合做随机读取，本文对java8中的ArrayList源码进行分析。
+
+属性
+12345678910//默认容量private static final int DEFAULT_CAPACITY = 10;//空数组，当指定数组长度为0的时候使用。private static final Object[] EMPTY_ELEMENTDA......
         </div>
     </a>
     
@@ -325,11 +334,11 @@
             
         
             
-            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
+            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
+            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
             
         
     </div>
@@ -362,7 +371,7 @@
 
             
                 <li>
-                    <a target="_blank"  href="https://github.com/guoshoujing">
+                    <a target="_blank"  href="https://github.com/corgiboygsj">
                         <span class="fa-stack fa-lg">
                             <i class="fa fa-circle fa-stack-2x"></i>
                             <i class="fa fa-github fa-stack-1x fa-inverse"></i>
@@ -453,7 +462,7 @@
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>

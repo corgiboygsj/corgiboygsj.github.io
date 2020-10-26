@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/article_header/article_bg.jpg')
+            background-image: url('/img/header_img/6fCfkt11-eQ.jpg')
             /*post*/
         
     }
@@ -92,7 +92,7 @@
                             
                         </div>
                         <h1>Redis哨兵模式</h1>
-                        <h2 class="subheading"></h2>
+                        <h2 class="subheading">本文Redis哨兵模式故障发现、故障转移的原理</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
                             2019-12-26
@@ -149,14 +149,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,12 +208,56 @@
 
             <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <hr>
-<h2 id="">{}</h2>
+                <blockquote>
+<p>Redis主从模式就是为了提高Redis的可用性，但是正常的Redis主从模式无法进行故障的及时发现和自动的故障转移等操作，为了保证高可用就出现了Redis Sentinel。</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="为什么需要redis-sentinel">为什么需要Redis Sentinel</h1>
+<p>一个主从结构的Redis服务，当Master故障之后都要做什么？<br>
+1、要挑选出一个slave节点手动设置为master节点。<br>
+2、改变其他slave节点的master指向。<br>
+3、通知客户端master节点的信息变化。</p>
+<p>当前主从结构的Redis的整个故障转移过程都需要人工干预，而且并不能及时的发现主节点故障。为了解决这些问题保证redis的高可用，就出现了redis sentinel。redis sentinel可以监控每个redis的状态并及时发现故障，自动进行故障转移、保存节点信息、通知客户端。</p>
+<h1 id="redis-sentinel原理">Redis Sentinel原理</h1>
+<h2 id="三个定时任务">三个定时任务</h2>
+<p>Sentinel只需要主节点的信息就可以开始工作了，原因是因为有下面的三个定时任务。</p>
+<ul>
+<li>每10秒给主节点发送info命令，主机点会回复自己的信息，包括从节点的信息，这样sentinel就可以获得整个主从redis结构的拓扑结构，也可以及时发现新加入的从节点。</li>
+<li>每2秒给master节点的_sentine_:hello频道发送自己对主节点的判断和自己的信息。所有的sentienl节点都会订阅这个频道，所以sentinel发送信息之后，其他的节点都会收到这个消息，他们就彼此知道了对方的信息，就可以进行互相的连通。</li>
+<li>每1秒sentinel给master节点、slave节点、其他sentinel节点发送ping命令来检测是否存活，因为前两个定时任务让sentinel节点知道了这个架构中其他节点的信息，所以就可以进行连接并且进行心跳检测。</li>
+</ul>
+<h2 id="主观下线-客观下线">主观下线、客观下线</h2>
+<ul>
+<li>
+<p>主观下线<br>
+每一秒Sentinel节点都会向其他的节点发送心跳命令，如果超时了还没有获得响应，则会认为目标节点下线了，并且会将目标节点标记为主观下线状态。</p>
+</li>
+<li>
+<p>客观下线<br>
+当sentinel节点主观下线了Master节点，他会给其他的sentinel节点发送sentinel is-master-down-by-addr命令，响应就是目标sentinel是否也将Master节点主观下线了，如果当前sentinel收集到了足够的主观下线意见，那么master就会被标记为客观下线。</p>
+</li>
+</ul>
+<p>sentinel is-master-down-by-addr命令通过参数的不同可以表示为两种请求。一种是‘*’参数，一总是携带自己runid的‘runid’参数。‘*’参数的时候代表询问目标节点对于master节点的主观下线意见，而‘runid’的命令表示让目标节点给自己投票。</p>
+<h2 id="故障转移流程">故障转移流程</h2>
+<h3 id="选举领导者sentinel节点">选举领导者Sentinel节点</h3>
+<p>当sentinel对master进行了客观下线后，那么需要挑选出一个sentinel节点进行master节点的故障转移操作。<br>
+sentinel领导者的选择是通过Raft算法实现的。流程如下：<br>
+1、将master客观下线之后，这个sentinel节点向其他的sentinel节点发送sentinel is-master-down-by-addr命令，携带自己的runid参数，表示需要别的节点对自己投票。<br>
+2、每个节点都只有一次投票的机会，它会将票投给第一个给自己发送命令的人，后续的投票请求将会被忽略。<br>
+3、当sentinel节点收到了max（quorum，(sentinel节点数/2)+1）的票数后，就会成为领导者。quorum是客观下线master所需的主观下线数。<br>
+4、如果没有选出领导者会进行下一轮的选举。</p>
+<h3 id="转移过程">转移过程</h3>
+<p>1、首先这个领导者sentinel会按照规则在slave节点中挑选出一个节点，规则如下，按照从上到下的顺序选择：</p>
+<ul>
+<li>节点优先级配置最高</li>
+<li>复制偏移量最大（表示与master的数据最相近）</li>
+<li>runid最小</li>
+</ul>
+<p>2、选择出来之后，会对其进行slave of no one，之后将其他的slave的master指向它，之后将新的master的消息发布，客户端就可以根据订阅的频道感知到新的master。</p>
 
                 
 
@@ -271,10 +315,22 @@
             <!-- Tabe of Content -->
             <!-- Table of Contents -->
 
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#为什么需要redis-sentinel"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4E3A;&#x4EC0;&#x4E48;&#x9700;&#x8981;Redis Sentinel</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redis-sentinel原理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">Redis Sentinel&#x539F;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#三个定时任务"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x4E09;&#x4E2A;&#x5B9A;&#x65F6;&#x4EFB;&#x52A1;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#主观下线-客观下线"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">&#x4E3B;&#x89C2;&#x4E0B;&#x7EBF;&#x3001;&#x5BA2;&#x89C2;&#x4E0B;&#x7EBF;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#故障转移流程"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">&#x6545;&#x969C;&#x8F6C;&#x79FB;&#x6D41;&#x7A0B;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#选举领导者sentinel节点"><span class="toc-nav-number">2.3.1.</span> <span class="toc-nav-text">&#x9009;&#x4E3E;&#x9886;&#x5BFC;&#x8005;Sentinel&#x8282;&#x70B9;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#转移过程"><span class="toc-nav-number">2.3.2.</span> <span class="toc-nav-text">&#x8F6C;&#x79FB;&#x8FC7;&#x7A0B;</span></a></li></ol></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
+
                 
             <!-- Sidebar Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
+                col-lg-9 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 sidebar-container">
 
@@ -385,7 +441,7 @@
 
                 
                     <li>
-                        <a target="_blank"  href="https://github.com/guoshoujing">
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-github fa-stack-1x fa-inverse"></i>
