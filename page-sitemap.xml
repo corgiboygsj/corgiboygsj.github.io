@@ -15,14 +15,14 @@
     </url>
     
     <url>
-        <loc>http://www.corgiboy.com/about/</loc>
+        <loc>http://www.corgiboy.com/archive/</loc>
         <lastmod>2020-10-26T06:07:56.913Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <url>
-        <loc>http://www.corgiboy.com/archive/</loc>
+        <loc>http://www.corgiboy.com/about/</loc>
         <lastmod>2020-10-26T06:07:56.913Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
