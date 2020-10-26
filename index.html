@@ -88,7 +88,7 @@
                     <div class="site-heading">
                         <h1>郭守敬</h1>
                         <!--<hr class="small">-->
-                        <span class="subheading">个人博客</span>
+                        <span class="subheading">爱技术、爱游戏、爱吃</span>
                     </div>
                 
 
@@ -134,6 +134,13 @@
 
                         
                         <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/archive/">Archives</a>
                         </li>
                         
@@ -142,13 +149,6 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,6 +208,96 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java基础-ConcurrentHashMap源码解析/">
+        <h2 class="post-title">
+            
+                <i class="fa fa-thumb-tack" style="color:#F4711F" ></i>
+                <!-- <i class="fa fa-thumb-tack" style="color:#F89E8C" ></i> -->
+                <!-- <i class="fa fa-thumb-tack" style="color:#1CB7ED" ></i> -->
+                <font color=#F4711F>置顶</font>
+                <!-- <font color=#F89E8C>置顶</font>  -->
+                <!-- <font color=#1CB7ED>置顶</font>  -->
+                                 
+            ConcurrentHashMap源码解析
+        </h2>
+        <h3 class="post-subtitle">
+            本文解读了JDK8中ConcurrentHashMap源码，如何保证并发安全，并且探究了其设计的精妙之处。
+        </h3>
+        <div class="post-content-preview">
+            
+之前我们说过HashMap无论是1.7还是1.8，在并发情况下都会出现各种各样的问题。虽然JDK中提供了同步集合包装器和HashTable，但是他们都是简单的对方法进行上锁，锁的粒度很粗，因此他们在高并发下的性能都不会很好。本文章都是围绕JDK1.8来说的。
+
+
+Java中如何使用线程安全的Map
+HashTable
+
+HashTable不支持null的key和value。
+HashTab......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-07-15
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java-HashMap-jdk8/">
+        <h2 class="post-title">
+            
+                <i class="fa fa-thumb-tack" style="color:#F4711F" ></i>
+                <!-- <i class="fa fa-thumb-tack" style="color:#F89E8C" ></i> -->
+                <!-- <i class="fa fa-thumb-tack" style="color:#1CB7ED" ></i> -->
+                <font color=#F4711F>置顶</font>
+                <!-- <font color=#F89E8C>置顶</font>  -->
+                <!-- <font color=#1CB7ED>置顶</font>  -->
+                                 
+            HashMap源码分析
+        </h2>
+        <h3 class="post-subtitle">
+            本文解析JDK8的HashMap的源码
+        </h3>
+        <div class="post-content-preview">
+            
+HashMap是平时使用非常广泛的集合工具之一。其内部的数据结构是哈希表，哈希表的查找效率是O（1），效率很高。本文通过增删改查的顺序阅读源码，并且分析了一下并发情况的问题和其他的拓展。JDK版本是1.8。
+
+
+HashMap数据结构
+解决哈希冲突的方式
+
+开放定址法
+链地址法
+
+HashMap内部是一个哈希表的数据结构，存储的是键值对，通过key的hash值与数组长度取模计算出value......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2019-09-23
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -485,78 +575,6 @@ maximumPoolSize：核心线程数量+非核心线......
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/Java基础/Java基础-ConcurrentHashMap源码解析/">
-        <h2 class="post-title">
-                                 
-            ConcurrentHashMap源码解析
-        </h2>
-        <h3 class="post-subtitle">
-            本文解读了JDK8中ConcurrentHashMap源码，如何保证并发安全，并且探究了其设计的精妙之处。
-        </h3>
-        <div class="post-content-preview">
-            
-之前我们说过HashMap无论是1.7还是1.8，在并发情况下都会出现各种各样的问题。虽然JDK中提供了同步集合包装器和HashTable，但是他们都是简单的对方法进行上锁，锁的粒度很粗，因此他们在高并发下的性能都不会很好。本文章都是围绕JDK1.8来说的。
-
-
-Java中如何使用线程安全的Map
-HashTable
-
-HashTable不支持null的key和value。
-HashTab......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-07-15
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/Java基础/Java基础-动态代理/">
-        <h2 class="post-title">
-                                 
-            Java动态代理
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍动态代理模式的设计，以及动态代理在实际项目的应用
-        </h3>
-        <div class="post-content-preview">
-            
-代理就是给对象的方法增加新的逻辑。代理类代替委托类接受请求，但是实际处理请求的还是委托类，在委托类处理的前后可以添加新的逻辑以达到对对象行为的增强。
-比如我希望给一个对象或者某一类的对象的方法记录执行的时间，这时可以使用代理模式。代理模式分为静态代理和动态代理。
-
-
-静态代理
-静态代理是由程序员手动编写代理类，在程序编译之后这个代理类的class文件已经确实的存在了。下面例子是需要记录一个......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-06-28
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -610,11 +628,11 @@ HashTab......
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
+            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
             
         
             
-            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
+            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
             
         
     </div>
@@ -632,7 +650,7 @@ HashTab......
         
 
         
-            <p>授人以鱼不如授人以渔</p>
+            <p>喜欢享受完成某件事带来的成就感</p>
         
 
         <!-- SNS Link -->
