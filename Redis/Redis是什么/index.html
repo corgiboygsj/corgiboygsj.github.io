@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/article_header/article_bg.jpg')
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/栅栏 短发女孩子插画 天空 夕阳4k动漫壁纸_彼岸图网.jpg')
             /*post*/
         
     }
@@ -92,7 +92,7 @@
                             
                         </div>
                         <h1>Redis是什么</h1>
-                        <h2 class="subheading"></h2>
+                        <h2 class="subheading">本文介绍Redis的基本架构以及优势，另外还说了它具备的特性。</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
                             2019-12-03
@@ -212,8 +212,50 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <hr>
-<h2 id="">{}</h2>
+                <blockquote>
+<p>Redis一种基于内存的键值存储数据库，拥有非常高的吞吐量与极高的性能。Redis支持多种数据类型的值，用于降低使用者的开发效率。Redis在3.0实现了集群模式，实现了真正的分布式，而且支持主从复制等等特性。</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="redis为什么快">Redis为什么快</h1>
+<ul>
+<li>Redis是单线程的，防止了多线程模式线程状态的切换引起的性能消耗。而且单线程还免去了并发情况的竞争情况，使得代码编写更加容易，也方便提升性能。</li>
+<li>Redis的数据存储在内存中，内存的操作速度本身就特别快，一个请求的处理可以小到100纳秒，这也是为什么redis可以一秒操作数万次。</li>
+<li>Redis的瓶颈不在于内存数据的存取，而是在于网络连接的IO上，Redis使用多路复用IO管理连接，将一个网络连接的连接、读、写、关闭都变成事件，通过一个监听事件的循环不断轮训准备好的事件进行处理。</li>
+</ul>
+<p>总结：避免了多线程下状态切换，通过IO多路复用管理大量的网络连接，基于内存操作速度很快。</p>
+<h1 id="redis单线程架构">Redis单线程架构</h1>
+<h2 id="单线程">单线程</h2>
+<p>Redis通过单个线程处理客户端发送过来的请求，但是客户端的请求即使同时到达，在Redis这边会将这些任务放到队列中一个个依次进行处理，所以并不会出现并发情况下的数据不一致问题。<br>
+但是这种模式会有一个问题，就是如果命令需要的处理时间非常长，那么就会阻塞其他的请求，所以redis适合处理快速的小型任务。</p>
+<h2 id="单线程为什么还快">单线程为什么还快</h2>
+<p>这点上面已经讲过了，即使是单线程，但是redis是基于内存操作的，所以速度一样非常快。而且完成多线程模式的话，会引入如线程状态切换、竞争情况数据不一致问题的处理，所以就没必要使用多线程模式了。<br>
+而且redis最耗时的地方在于内存大小和网络io，瓶颈并不在cpu上。</p>
+<h1 id="redis特性">Redis特性</h1>
+<h2 id="数据持久化">数据持久化</h2>
+<p>Redis提供了AOF和RDB两种持久化方式，因为redis数据都在内存中，如果突然挂掉数据就会丢失，所以需要讲数据持久化到磁盘上。</p>
+<h2 id="高可用">高可用</h2>
+<h3 id="主从复制">主从复制</h3>
+<p>这点redis实现了主从复制，从节点是主节点的副本，可以保证主节点的数据备份。</p>
+<h3 id="哨兵模式">哨兵模式</h3>
+<p>另外，还提供了哨兵模式，当主节点宕机时，从节点顶替主节点向外提供服务，当主节点复活时，会成为从节点。</p>
+<h3 id="集群模式">集群模式</h3>
+<p>在redis3.0时，为了实现分布式提高处理能力，防止单点问题，提供了redis集群模式，集群模式中存在多个主节点，主节点又有多个从节点，只要一个主节点和它的从节点没有全部挂掉就可以提供服务，保证了高可用。</p>
+<h1 id="redis能做什么">Redis能做什么</h1>
+<h2 id="消息队列">消息队列</h2>
+<p>通过redis的队列模式可以实现消息队列，生产者放入数据，消费者拿出数据。但是这种队列模式没有确认机制。</p>
+<h2 id="发布订阅">发布订阅</h2>
+<p>一个客户端可以订阅多个频道，一个频道可以被多个客户端订阅。当频道收到新消息时，会发布给所有订阅的客户端。</p>
+<h2 id="排行榜">排行榜</h2>
+<p>通过有序结合可以实现排行榜。</p>
+<h2 id="缓存">缓存</h2>
+<p>可以将高访问数据在后端查出之后丢到redis中，当再次访问同样数据时，可以直接从redis返回值，这样一方面减少了db的压力，一方面防止了多次查询相同数据消耗的时间。缓存是应对高并发的银弹。</p>
+<h2 id="计数器">计数器</h2>
+<p>redis的字符串类型的值可以是整数类型的，可以通过incr命令自增，可以做计时器。</p>
+<h1 id="如何合理使用redis">如何合理使用Redis</h1>
+<ul>
+<li>将热点数据放到redis中作为缓存，冷数据不要放到redis中，因为会占用内存，而且影响查找的速度。</li>
+<li>任务消耗的时间一定要小，不然会阻塞后面的请求。</li>
+</ul>
 
                 
 
@@ -270,6 +312,18 @@
             
             <!-- Tabe of Content -->
             <!-- Table of Contents -->
+
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redis为什么快"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">Redis&#x4E3A;&#x4EC0;&#x4E48;&#x5FEB;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redis单线程架构"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">Redis&#x5355;&#x7EBF;&#x7A0B;&#x67B6;&#x6784;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#单线程"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x5355;&#x7EBF;&#x7A0B;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#单线程为什么还快"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">&#x5355;&#x7EBF;&#x7A0B;&#x4E3A;&#x4EC0;&#x4E48;&#x8FD8;&#x5FEB;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redis特性"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">Redis&#x7279;&#x6027;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#数据持久化"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#高可用"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">&#x9AD8;&#x53EF;&#x7528;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#主从复制"><span class="toc-nav-number">3.2.1.</span> <span class="toc-nav-text">&#x4E3B;&#x4ECE;&#x590D;&#x5236;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#哨兵模式"><span class="toc-nav-number">3.2.2.</span> <span class="toc-nav-text">&#x54E8;&#x5175;&#x6A21;&#x5F0F;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#集群模式"><span class="toc-nav-number">3.2.3.</span> <span class="toc-nav-text">&#x96C6;&#x7FA4;&#x6A21;&#x5F0F;</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redis能做什么"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">Redis&#x80FD;&#x505A;&#x4EC0;&#x4E48;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#消息队列"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">&#x6D88;&#x606F;&#x961F;&#x5217;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#发布订阅"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">&#x53D1;&#x5E03;&#x8BA2;&#x9605;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#排行榜"><span class="toc-nav-number">4.3.</span> <span class="toc-nav-text">&#x6392;&#x884C;&#x699C;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#缓存"><span class="toc-nav-number">4.4.</span> <span class="toc-nav-text">&#x7F13;&#x5B58;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#计数器"><span class="toc-nav-number">4.5.</span> <span class="toc-nav-text">&#x8BA1;&#x6570;&#x5668;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#如何合理使用redis"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x5982;&#x4F55;&#x5408;&#x7406;&#x4F7F;&#x7528;Redis</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
 
                 
             <!-- Sidebar Container -->

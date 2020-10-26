@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/header_img/山湖泊倒影风景5K高清壁纸_彼岸图网.jpg') 
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/山湖泊倒影风景5K高清壁纸_彼岸图网.jpg') 
             /*config*/
         
     }
@@ -426,12 +426,17 @@ RDB方式是通过生成redis内存快照文件的方式来进行持久化的，
             Redis是什么
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍Redis的基本架构以及优势，另外还说了它具备的特性。
         </h3>
         <div class="post-content-preview">
             
-{}
-...
+Redis一种基于内存的键值存储数据库，拥有非常高的吞吐量与极高的性能。Redis支持多种数据类型的值，用于降低使用者的开发效率。Redis在3.0实现了集群模式，实现了真正的分布式，而且支持主从复制等等特性。
+
+
+Redis为什么快
+
+Redis是单线程的，防止了多线程模式线程状态的切换引起的性能消耗。而且单线程还免去了并发情况的竞争情况，使得代码编写更加容易，也方便提升性能。
+Redi......
         </div>
     </a>
     
