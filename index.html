@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/header_img/home.jpg') 
+            background-image: url('/img/header_img/山湖泊倒影风景5K高清壁纸_彼岸图网.jpg') 
             /*config*/
         
     }
@@ -134,14 +134,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -211,41 +211,316 @@
 
 <div class="post-preview">
 
-    <a href="/article/hexo-theme-huweihuang/">
+    <a href="/SpringBoot/SpringBoot自动配置/">
         <h2 class="post-title">
-            
-                <i class="fa fa-thumb-tack" style="color:#F4711F" ></i>
-                <!-- <i class="fa fa-thumb-tack" style="color:#F89E8C" ></i> -->
-                <!-- <i class="fa fa-thumb-tack" style="color:#1CB7ED" ></i> -->
-                <font color=#F4711F>置顶</font>
-                <!-- <font color=#F89E8C>置顶</font>  -->
-                <!-- <font color=#1CB7ED>置顶</font>  -->
                                  
-            [Hexo] Theme HuWeihuang
+            SpringBoot自动配置
         </h2>
         <h3 class="post-subtitle">
-            This is hexo theme Demo.
+            本文介绍SpringBoot版本2.3.4.RELEASE的自动配置原理
         </h3>
         <div class="post-content-preview">
-            
-This HuWeihuang theme created by HuWeihuang modified from the original Porter YuHsuan
+            @Import注入对象的三种方式
+https://juejin.im/post/6844903946155212813
+自动配置原理
+@SpringBootApplication是SpringBoot启动类的注解，如下图。
 
-Live Demo
-Hu Weihuang Blog : www.huweihuang.com
+自动配置就是通过其内部的@EnableAutoConfiguration注解来实现，EnableAutoConfiguration的内部如下图。
 
-Install Hexo
-Install Node.js  and Git
-123#For Macbrew instal......
+上图重要的部分是其内......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2017-09-18
+            2020-10-13
         </p>
         <div class="tags">
             
-              <a href="/tags/#Hexo" title="Hexo">Hexo</a>
+              <a href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-索引/">
+        <h2 class="post-title">
+                                 
+            InnoDB-索引
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+{}
+...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-09-29
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-数据页/">
+        <h2 class="post-title">
+                                 
+            InnoDB-数据页
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+{}
+...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-09-29
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-Redo-Log/">
+        <h2 class="post-title">
+                                 
+            InnoDB Redo Log
+        </h2>
+        <h3 class="post-subtitle">
+            介绍Java中Exception的基本使用原则
+        </h3>
+        <div class="post-content-preview">
+            
+InnoDB操作的都是内存中的数据，那么为什么数据库宕机后重新启动还可以恢复之前提交的数据呢，而且一条sql语句可能更改很多在磁盘上不在同一个位置的数据，那么数据同步回磁盘的随机io开销InnoDB是怎么避免的呢？Redo Log的设计解决了这部分问题，在故障恢复中和数据页落盘策略上它起到了很大的作用。
+
+什么是redo log？
+redo log是用来持久化事务的，记录数据的物理更改。因......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-08-11
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/分布式/分布式锁/">
+        <h2 class="post-title">
+                                 
+            分布式锁
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+现在的架构都是分布式架构，服务部署在多个服务器上，因此他们的虚拟机不共享也不是同一个进程，所以jdk原生的Synchronized和并发包提供的锁都无法满足共享资源的单独占用。因此出现了分布式场景下的分布式锁。
+
+分布式锁
+分布式锁是为了解决分布式场景下对共享资源的访问问题。比如查询库存并且消费，两个请求都查询出为1，之后A对库存-1，之后B也对库存-1，就会发生超卖现象。这时就需要将查库......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-08-11
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#分布式" title="分布式">分布式</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/对象逃逸分析/">
+        <h2 class="post-title">
+                                 
+            对象逃逸分析
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+{}
+...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-08-11
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB引擎-行格式/">
+        <h2 class="post-title">
+                                 
+            InnoDB-数据行
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+{}
+...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-07-16
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java基础-线程池/">
+        <h2 class="post-title">
+                                 
+            线程池
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+{}
+...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-07-15
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java基础-ConcurrentHashMap源码解析/">
+        <h2 class="post-title">
+                                 
+            ConcurrentHashMap源码解析
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+{}
+...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-07-15
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java基础-动态代理/">
+        <h2 class="post-title">
+                                 
+            Java动态代理
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+{}
+...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-06-28
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -259,6 +534,10 @@ Install Node.js  and Git
 
 <ul class="pager">
     
+    
+        <li class="next">
+            <a href="/page/2/">Older Posts &rarr;</a>
+        </li>
     
 </ul>
 
@@ -290,7 +569,23 @@ Install Node.js  and Git
     <div class="tags">
         
             
-            <a href="/tags/#Hexo" title="Hexo" rel="1">Hexo</a>
+            <a href="/tags/#Java" title="Java" rel="12">Java</a>
+            
+        
+            
+            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="4">InnoD引擎</a>
+            
+        
+            
+            <a href="/tags/#Redis" title="Redis" rel="4">Redis</a>
+            
+        
+            
+            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
+            
+        
+            
+            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
             
         
     </div>
@@ -304,11 +599,11 @@ Install Node.js  and Git
     <div class="short-about">
 
         
-            <img id = "avatar_pic" src="/img/avatar/my.jpg" />
+            <img id = "avatar_pic" src="/img/avatar/柯基.jpeg" />
         
 
         
-            <p>Stay hungry,Stay foolish</p>
+            <p>授人以鱼不如授人以渔</p>
         
 
         <!-- SNS Link -->
@@ -346,7 +641,23 @@ Install Node.js  and Git
     <ul>
       
         <li>
-          <a href="/article/hexo-theme-huweihuang/">[Hexo] Theme HuWeihuang</a>
+          <a href="/SpringBoot/SpringBoot自动配置/">SpringBoot自动配置</a>
+        </li>
+      
+        <li>
+          <a href="/InnoD引擎/InnoDB-索引/">InnoDB-索引</a>
+        </li>
+      
+        <li>
+          <a href="/InnoD引擎/InnoDB-数据页/">InnoDB-数据页</a>
+        </li>
+      
+        <li>
+          <a href="/InnoD引擎/InnoDB-Redo-Log/">InnoDB Redo Log</a>
+        </li>
+      
+        <li>
+          <a href="/分布式/分布式锁/">分布式锁</a>
         </li>
       
     </ul>
@@ -360,11 +671,7 @@ Install Node.js  and Git
 <ul class="list-inline">
 
     
-        <li><a href="http://blog.csdn.net/huwh_" target="_blank">CSDN Blog 胡伟煌</a></li>
-    
-        <li><a href="http://dockone.io/people/胡伟煌" target="_blank">DockOne 胡伟煌</a></li>
-    
-        <li><a href="https://yq.aliyun.com/u/huweihuang" target="_blank">阿里云栖社区 胡伟煌</a></li>
+        <li><a href="www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
     
 </ul>
 
@@ -373,7 +680,7 @@ Install Node.js  and Git
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>
