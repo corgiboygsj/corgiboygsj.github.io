@@ -76,10 +76,6 @@
         
     }
     
-    #signature{
-        background-image: url('/img/signature/BeanTechSign-white.png');
-    }
-    
 </style>
 
 <header class="intro-header" >
@@ -382,6 +378,107 @@ https://juejin.im/post/6844903946155212813
 
 <div class="post-preview">
 
+    <a href="/InnoD引擎/InnoDB-Redo-Log/">
+        <h2 class="post-title">
+                                 
+            InnoDB Redo Log
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍InnoDB中保证事务持久性的重做日志
+        </h3>
+        <div class="post-content-preview">
+            
+InnoDB操作的都是内存中的数据，那么为什么数据库宕机后重新启动还可以恢复之前提交的数据呢，而且一条sql语句可能更改很多在磁盘上不在同一个位置的数据，那么数据同步回磁盘的随机io开销InnoDB是怎么避免的呢？Redo Log的设计解决了这部分问题，在故障恢复中和数据页落盘策略上它起到了很大的作用。
+
+什么是redo log？
+redo log是用来持久化事务的，记录数据的物理更改。因......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-11
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-执行计划/">
+        <h2 class="post-title">
+                                 
+            InnoDB-执行计划
+        </h2>
+        <h3 class="post-subtitle">
+            本文主要介绍怎么查看Sql语句的执行计划，看自己sql的性能
+        </h3>
+        <div class="post-content-preview">
+            什么是执行计划
+一条sql会经过mysql优化器的优化后变成一个所谓的执行计划，这个执行计划可以看出来这条sql是如何被mysql来使用的。explain可以帮助我们来查看执行计划，从而我们可以通过执行计划对sql进行优化来提升性能。
+explain各个列的含义
+
+建立一张表来举例
+123456789101112131415CREATE TABLE single_table (    id ......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-02
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/">
+        <h2 class="post-title">
+                                 
+            InnoDB-索引生效失效条件分析
+        </h2>
+        <h3 class="post-subtitle">
+            本文从索引结构出发讲解索引的失效、生效条件
+        </h3>
+        <div class="post-content-preview">
+            索引结构回顾
+
+InnoDB与磁盘操作的基本单位是数据页，一个数据页是16kb。数据页中数据按照主键盘或者人为指定索引列从小到大排序，并且将数据行分组并且建立槽，查找时通过槽进行二分查找定位数据行所在位置。在由多个列组成的索引中，按照声明列的顺序排序，前面的先排序，相同的话再按照后面列排序。
+索引是一个B+树结构，B+树的节点是数据页。
+
+非叶子节点是目录数据页，里面存储的是很多目录行，一个......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-02
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/InnoD引擎/InnoDB-索引/">
         <h2 class="post-title">
                                  
@@ -450,39 +547,6 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
 
 <div class="post-preview">
 
-    <a href="/InnoD引擎/InnoDB-Redo-Log/">
-        <h2 class="post-title">
-                                 
-            InnoDB Redo Log
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍InnoDB中保证事务持久性的重做日志
-        </h3>
-        <div class="post-content-preview">
-            
-InnoDB操作的都是内存中的数据，那么为什么数据库宕机后重新启动还可以恢复之前提交的数据呢，而且一条sql语句可能更改很多在磁盘上不在同一个位置的数据，那么数据同步回磁盘的随机io开销InnoDB是怎么避免的呢？Redo Log的设计解决了这部分问题，在故障恢复中和数据页落盘策略上它起到了很大的作用。
-
-什么是redo log？
-redo log是用来持久化事务的，记录数据的物理更改。因......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-08-11
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
     <a href="/分布式/分布式锁/">
         <h2 class="post-title">
                                  
@@ -507,73 +571,6 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
         <div class="tags">
             
               <a href="/tags/#分布式" title="分布式">分布式</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/Java基础/对象逃逸分析/">
-        <h2 class="post-title">
-                                 
-            对象逃逸分析
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍为什么对象不全都是分配到堆上的。
-        </h3>
-        <div class="post-content-preview">
-            
-Java对象是否都分配到堆上？答案是否定的，通过逃逸分析可以将不会被外界引用的对象分配在栈上，可以随着栈一起被回收，同时减少了堆的压力也就减少了gc次数，达到了优化程序执行时间的目的。
-
-
-什么是逃逸分析
-逃逸分析通过分析对象的作用域来判断对象是否会被分配方法之外的地方所引用和持有。逃逸分析可以有效的减少线程同步开销和堆内存分配的压力。通过分析如果发现了没有发生逃逸的对象，则可以将对象直接......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-08-11
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB引擎-行格式/">
-        <h2 class="post-title">
-                                 
-            InnoDB-数据行
-        </h2>
-        <h3 class="post-subtitle">
-            本文简单介绍InnoDB数据行的构成
-        </h3>
-        <div class="post-content-preview">
-            
-InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说一次将16kb的数据刷到磁盘或者从磁盘读取16kb数据到内存，数据页中包含的就是数据行。InnoDB一共提供了四种行结构，分别是Compact、Redundant、Dynamic和Compressed行格式，现在mysql从5.7之后默认使用的行结构是Dynamic。
-
-行结构
-一行数据是由两个部分组成：实际数据、记录额外信......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-07-16
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
             
         </div>
     
@@ -622,7 +619,7 @@ InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说�
     <div class="tags">
         
             
-            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="4">InnoD引擎</a>
+            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="6">InnoD引擎</a>
             
         
             
@@ -656,7 +653,7 @@ InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说�
         
 
         
-            <p>好好学习，天天向上</p>
+            <p>等有条件一定要养只柯基</p>
         
 
         <!-- SNS Link -->
@@ -698,19 +695,19 @@ InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说�
         </li>
       
         <li>
-          <a href="/InnoD引擎/InnoDB-索引/">InnoDB-索引</a>
-        </li>
-      
-        <li>
-          <a href="/InnoD引擎/InnoDB-数据页/">InnoDB-数据页</a>
-        </li>
-      
-        <li>
           <a href="/InnoD引擎/InnoDB-Redo-Log/">InnoDB Redo Log</a>
         </li>
       
         <li>
-          <a href="/分布式/分布式锁/">分布式锁</a>
+          <a href="/InnoD引擎/InnoDB-执行计划/">InnoDB-执行计划</a>
+        </li>
+      
+        <li>
+          <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/">InnoDB-索引生效失效条件分析</a>
+        </li>
+      
+        <li>
+          <a href="/InnoD引擎/InnoDB-索引/">InnoDB-索引</a>
         </li>
       
     </ul>
@@ -735,7 +732,7 @@ InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说�
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>

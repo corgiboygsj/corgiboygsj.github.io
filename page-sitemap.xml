@@ -8,15 +8,15 @@
     </url>
     
     <url>
-        <loc>http://www.corgiboy.com/about/</loc>
-        <lastmod>2020-11-02T07:50:12.554Z</lastmod>
+        <loc>http://www.corgiboy.com/tags/</loc>
+        <lastmod>2020-11-02T07:53:01.165Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <url>
-        <loc>http://www.corgiboy.com/tags/</loc>
-        <lastmod>2020-10-26T15:24:49.733Z</lastmod>
+        <loc>http://www.corgiboy.com/about/</loc>
+        <lastmod>2020-11-02T07:50:12.554Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>

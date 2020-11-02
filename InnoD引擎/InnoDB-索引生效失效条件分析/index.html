@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          InnoDB-数据行 - 郭守敬 | Blog
+          InnoDB-索引生效失效条件分析 - 郭守敬 | Blog
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/InnoD引擎/InnoDB引擎-行格式/">
+    <link rel="canonical" href="http://www.corgiboy.com/InnoD引擎/InnoDB-索引生效失效条件分析/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/宇宙 星空 云 一个人 心愿 愿望 3440x1440动漫壁纸_彼岸图网.jpg')
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/天空 云 制服水手服高中生女子6k动漫壁纸_彼岸图网.jpg')
             /*post*/
         
     }
@@ -91,11 +91,11 @@
                               <a class="tag" href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
                             
                         </div>
-                        <h1>InnoDB-数据行</h1>
-                        <h2 class="subheading">本文简单介绍InnoDB数据行的构成</h2>
+                        <h1>InnoDB-索引生效失效条件分析</h1>
+                        <h2 class="subheading">本文从索引结构出发讲解索引的失效、生效条件</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
-                            2020-07-16
+                            2020-10-02
                         </span>
                     </div>
                 
@@ -212,53 +212,88 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <blockquote>
-<p>InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说一次将16kb的数据刷到磁盘或者从磁盘读取16kb数据到内存，数据页中包含的就是数据行。InnoDB一共提供了四种行结构，分别是Compact、Redundant、Dynamic和Compressed行格式，现在mysql从5.7之后默认使用的行结构是Dynamic。</p>
-</blockquote>
-<h1 id="行结构">行结构</h1>
-<p>一行数据是由两个部分组成：实际数据、记录额外信息。<br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/%E6%95%B0%E6%8D%AE%E8%A1%8C%E7%BB%84%E6%88%90.jpg" width="80%"></p>
-<h2 id="记录额外信息">记录额外信息</h2>
+                <h1 id="索引结构回顾">索引结构回顾</h1>
 <ul>
-<li>变长字段列表<br>
-因为InnoDB需要知道每个字段的实际长度而不是声明列时的长度，所以需要存储实际字段所占用的字节长度。像varchar，Text这种可变长度的数据类型的字段的实际占用字节的长度通过16进制按照列声明顺序倒序保存在变长字段列表。每一个值占用的大小为1-2个字节，如果长度小于255就是1个字节，如果长度大于255就是两个字节。</li>
+<li>InnoDB与磁盘操作的基本单位是数据页，一个数据页是16kb。数据页中数据按照主键盘或者人为指定索引列从小到大排序，并且将数据行分组并且建立槽，查找时通过槽进行二分查找定位数据行所在位置。在由多个列组成的索引中，按照声明列的顺序排序，前面的先排序，相同的话再按照后面列排序。</li>
+<li>索引是一个B+树结构，B+树的节点是数据页。
+<ul>
+<li>非叶子节点是目录数据页，里面存储的是很多目录行，一个目录行对应一个树的子节点，目录行中存储的值是其所指向数据页中记录的最小值和页号。</li>
+<li>叶子节点存储的是数据，聚簇索引的话存储的是整行记录，二级索引存储的是键值和主键的值。</li>
 </ul>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/变长字段列表1.jpg" width="80%">
-<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/变长字段列表2.jpg" width="80%">
-<p>该值占用的大小为1-2个字节，如果长度小于255就是1个字节，如果长度大于255就是两个字节。</p>
+</li>
+<li>查找时，从B+树根节点出发，通过页内查找方式定位到目录行，通过页号定位到下一层节点的数据页，依次类推定位叶子节点。
 <ul>
-<li>NULL值字段列表<br>
-为了防止数据为null的字段占用空间，所以需要null值字段列表。首先数据库查看哪些列可以为null，之后将这些列按照列顺序逆序的表示为每一个bit位，bit位为0表示该行这个字段不为null，否则表示数据为null。高位补0。<br>
-比如声明列c1、c2、c3、c4，c2列不可为null，则该列表存储为下图：</li>
-</ul>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/null%E5%AD%97%E6%AE%B5%E5%88%97%E8%A1%A8.jpg" width="50%">
+<li>聚簇索引：返回要查找的数据。</li>
+<li>二级索引：
 <ul>
-<li>记录头信息<br>
-记录头由5个字节组成，属性结构如图。主要用于描述记录的状态，在B+树索引等功能上会使用的到。<br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/记录头.jpg" width="80%"></li>
-</ul>
-<h2 id="实际数据部分">实际数据部分</h2>
-<p>实际数据部分分为真实数据、隐藏列两个部分。<br>
-这里先说一下innodb的主键生成策略：建表时如果指定了主键列的话InnoDB就用指定的主键，否则自动挑选出一个被声明为唯一索引字段为主键，如果都不存在的话InnoDB就会为每一行添加row_id作为主键。</p>
-<ul>
-<li>隐藏列：对于每一个数据行，增加了三个额外列。
-<ul>
-<li>row_id：数据行的唯一标识。根据前面的主键生成策略可以知道，这个列并不是必须存在的。</li>
-<li>transaction_id：表示对记录做写操作的事务的事事务ID，是在MVCC上做版本可见性区分基础。</li>
-<li>roll_pointer：回滚指针，指向该行数据发生变化的上一个版本的undo log，用于事务回滚数据。</li>
+<li>索引列包含要返回的所有列：直接返回数据。</li>
+<li>不包含或者不完全包涵：拿着主键值返回聚簇索引查找数据。</li>
 </ul>
 </li>
 </ul>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/隐藏列.jpg" width="80%">
-<ul>
-<li>真实数据部分<br>
-这部分就是正常看见的数据，由使用者自行操控的数据。</li>
+</li>
 </ul>
-<h2 id="行溢出">行溢出</h2>
-<p>一个页的大小为16kb，当一个列的数据占用空间过大，大于数据页大小的话就会发生行溢出。<br>
-比如varchar类型的字段，占用字节长度最大65536，那么就是65kb，一定会大于一个数据页的16kb，这个时候就会出现行溢出。在原该存储该列的地方只会存储一个其他页的地址，将数据分散到其他数据页中，之后串起来。如下图：<br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/行溢出.jpg" width="80%"></p>
-<p>另外varchar类型的能存储字符的最大长度等于65536/该列字符集字符占用字节长度。</p>
+<h1 id="索引的代价">索引的代价</h1>
+<ul>
+<li>空间代价：一个页的大小是16kb，建立的索引越多，占用的空间也就越大。</li>
+<li>时间代价：因为索引是拥有排序规则的，在做写操作的时候数据发生了变动，为了维护排序记录在B+树中的位置也就可能需要进行调整，建立的索引越多，一次写操作需要维护的索引就越多。</li>
+</ul>
+<h1 id="索引生效失效条件">索引生效/失效条件</h1>
+<p>首先建立一张表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE person_info(</span><br><span class="line">    id INT NOT NULL auto_increment,</span><br><span class="line">    name VARCHAR(100) NOT NULL,</span><br><span class="line">    birthday DATE NOT NULL,</span><br><span class="line">    phone_number CHAR(11) NOT NULL,</span><br><span class="line">    country varchar(100) NOT NULL,</span><br><span class="line">    PRIMARY KEY (id),</span><br><span class="line">    KEY idx_name_birthday_phone_number (name, birthday, phone_number)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>之后插入数据，结构如下图。<br>
+<img src="https://github.com/corgiboygsj/MarkDownPhoto/blob/master/mysql/%E7%B4%A2%E5%BC%95.jpg?raw=true" alt="IMAGE"><br>
+首先通过name进行排序，name相同情况对birthday排序，birthday相同对phone_number排序。</p>
+<h2 id="最左前缀原则">最左前缀原则</h2>
+<p>一个查询sql的条件列必须满足创建索引的顺序，从索引最左边列开始依次匹配才能走索引。就是说where条件字段顺序要满足索引建立的顺序才能走索引。这个如何理解呢，想象下索引的结构，它是通过索引列从左到右依次排序的，那么很显然如果搜索使用的列不是索引列最左边的那个列就没办法进行定位。所以只要考虑一下索引的结构就可以很容易知道一个sql走不走索引。举个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where phone_number=&apos;123123123&apos;;</span><br></pre></td></tr></table></figure>
+<p>这种查询就走不了上面的索引，原因其实显而易见的，索引建立顺序中name是第一个，那么首先就会按照name排序，只有在name和birthday相同的情况下才会按照phone_number排序。直接按照phone_number查找的话，phone_number在索引中直接来看是无序的，所以不能走索引。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where name=&apos;guo&apos; and birthday = &apos;2019-11-11 10:11:11&apos;;</span><br></pre></td></tr></table></figure>
+<p>这种就可以走索引，因为首先按照name排序，而且条件中有name列，那么可以先按照name='guo’搜索，之后在name='guo’的数据中找birthday='2019-11-11 10:11:11’的。<br>
+即使搜索条件没有phone_number，只要前面匹配上了，就可以走索引，因为索引的结构就是从左向右依次排序。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where name=&apos;guo&apos; and phone_num=&apos;123123&apos;</span><br></pre></td></tr></table></figure>
+<p>这样只有name可以走索引，phone_number的搜索走不了索引，还是上面说的结构问题。<br>
+另外如果where中书写name,birthday,phone_number的顺序即使不是按照从左到右也可以走索引，mysql优化器对sql进行分析并且会自动进行字段重新排序。</p>
+<h2 id="匹配查询">匹配查询</h2>
+<p>比如要查询name是As开头的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where name like &quot;As%&quot;;</span><br></pre></td></tr></table></figure>
+<p>这种查询是可以走索引的，因为首先name列是排好序的，而且字符串排序是按照字符串字符顺序依次进行排序。所以这个查询是可以走索引的。首先找大于等于A的，从结果里着大于等于s的，之后同理。<br>
+但是下面这种就走不了索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where name like &quot;%As&quot;;</span><br></pre></td></tr></table></figure>
+<p>因为是只匹配中间的，开头是什么mysql并不知道，就没有办法通过name进行排序了索，就只能进行全表搜索。<br>
+但是这样的数据可以反过来存，就可以写成sA%了，就可以走索引了。</p>
+<p>另外如果name like &quot;As%&quot;之后再加上个birthday=xxx，这样的话也是只有name可以走索引，因为birthday在name值不相同的时候是无序的。</p>
+<h2 id="范围搜索">范围搜索</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where name = &apos;Aaron&apos; and birthday &gt; &apos;1988-07-03 12:12:12&apos;</span><br></pre></td></tr></table></figure>
+<p>这种是可以走索引，还是结合索引结构来分析，首先name排好序，通过等值查询定位到记录的位置，之后在name等于guo的记录向后找birthday大于 '2009-10-10 20:20:20’的，找到了第一个大于该值的，后面的就可以直接返回了，因为birthday是排好序的。<br>
+下面列举一下其他的情况。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where name &gt; &apos;Aaron&apos; and birthday &gt; &apos;1988-07-03 12:12:12&apos;</span><br></pre></td></tr></table></figure>
+<p>这种情况只有name列的查询可以走索引，还是从结构出发，先找到name=Aaron的数据，这之后的数据都是大于Aaron的，但是这些数据里虽然大于Aaron，但是birthday并不一定大于’1988-07-03 12:12:12’。因为只有在name相同的情况下才会按照birthday排序。就算birthday后续还有phone_number的查询也不能走索引了。</p>
+<h2 id="排序">排序</h2>
+<p>看一下如下sql</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where name=&apos;Aaron&apos; order by country;</span><br></pre></td></tr></table></figure>
+<p>这句sql可以通过索引找到Aaron的数据，但是需要对country进行排序，通常数据量很大都需要在内存之外进行排序，因为内存扛不住，所以需要借助外部文件存储一些计算的结果，也就是文件排序（file sort），磁盘和内存的性能差很多。但是索引也可以帮助排序提供服务。比如如下sql</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where name=&apos;Aaron&apos; order by name,birthday desc;</span><br></pre></td></tr></table></figure>
+<p>这种时候只需要通过B+树定位到name为Aaron的数据，将后面的数据都进行回表查询之后倒过来就可以了，因为索引本身就是排好序的，而且下面sql也可以走索引，同样是因为索引结构满足。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from person_info where name=&apos;Aaron&apos; order by birthday,phone_number;</span><br></pre></td></tr></table></figure>
+<p>所以能够使用索引帮助排序的前提是这个搜索可以走索引，也就是说where条件必须都要可以走索引才可以。<br>
+有一种情况就算满足最左前缀原则也是不能利用到索引排序的，那就是desc和asc混合使用。</p>
+<h2 id="回表查询的代价">回表查询的代价</h2>
+<p>我们知道回表查询是二级索引查询到数据之后，但是并不能返回所需要的所有列的数据，就需要拿着主键值返回聚簇索引中拿其他列的数据。<br>
+这个回表的过程是一个随机IO得过程，比如一个查询从二级索引中查询出很多条数据，要依次在聚簇索引中查询，因为对应的数据可能根本不在一个数据页中。<br>
+所以结论就是回表的数据量越大，那么二级索引的效率就会越低，比如一次二级索引的查询查出来表中的80%的数据，那么回表的代价就很大。但是mysql优化器会对表数据做一些统计工作，当一个sql拿来之后如果mysql分析出回表代价大于直接在聚簇索引中全表查询，那么不会走二级索引+回表的操作。</p>
+<h2 id="覆盖索引">覆盖索引</h2>
+<p>基于回表查询的代价问题，所以尽可能的使用覆盖索引，覆盖索引是如果要查询的数据列在二级索引中如果存在的话就不需要回表查询了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select name,birthday,phone_num where name = &quot;Aaron&quot;;</span><br></pre></td></tr></table></figure>
+<p>这个带来的性能提升是显而易见的，这样的话走一次索引就可以了。</p>
+<h2 id="总结">总结</h2>
+<ul>
+<li>只对需要查询、排序、分组的列进行创建索引，不要乱多建立索引。这样可以有效减小索引大小和索引的维护成本。</li>
+<li>基于列的基数创建索引。这里的基数就是说值的唯一性，也就是《高性能mysql》中说的区分度，一个列的值的区分度（表中列相同值越少区分度就越大）越大那么性能就越高。</li>
+<li>挑选占用小的数据类型。这样可以减小索引大小，那么就可以让更多得的数据页被缓存在mysql内存中，提高速度。</li>
+<li>让索引列在符号的一侧单独出现，比如a * 2 &lt; 10和a &lt; 5的效率是不同的，因为这样查询的时候a*2是在搜索过程中进行计算的，而不是a&lt;5是一个明确值。</li>
+<li>尽量让键值变的有序，这样新插入的数据直接放到索引最后的叶子节点最后就可以了，而不需要造成前面页的分裂和调整。</li>
+</ul>
 
                 
 
@@ -267,12 +302,12 @@
                 <ul class="pager">
                     
                         <li class="previous">
-                            <a href="/Java基础/对象逃逸分析/" data-toggle="tooltip" data-placement="top" title="对象逃逸分析">&larr; Previous Post</a>
+                            <a href="/InnoD引擎/InnoDB-执行计划/" data-toggle="tooltip" data-placement="top" title="InnoDB-执行计划">&larr; Previous Post</a>
                         </li>
                     
                     
                         <li class="next">
-                            <a href="/Java基础/Java基础-线程池/" data-toggle="tooltip" data-placement="top" title="线程池">Next Post &rarr;</a>
+                            <a href="/InnoD引擎/InnoDB-索引/" data-toggle="tooltip" data-placement="top" title="InnoDB-索引">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -322,7 +357,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#行结构"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x884C;&#x7ED3;&#x6784;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#记录额外信息"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x8BB0;&#x5F55;&#x989D;&#x5916;&#x4FE1;&#x606F;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#实际数据部分"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x5B9E;&#x9645;&#x6570;&#x636E;&#x90E8;&#x5206;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#行溢出"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">&#x884C;&#x6EA2;&#x51FA;</span></a></li></ol></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#索引结构回顾"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x7D22;&#x5F15;&#x7ED3;&#x6784;&#x56DE;&#x987E;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#索引的代价"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x7D22;&#x5F15;&#x7684;&#x4EE3;&#x4EF7;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#索引生效失效条件"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x7D22;&#x5F15;&#x751F;&#x6548;/&#x5931;&#x6548;&#x6761;&#x4EF6;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#最左前缀原则"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">&#x6700;&#x5DE6;&#x524D;&#x7F00;&#x539F;&#x5219;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#匹配查询"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">&#x5339;&#x914D;&#x67E5;&#x8BE2;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#范围搜索"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">&#x8303;&#x56F4;&#x641C;&#x7D22;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#排序"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">&#x6392;&#x5E8F;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#回表查询的代价"><span class="toc-nav-number">3.5.</span> <span class="toc-nav-text">&#x56DE;&#x8868;&#x67E5;&#x8BE2;&#x7684;&#x4EE3;&#x4EF7;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#覆盖索引"><span class="toc-nav-number">3.6.</span> <span class="toc-nav-text">&#x8986;&#x76D6;&#x7D22;&#x5F15;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#总结"><span class="toc-nav-number">3.7.</span> <span class="toc-nav-text">&#x603B;&#x7ED3;</span></a></li></ol></li></ol>
         
         </div>
       </aside>
