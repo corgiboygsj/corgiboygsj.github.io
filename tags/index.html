@@ -76,6 +76,10 @@
         
     }
     
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
 </style>
 
 <header class="intro-header" >
@@ -198,9 +202,9 @@
             <!-- 标签云 -->
             <div id='tag_cloud' class="tags">
                 
-                    <a href="#Java" title="Java" rel="12">Java</a>
-                
                     <a href="#InnoD引擎" title="InnoD引擎" rel="4">InnoD引擎</a>
+                
+                    <a href="#Java" title="Java" rel="12">Java</a>
                 
                     <a href="#Redis" title="Redis" rel="4">Redis</a>
                 
@@ -212,6 +216,89 @@
 
             <!-- 标签列表 -->
 
+            
+            <div class="one-tag-list">
+                <span class="fa fa-tag listing-seperator" id="InnoD引擎">
+                    <span class="tag-text">InnoD引擎</span>
+                </span>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/InnoD引擎/InnoDB-索引/">
+                        <h2 class="post-title">
+                            InnoDB-索引
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文介绍InnoDB索引的原理
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/InnoD引擎/InnoDB-数据页/">
+                        <h2 class="post-title">
+                            InnoDB-数据页
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                介绍InnoDB数据页面的组织方式
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/InnoD引擎/InnoDB-Redo-Log/">
+                        <h2 class="post-title">
+                            InnoDB Redo Log
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文介绍InnoDB中保证事务持久性的重做日志
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/InnoD引擎/InnoDB引擎-行格式/">
+                        <h2 class="post-title">
+                            InnoDB-数据行
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文简单介绍InnoDB数据行的构成
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+            </div>
             
             <div class="one-tag-list">
                 <span class="fa fa-tag listing-seperator" id="Java">
@@ -432,89 +519,6 @@
                         <h2 class="post-title">
                             ArrayList源码分析
                         </h2>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-            </div>
-            
-            <div class="one-tag-list">
-                <span class="fa fa-tag listing-seperator" id="InnoD引擎">
-                    <span class="tag-text">InnoD引擎</span>
-                </span>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/InnoD引擎/InnoDB-索引/">
-                        <h2 class="post-title">
-                            InnoDB-索引
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文介绍InnoDB索引的原理
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/InnoD引擎/InnoDB-数据页/">
-                        <h2 class="post-title">
-                            InnoDB-数据页
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                介绍InnoDB数据页面的组织方式
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/InnoD引擎/InnoDB-Redo-Log/">
-                        <h2 class="post-title">
-                            InnoDB Redo Log
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文介绍InnoDB中保证事务持久性的重做日志
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/InnoD引擎/InnoDB引擎-行格式/">
-                        <h2 class="post-title">
-                            InnoDB-数据行
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文简单介绍InnoDB数据行的构成
-                            </h3>
                         
                     </a>
                     <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
