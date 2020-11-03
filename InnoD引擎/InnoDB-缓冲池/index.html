@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          SpringBoot自动配置 - 郭守敬 | Blog
+          InnoDB-缓冲池 - 郭守敬 | Blog
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/SpringBoot/SpringBoot自动配置/">
+    <link rel="canonical" href="http://www.corgiboy.com/InnoD引擎/InnoDB-缓冲池/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/home.jpg')
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/我等你 女孩 窗前 日出 日落 唯美背影 艺术站设计4k壁纸3840x2160_彼岸图网.jpg')
             /*post*/
         
     }
@@ -88,14 +88,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+                              <a class="tag" href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
                             
                         </div>
-                        <h1>SpringBoot自动配置</h1>
-                        <h2 class="subheading">本文介绍SpringBoot版本2.3.4.RELEASE的自动配置原理</h2>
+                        <h1>InnoDB-缓冲池</h1>
+                        <h2 class="subheading">介绍InnoDB的缓冲池内部结构，以及如何管理内存数据，和其他特性。</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
-                            2020-10-13
+                            2020-11-03
                         </span>
                     </div>
                 
@@ -212,47 +212,56 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h1 id="import注入对象的三种方式">@Import注入对象的三种方式</h1>
-<p><a href="https://juejin.im/post/6844903946155212813" target="_blank" rel="noopener">https://juejin.im/post/6844903946155212813</a></p>
-<h1 id="自动配置原理">自动配置原理</h1>
-<p>@SpringBootApplication是SpringBoot启动类的注解，如下图。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/1.jpg">
-<p>自动配置就是通过其内部的@EnableAutoConfiguration注解来实现，EnableAutoConfiguration的内部如下图。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/2.jpg" width="50%">
-<p>上图重要的部分是其内部的AutoConfigurationImportSelector这个类，这个类通过配合@Import进行了自动配置类的生成。点开这个类，其内部有一个selectImports方法，如下图，这个方法就用于筛选出SpringBoot中的@EnableAutoConfiguration对应的自动配置类，下面几张图片是这个方法内部执行过程。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/3.jpg">
-<p>在下图中横线看到return返回的configurations这个集合，上面代码找到获得这个集合的代码，方法为getCandidateConfigurations，之后点进去。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/4.jpg">
-<p>如下图，这个地方有两个方法，一个是getSpringFactoriesLoaderFactoryClass，只一个是SpringFactoriesLoader.loadFactoryNames。点进去一个是getSpringFactoriesLoaderFactoryClass可以发现他就是返回了一个@EnableAutoConfiguration这个类，之后点进去loadFactoryNames方法，看到loadSpringFactories这个方法，这个方法才是重点。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/5.jpg">
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/6.jpg">
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/7.jpg">
-<p>loadSpringFactories方法如下图</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/8.jpg">
-<h1 id="loadspringfactories方法">loadSpringFactories方法</h1>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//重点。这是存储自动配置类信息的资源文件位置，下图为这个文件存储的内容信息。</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String FACTORIES_RESOURCE_LOCATION = <span class="string">"META-INF/spring.factories"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, List&lt;String&gt;&gt; loadSpringFactories(<span class="meta">@Nullable</span> ClassLoader classLoader) &#123;</span><br><span class="line">		MultiValueMap&lt;String, String&gt; result = cache.get(classLoader);</span><br><span class="line">		<span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> result;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="comment">//通过getResources方法获取所有jar包下的META-INF/spring.factories文件</span></span><br><span class="line">			Enumeration&lt;URL&gt; urls = (classLoader != <span class="keyword">null</span> ?</span><br><span class="line">					classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :    </span><br><span class="line">					ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));</span><br><span class="line">			result = <span class="keyword">new</span> LinkedMultiValueMap&lt;&gt;();     <span class="comment">//一键多值的map</span></span><br><span class="line">			<span class="comment">//遍历前面获取到的所有spring.factories文件</span></span><br><span class="line">			<span class="keyword">while</span> (urls.hasMoreElements()) &#123;</span><br><span class="line">				URL url = urls.nextElement();</span><br><span class="line">				UrlResource resource = <span class="keyword">new</span> UrlResource(url);</span><br><span class="line">				<span class="comment">//将文件转化为Properties对象</span></span><br><span class="line">				Properties properties = PropertiesLoaderUtils.loadProperties(resource);</span><br><span class="line">				<span class="comment">//获取文件内部的键值信息</span></span><br><span class="line">				<span class="keyword">for</span> (Map.Entry&lt;?, ?&gt; entry : properties.entrySet()) &#123;</span><br><span class="line">				  <span class="comment">//拿到key，例如org.springframework.boot.autoconfigure.EnableAutoConfiguration这个键</span></span><br><span class="line">					String factoryTypeName = ((String) entry.getKey()).trim();</span><br><span class="line">					<span class="comment">//将等号后面的值按照逗号进行拆分，并且加入到这个一键多值map中。</span></span><br><span class="line">					<span class="keyword">for</span> (String factoryImplementationName : StringUtils.commaDelimitedListToStringArray((String) entry.getValue())) &#123;</span><br><span class="line">						result.add(factoryTypeName, factoryImplementationName.trim());</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			cache.put(classLoader, result);</span><br><span class="line">			<span class="keyword">return</span> result;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Unable to load factories from location ["</span> +</span><br><span class="line">					FACTORIES_RESOURCE_LOCATION + <span class="string">"]"</span>, ex);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/9.jpg">
-<p>通过上面的方法，最后可以得到一个map，键是文件中等号前面的那个类名。值是多个的，就是等号后面对应的值按照逗号拆分开，下图为debug的结果，可以看到的确是将这个文件形成了这样一键多值的映射。<br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/10.jpg"></p>
-<p>之后回到调用它的方法loadFactoryNames。<br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/11.jpg"><br>
-前面图上有，factoryType这个Class就是EnableAutoConfiguration类，之后获取名称从返回的map中获取值，就会获得spring.factories中该类对应的那些类的名称。</p>
-<h1 id="配置类">配置类</h1>
-<p>在上面的spring.factories中随便找一个类看下是怎么自动配置的，例如：org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration。<br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/12.jpg"><br>
-可以看到自动配置类都是xxxAutoConfiguration形式的，通过上面的@Configuration注解标示这是一个配置类。下面两个Conditionalxxxx注解用于判断是否满足加载这个自动配置类的条件，第一个表示必须是web项目，第二表示项目中必须有DispatcherServlet这个类，才会生成这个自动配置类，否则不生成。</p>
-<p>看类内部白框，@EnableConfigurationProperties注解中有一个WebMvcProperties类，通过这个注解可以生成一个WebMvcProperties的对象，之后在下面@Bean方法中会从容器拿到这个WebMvcProperties对象放到参数中执行dispatcherServlet方法进行DispatcherServlet类的自动配置。</p>
-<p>看一下WebMvcProperties这个类是如何生成自动配置的，类如下图。<br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/13.jpg"><br>
-上图中WebMvcProperties通过@ConfigurationProperties这个注解来获取配置文件中的spring.mvc为前缀的配置的值设置到内部属性上。这些属性值都有一些默认的值，这些值存在于与spring.factories同位置的spring-configuration-metadata.json文件中，如下图所示为上图白框属性的默认值。所以我们更改默认值就可以在配置文件中指定值就可以了，未指定就会使用这个文件里的默认值，也就是自动配置，约定大于配置。<br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/14.jpg"><br>
-接下来看一下@EnableConfigurationProperties这个注解是怎么生成配置类的，如下图。<br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/15.jpg"><br>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/16.jpg"><br>
-这是@Import的使用方法之一，通过实现ImportBeanDefinitionRegistrar接口的类，可以将bean注入到容器中。<br>
-通过给@EnableConfigurationProperties设置value为WebMvcProperties.class再配合@Import，在registerBeanDefintions方法中的metadata注解元信息获取到需要注入的类，之后添加到容器中，实现WebMvcProperties的设置，之后完成自动配置。</p>
-<h1 id="总结">总结</h1>
-<p>@EnableXXXXX的注解通过@Import配合ImportSelector的方式，在所有的jar包中搜索meta-inf/spring.factories文件，获取其中对应@EnableXXXXX的自动配置类信息，并将这些对象注入到容器中。但是这些对象会受到@Conditionalxxxx注解的限制用于判断是否需要启用这个配置类。在配置类内部有用于自动配置的XXXXProperties类，他们通过@ConfigurationProperties注解获取到springboot提供的默认配置，之后设置到对应的功能类上完成自动配置。</p>
+                <h1 id="缓冲池">缓冲池</h1>
+<p>InnoDB的数据是持久化在磁盘上的，工作时从磁盘读取数据到内存中。但是磁盘的读写效率很低，而内存的读写效率很高，所以出现了缓冲池用户缓存一部分数据和InnoDB工作时的数据，用来提高读写效率。<br>
+所以InnoDB会通过一定的机制，让一些最热的数据保存在缓冲池中，加速请求的响应。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/1810497152113AF80DAFDDBC5B3AC476.jpg" width="70%">
+<h1 id="缓冲池中数据组织方式">缓冲池中数据组织方式</h1>
+<h2 id="free-list">Free List</h2>
+<p>数据库启动时InnoDB向操作系统申请一片内存区域，之后InnoDB会将这个内存区域按照数据页的大小（16kb）进行划分，之后将他们的控制体连成一个链表，这个链表就叫做Free List。当InnoDB需要内存缓冲一些数据的时候，就会到Free List中取一定数量的控制体并且将它们移除Free List，当数据同步磁盘、释放内存的时候又会将被释放数据页的控制体加入到Free List中。<br>
+也就是说Free List就是InnoDB尚未使用的内存。如下图就是Free List，其中碎片部分就是整块内存按照16Kb拆分最后无法形成完整数据页的内存。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/A1902CA9CBBC5B64628F2D2375466446.jpg" width="80%">
+<h2 id="lru-list">Lru List</h2>
+<p>前面说InnoDb需要内存时会从Free List移除控制块，那么被使用的内存如何管理？就是通过这个Lru List。从Free List中拿出的控制体会被加入到Lru List中来。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/8A97D18FF7F7EDEA7B78C8F9E256B03A.jpg" width="70%">
+<p>那么InnoDB如何访问数据页呢，就是通过图中的哈希表，它会将控制块的表空间和页号进行哈希，当InnoDB需要某个数据页时就可以直接定位，而不需要从头遍历。</p>
+<p>另外InnoDB内存淘汰机制就是Lru算法，最近被使用的内存会被放到链表的首部，也就是热数据都存在链表首部，之后读入数据时内存不足就会将尾部的内存淘汰掉，并且将新的数据页放到链表头部。</p>
+<p>虽然Lru看似合理，但是InnoDB不止这么简单，它还提供了预读机制，用来提升性能。而且我们写的查询可能会进行全表扫描等大范围扫描数据的操作。</p>
+<h3 id="预读">预读</h3>
+<p>InnoDB提供预读用来优化性能，它猜测我们可能接下来会读取数据是哪些，并且提前将它们读取到内存中，这样在后续的访问中就可以提高性能。InnoDB提供了两种预读方式。</p>
+<ul>
+<li>线性预读：当在一区域（InnoDB中64个数据页为一个区域）中连续读取的数据页超过一定数量，InnoDb会将下一个区域的数据都读取到内存中，它猜测你可能在做大范围的连续搜索。</li>
+<li>随机预读：当一个区域内被读取（不要求必须顺序读）的数据页面超过一定数量，那么会讲该区域其他的数据页面读取到内存中来。</li>
+</ul>
+<p>比如有时可能会有全表扫描或者大氛围扫描数据的情况，那么这些大量的数据读入到内存中很可能会把热数据也给淘汰掉，但是这些数据并不经常使用，可能只为这个全表扫描使用一次，但是热数据却被淘汰了。所以InnoDb将Lru List进行划分，划分成Young、Old区域，热数据都存在于Young区域，新读入的数据会加到Old区域链表的头部，并且淘汰尾部的数据。</p>
+<h2 id="flush-list">Flush List</h2>
+<p>被写操作影响的数据页别叫做脏页，InnoDB会在特定的时间将它们刷新到磁盘上。InnoDB通过Flush List来管理这些脏页，当数据页发生修改时它的控制体就会被加入到Flush List中，但是并不会从Lru List中移除。</p>
+<h1 id="插入缓存">插入缓存</h1>
+<p>一般表在建立的时候，指定的主键建议都是单调递增的。原因是递增的主键在维护索引结构的时候效率更高，只需要在树的最后面加入数据就可以了，不会引起节点的分裂和数据的调整。<br>
+但是二级索引是不一样的，它虽然是排序的，但是我们插入的数据不一定是什么，为了维持这个排序就会出现新插入/修改的数据引起二级索引结构的调整。这样就会涉及到大量的磁盘随机读取，效率就会很低。<br>
+为了解决上面的问题，就出现了插入缓存。它是一块缓冲区域。在对数据进行写操作的时候，它会先判断对应的索引数据页在不在缓冲池中，如果在的话就可以直接修改缓冲池中的索引页，如果不在的话，就将修改放到插入缓冲中，InnoDB会定时进行插入的合并，将它们刷新到磁盘上，这样就做到了合并插入的效果。</p>
+<h1 id="双写缓存">双写缓存</h1>
+<p>Linux系统的一次原子性将数据写入磁盘的数据大小是4kb，而InnoDb数据页的大小是16kb，这样就会出现一种问题。问题是在数据页同步磁盘的时候，没有将完整的16kb都写到磁盘上，服务器就宕机了，这就会造成数据的不一致，数据也会发生损坏。这种问题叫做partial page write。</p>
+<h2 id="为什么不能使用redo-log恢复解决">为什么不能使用Redo Log恢复解决</h2>
+<p>Redo Log是重做日志，保存了我们对数据库的更改，那么Redo Log为什么不能解决这种异常情况呢？<br>
+引用来自http://catkang.github.io/2020/02/27/mysql-redo.html的部分文章</p>
+<blockquote>
+<p>那么我们需要什么样的REDO呢？首先，REDO的维护增加了一份写盘数据，同时为了保证数据正确，事务只有在他的REDO全部落盘才能返回用户成功，REDO的写盘时间会直接影响系统吞吐，显而易见，REDO的数据量要尽量少。其次，系统崩溃总是发生在始料未及的时候，当重启重放REDO时，系统并不知道哪些REDO对应的Page已经落盘，因此REDO的重放必须可重入，即REDO操作要保证幂等。最后，为了便于通过并发重放的方式加快重启恢复速度，REDO应该是基于Page的，即一个REDO只涉及一个Page的修改。</p>
+<p>熟悉的读者会发现，数据量小是Logical Logging的优点，而幂等以及基于Page正是Physical Logging的优点，因此InnoDB采取了一种称为Physiological Logging的方式，来兼得二者的优势。所谓Physiological Logging，就是以Page为单位，但在Page内以逻辑的方式记录。举个例子，MLOG_REC_UPDATE_IN_PLACE类型的REDO中记录了对Page中一个Record的修改，方法如下：</p>
+<p>（Page ID，Record Offset，(Filed 1, Value 1) … (Filed i, Value i) … )<br>
+其中，PageID指定要操作的Page页，Record Offset记录了Record在Page内的偏移位置，后面的Field数组，记录了需要修改的Field以及修改后的Value。</p>
+</blockquote>
+<p>也就是说，Redo Log是一种物理逻辑日志，物理是说它定位了页面和记录的位置。逻辑说的是它记录了被修改的字段和被修改之后的值，所以它需要依赖一个完整的数据页才能进行逻辑的恢复，但是上面说的那种情况会破坏页面的完整性。</p>
+<h2 id="double-write-buffer">Double Write Buffer</h2>
+<p>所以问题在于如何在同步磁盘之前保存页面的完整副本，即使出现问题也可以通过副本恢复，InnoDB推出了Double Write Buffer，也就是双写缓存。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/39552D4C32D5EC6D14C7341410F9ADED.jpg" width="70%">
+<p>双写缓存由两个部分组成，一个是位于内存的缓冲区域，大小为2MB，另一个部分是位于磁盘的共享表空间的区域，也是2MB。在数据页从缓冲池刷出时，会先将页面拷贝到内存的Double write buffer中，之后buffer会分两次一次拷贝1MB到磁盘的Double Write buffer做持久化，每次拷贝完都会调用fsyn强制刷入磁盘。之后再从内存中将数据页离散的同步到数据文件上。<br>
+在同步磁盘Double Write Buffer时是顺序写入的，在同步数据文件时是离散随机写入的。当数据库宕机发生partial page write时，重启数据库后，会去磁盘上的Double Write Buffer拿数据页的副本进行恢复，之后再通过redo log恢复尚未同步到磁盘的数据。</p>
+<h1 id="自适应哈希索引">自适应哈希索引</h1>
+<p>索引是B+树的结构，再我们通过二级索引查询的时候还需要拿着主键id再回到聚簇索引进行查询，虽然一般情况下B+树的树高不会超过3-4层，但是一个3层的树在查询的时候就需要查询3次。<br>
+InnoDb会对查询进行监控，一旦发现按照某一条件查询，那么就会认为是热点数据，就会建立自适应哈希索引，它是基于原B+树创建的，如下图。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/6516396343C2EA44B56157EDC211E8EA.jpg" width="70%">
+<p>它可以让查询的复杂度变成O(1)，直接通过条件定位到对应的叶子节点，而不需要从树根向下搜索。</p>
 
                 
 
@@ -260,13 +269,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/InnoD引擎/InnoDB-缓冲池/" data-toggle="tooltip" data-placement="top" title="InnoDB-缓冲池">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/InnoD引擎/InnoDB-Redo-Log/" data-toggle="tooltip" data-placement="top" title="InnoDB Redo Log">Next Post &rarr;</a>
+                            <a href="/SpringBoot/SpringBoot自动配置/" data-toggle="tooltip" data-placement="top" title="SpringBoot自动配置">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -316,7 +321,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#import注入对象的三种方式"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">@Import&#x6CE8;&#x5165;&#x5BF9;&#x8C61;&#x7684;&#x4E09;&#x79CD;&#x65B9;&#x5F0F;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#自动配置原理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x81EA;&#x52A8;&#x914D;&#x7F6E;&#x539F;&#x7406;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#loadspringfactories方法"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">loadSpringFactories&#x65B9;&#x6CD5;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#配置类"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x914D;&#x7F6E;&#x7C7B;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#总结"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x603B;&#x7ED3;</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#缓冲池"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x7F13;&#x51B2;&#x6C60;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#缓冲池中数据组织方式"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x7F13;&#x51B2;&#x6C60;&#x4E2D;&#x6570;&#x636E;&#x7EC4;&#x7EC7;&#x65B9;&#x5F0F;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#free-list"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">Free List</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#lru-list"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">Lru List</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#预读"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">&#x9884;&#x8BFB;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#flush-list"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">Flush List</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#插入缓存"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x63D2;&#x5165;&#x7F13;&#x5B58;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#双写缓存"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x53CC;&#x5199;&#x7F13;&#x5B58;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#为什么不能使用redo-log恢复解决"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">&#x4E3A;&#x4EC0;&#x4E48;&#x4E0D;&#x80FD;&#x4F7F;&#x7528;Redo Log&#x6062;&#x590D;&#x89E3;&#x51B3;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#double-write-buffer"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">Double Write Buffer</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#自适应哈希索引"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x81EA;&#x9002;&#x5E94;&#x54C8;&#x5E0C;&#x7D22;&#x5F15;</span></a></li></ol>
         
         </div>
       </aside>
@@ -336,7 +341,7 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+                          <a class="tag" href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
                         
                     </div>
                 </section>
