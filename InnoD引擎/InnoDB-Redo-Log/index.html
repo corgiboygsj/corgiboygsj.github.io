@@ -142,13 +142,6 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
                             <a href="/archive/">Archives</a>
                         </li>
                         
@@ -157,6 +150,13 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -224,35 +224,39 @@
 <li>事务提交后每秒将buffer的数据写入内核缓冲并且fsync刷入磁盘。</li>
 <li>事务提交时将buffer写入内核缓冲区，之后每条调用fsync将内核缓存刷入磁盘。</li>
 </ul>
-<img src="http://storage.aixuexi.com/u/c7hvtFAsFf15" width="70%" height="70%" alt="redo log刷盘策略">
-<h1 id="redo-log文件">redo log文件</h1>
-<p>redo log默认有两个日志文件，可以修改日志文件数量。日志文件头部会有一部分空间空留出来记录checkpoint等信息，但是只会使用到第一个log file记录这些信息，其他的文件头部不记录信息只是空着。在写入日志的时候把这些文件当作一个循环链表来使用，最后一个写完了可以把最开始的文件的日志覆盖掉，但首先被覆写的日志必须是已经无效的日志了（redo log对应的数据页已经落盘了，根据checkpont的lsn做判断）。<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/redo_1.png">
+<h1 id="redo-log文件组">redo log文件组</h1>
+<p>redo log默认有两个日志文件，可以修改日志文件数量。日志文件头部会有一部分空间空留出来记录checkpoint等信息，但是只会使用到第一个log file记录这些信息，其他的文件头部不记录信息只是空着。在写入日志的时候把这些文件当作一个循环链表来使用，最后一个写完了可以把最开始的文件的日志覆盖掉，但首先被覆写的日志必须是已经无效的日志了（最近一次发生Checkpoint对应Redo Log位置之前的日志全都是无效的了，后面会说CheckPoint）<br>
 第一个日志文件头部有两个记录checkpoint的位置，这两个是交替进行写入的，目的就是防止写入第二个checkpoint时候发生异常，这样可以用之前的那个checkpoint来恢复数据。</p>
-<img src="http://storage.aixuexi.com/u/6fOMaFfkF4e0" width="80%" height="80%" alt="日志文件组">
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/redo_2.png">
+<h1 id="lsn">LSN</h1>
+<p>LSN是redo log的逻辑序号，是一个不断递增的值，增加的大小等于redo log占用空间的字节大小。但是lsn不仅仅存在于redo log中，还存在于数据页的头部，用于记录最后修改这个数据页的操作的lsn是多少，同时数据页头部还记录了checkpoint的值。<br>
+页面头部记录LSN是为了在故障恢复的时候进行Redo Log的比对，如果页面LSN大于Redo Log的LSN则表示这个数据页已经提前刷盘了，不需要使用这个redo log恢复。</p>
 <h1 id="redo-log落盘时机">redo log落盘时机</h1>
 <ul>
 <li>在事务提交的时候，需要将redo log buffer的数据写出，写出规则就是上面可以自定义的三种规则。</li>
 <li>每秒一次，Master线程会将redo log buffer的数据写出，这个刷出跟事务提交无关，彼此是独立的。</li>
 <li>当redo log buffer的数据超过redo log buffer容量的一半时。</li>
-<li>checkpoint产生的时候，产生checkpoint的情况有很多，Master线程每10秒就会生成一次checkpoint，一定程度可以代表已经完成刷盘的redo log的位置。</li>
+<li>checkpoint产生的时候，产生checkpoint的情况有很多。</li>
 </ul>
+<h1 id="flush链表">Flush链表</h1>
+<p>在缓冲池中有一条Flush链表用来维护被修改的数据页面，也就是脏页所组成的链表。这个链表对应的数据页只有在第一次被修改的时候才会加入到链表，所以Flush List自然就是按照修改时间从早到晚排序的。<br>
+节点中维护了old_lsn和new_lsn两个属性，old_lsn就表示第一次修改数据页时的redo log lsn的值，后续对该数据页的更新只会改变new_lsn的值，而不会改动链表节点的顺序。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/redo_3.png">
 <h1 id="checkpoint">Checkpoint</h1>
-<p>CheckPiont的意思是检查点，检查点触发后就要将缓存中的数据刷新到磁盘上，将发生变化的数据持久化。</p>
+<p>CheckPiont的意思是检查点，用于推进Redo Log的失效。当触发Checkpoint后，会去看Flush List中最早的那个节点old_lsn是多少，也就是说当前Flush List还剩的最早被修改的数据页的redo log lsn是多少，并且将这个lsn记录到Checkpoint中，因为在这之前被修改的数据页都已经刷新到磁盘了，对应的redo log也就无效了，所以说之后在这个old_lsn之后的redo log才是有用的。这就解释了之前说的redo log文件组如何覆盖无效日志。</p>
 <h2 id="checkpoint种类">CheckPoint种类</h2>
 <ul>
 <li>Sharp Checkpoint：在数据库正常关闭的时候会记录这个CheckPoint，并且把所有的脏页、redo log buffer的数据都刷到磁盘上。</li>
 <li>Fuzzy Checkpoint：
 <ul>
-<li>Master线程定时刷新部分脏页到磁盘。</li>
-<li>脏页清理线程定时刷新lru、flush链表的部分脏页到磁盘。</li>
-<li>同步/异步刷新，当redo文件不可用时触发。比如redo log的数据无法再进行覆盖了，就需要讲脏页刷新到磁盘上让一部分redo log失效才可以继续覆盖原有的redo log。</li>
+<li>Master线程定时从Flush List中刷出部分脏页。</li>
+<li>Pape Cleaner线程定时从Lru List尾部刷出部分数据页，如果其中有脏页就做CheckPoint。</li>
+<li>同步/异步刷新，当redo文件不可用时触发。当系统负载很高的时候，自动刷新脏页的线程跟不上redo log的推进速度，就可能导致redo log不可用，就会阻塞用户线程进行同步的刷脏。这样可以保证redo log不会覆盖最近的checkpoint，保证数据的完整。</li>
 <li>脏页占用内存超过缓冲池一定比例时触发。</li>
 </ul>
 </li>
 </ul>
-<h1 id="lsn">LSN</h1>
-<p>LSN是redo log的序号，它的增长是redo log占用字节的大小，比如当前倒数第二条的lsn是10000，倒数第一条占用的大小是400，那么新插入一条的lsn就是10400。<br>
-这个号记录了</p>
 
                 
 
@@ -316,7 +320,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#什么是redo-log"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;redo log&#xFF1F;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redo-log-buffer"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">redo log buffer</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redo-log文件"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">redo log&#x6587;&#x4EF6;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redo-log落盘时机"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">redo log&#x843D;&#x76D8;&#x65F6;&#x673A;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#checkpoint"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">Checkpoint</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#checkpoint种类"><span class="toc-nav-number">5.1.</span> <span class="toc-nav-text">CheckPoint&#x79CD;&#x7C7B;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#lsn"><span class="toc-nav-number">6.</span> <span class="toc-nav-text">LSN</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#什么是redo-log"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;redo log&#xFF1F;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redo-log-buffer"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">redo log buffer</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redo-log文件组"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">redo log&#x6587;&#x4EF6;&#x7EC4;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#lsn"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">LSN</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#redo-log落盘时机"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">redo log&#x843D;&#x76D8;&#x65F6;&#x673A;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#flush链表"><span class="toc-nav-number">6.</span> <span class="toc-nav-text">Flush&#x94FE;&#x8868;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#checkpoint"><span class="toc-nav-number">7.</span> <span class="toc-nav-text">Checkpoint</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#checkpoint种类"><span class="toc-nav-number">7.1.</span> <span class="toc-nav-text">CheckPoint&#x79CD;&#x7C7B;</span></a></li></ol></li></ol>
         
         </div>
       </aside>
