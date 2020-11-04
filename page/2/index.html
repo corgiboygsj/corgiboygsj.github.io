@@ -134,6 +134,13 @@
 
                         
                         <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/archive/">Archives</a>
                         </li>
                         
@@ -142,13 +149,6 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,6 +208,40 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-数据页/">
+        <h2 class="post-title">
+                                 
+            InnoDB-数据页
+        </h2>
+        <h3 class="post-subtitle">
+            介绍InnoDB数据页面的组织方式
+        </h3>
+        <div class="post-content-preview">
+            
+InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条读取到内存修改后再刷新回去的话，效率是十分底下的。InnoDB通过大小为16kb的数据页来管理数据行。数据页是InnoDB和磁盘交互的基本单位，一次最少读取一个数据页，同步磁盘也是最少一个数据页。
+
+页结构
+
+这里我们只关心行记录部分。infimun+supermum部分是数据页自带的。UserRecords部分存储用户操作的数据......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-09-29
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -463,11 +497,10 @@ Exception和Error的区别：Exception是一种可以提前预想到的异常情
             
 Redis主从模式就是为了提高Redis的可用性，但是正常的Redis主从模式无法进行故障的及时发现和自动的故障转移等操作，为了保证高可用就出现了Redis Sentinel。
 
-
 为什么需要Redis Sentinel
 一个主从结构的Redis服务，当Master故障之后都要做什么？
 1、要挑选出一个slave节点手动设置为master节点。
-2、改变其他slave节点的master指向......
+2、改变其他slave节点的master指向。......
         </div>
     </a>
     
@@ -504,42 +537,6 @@ Redis主从模式就是为了提高Redis的可用性，但是正常的Redis主�
 在节点上执行slaveof命令可以将节点指定为某个节点的从节点，slaveof同样可以取消某个节点的主从关系。
 指定主从关系
 slaveof ho......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2019-12-03
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Redis" title="Redis">Redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/Redis/Redis持久化/">
-        <h2 class="post-title">
-                                 
-            Redis持久化
-        </h2>
-        <h3 class="post-subtitle">
-            本文Redis中aof、rdb两种持久化的原理，以及它们的区别。
-        </h3>
-        <div class="post-content-preview">
-            
-Redis持久化是为了防止内存中的数据在Redis重启后丢失，所以生成了一个持久化文件，用来保存在内存中的数据，当redis重启之后通过持久化文件恢复内存中的数据。
-Redis提供了两种持久化方式，分别是RDB和AOF。
-
-
-RDB
-RDB是如何进行的
-RDB方式是通过生成redis内存快照文件的方式来进行持久化的，rdb文件是一个二进制文件。一共有两个命令，分别是save个bgsave。......
         </div>
     </a>
     
@@ -606,7 +603,7 @@ RDB方式是通过生成redis内存快照文件的方式来进行持久化的，
             
         
             
-            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="7">InnoD引擎</a>
+            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
             
         
             
@@ -674,6 +671,10 @@ RDB方式是通过生成redis内存快照文件的方式来进行持久化的，
     <ul>
       
         <li>
+          <a href="/InnoD引擎/InnoDB-事务原理/">InnoDB-事务原理</a>
+        </li>
+      
+        <li>
           <a href="/InnoD引擎/InnoDB-缓冲池/">InnoDB-缓冲池</a>
         </li>
       
@@ -687,10 +688,6 @@ RDB方式是通过生成redis内存快照文件的方式来进行持久化的，
       
         <li>
           <a href="/InnoD引擎/InnoDB-执行计划/">InnoDB-执行计划</a>
-        </li>
-      
-        <li>
-          <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/">InnoDB-索引生效失效条件分析</a>
         </li>
       
     </ul>
@@ -715,7 +712,7 @@ RDB方式是通过生成redis内存快照文件的方式来进行持久化的，
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>

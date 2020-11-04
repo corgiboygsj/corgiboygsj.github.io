@@ -134,6 +134,13 @@
 
                         
                         <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/archive/">Archives</a>
                         </li>
                         
@@ -142,13 +149,6 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -208,6 +208,51 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-事务原理/">
+        <h2 class="post-title">
+            
+                <i class="fa fa-thumb-tack" style="color:#F4711F" ></i>
+                <!-- <i class="fa fa-thumb-tack" style="color:#F89E8C" ></i> -->
+                <!-- <i class="fa fa-thumb-tack" style="color:#1CB7ED" ></i> -->
+                <font color=#F4711F>置顶</font>
+                <!-- <font color=#F89E8C>置顶</font>  -->
+                <!-- <font color=#1CB7ED>置顶</font>  -->
+                                 
+            InnoDB-事务原理
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍InnoDB事务的实现原理
+        </h3>
+        <div class="post-content-preview">
+            
+本文主要探讨的是InnoDB下的实现，尤其是隔离性在网上争议较大，我个人看了很多博文也是很多人说的都不一样。文章属于个人理解，如果有错误请联系我，或者探讨。
+
+什么是事务
+事务可以将对于数据库的一系列操作绑定到一起，让这些操作成为一个整体，一起成功或者一起失败。
+事务的四个特性
+原子性
+一系列操作要么都成功、要么都失败。数据会变成操作之前或者整体操作之后的状态。
+一致性
+事务提交提交/回滚......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-11-04
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -546,40 +591,6 @@ InnoDB与磁盘操作的基本单位是数据页，一个数据页是16kb。数�
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB-数据页/">
-        <h2 class="post-title">
-                                 
-            InnoDB-数据页
-        </h2>
-        <h3 class="post-subtitle">
-            介绍InnoDB数据页面的组织方式
-        </h3>
-        <div class="post-content-preview">
-            
-InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条读取到内存修改后再刷新回去的话，效率是十分底下的。InnoDB通过大小为16kb的数据页来管理数据行。数据页是InnoDB和磁盘交互的基本单位，一次最少读取一个数据页，同步磁盘也是最少一个数据页。
-
-页结构
-
-这里我们只关心行记录部分。infimun+supermum部分是数据页自带的。UserRecords部分存储用户操作的数据......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-09-29
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -625,7 +636,7 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
             
         
             
-            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="7">InnoD引擎</a>
+            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
             
         
             
@@ -693,6 +704,10 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
     <ul>
       
         <li>
+          <a href="/InnoD引擎/InnoDB-事务原理/">InnoDB-事务原理</a>
+        </li>
+      
+        <li>
           <a href="/InnoD引擎/InnoDB-缓冲池/">InnoDB-缓冲池</a>
         </li>
       
@@ -706,10 +721,6 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
       
         <li>
           <a href="/InnoD引擎/InnoDB-执行计划/">InnoDB-执行计划</a>
-        </li>
-      
-        <li>
-          <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/">InnoDB-索引生效失效条件分析</a>
         </li>
       
     </ul>
@@ -734,7 +745,7 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>
