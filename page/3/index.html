@@ -319,6 +319,40 @@ Java IO模型
 
 <div class="post-preview">
 
+    <a href="/Java基础/Java基础-AQS源码分析/">
+        <h2 class="post-title">
+                                 
+            AbstractQueuedSynchronizer源码分析
+        </h2>
+        <h3 class="post-subtitle">
+            本文详细解读了AQS框架控制并发的原理，以及基于AQS怎么实现不同的锁
+        </h3>
+        <div class="post-content-preview">
+            
+Java并发包中的锁工具都是基于AQS来实现的。AQS是并发包的核心，它是一个加强版的CLH队列，它实现了线程阻塞唤醒、取消节点、支持重入、支持独占、共享锁等多种基础功能，其他并发工具直接基于AQS实现自己的特殊的功能即可。
+
+
+什么是CLH队列
+CLH队列是一个先进先出队列，本质是通过队列与节点的状态控制节点的阻塞与唤醒。其中每一个线程代表队列中的一个节点，它不断自旋监听前驱节点的状态（......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2019-10-12
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/Java基础/Java-Synchronized原理/">
         <h2 class="post-title">
                                  
@@ -388,6 +422,45 @@ Java数据类型
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
             2019-10-08
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java-HashMap-jdk8/">
+        <h2 class="post-title">
+                                 
+            HashMap源码分析
+        </h2>
+        <h3 class="post-subtitle">
+            本文解析JDK8的HashMap的源码
+        </h3>
+        <div class="post-content-preview">
+            
+HashMap是平时使用非常广泛的集合工具之一。其内部的数据结构是哈希表，哈希表的查找效率是O（1），效率很高。本文通过增删改查的顺序阅读源码，并且分析了一下并发情况的问题和其他的拓展。JDK版本是1.8。
+
+
+HashMap数据结构
+解决哈希冲突的方式
+
+开放定址法
+链地址法
+
+HashMap内部是一个哈希表的数据结构，存储的是键值对，通过key的hash值与数组长度取模计算出value......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2019-09-23
         </p>
         <div class="tags">
             
@@ -489,7 +562,7 @@ ArrayList是平时特别常用的java集合类，非常适合做随机读取，�
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="1">分布式</a>
+            <a href="/tags/#分布式" title="分布式" rel="2">分布式</a>
             
         
     </div>
@@ -545,6 +618,14 @@ ArrayList是平时特别常用的java集合类，非常适合做随机读取，�
     <ul>
       
         <li>
+          <a href="/分布式/分布式ID生成方案/">分布式ID生成方案</a>
+        </li>
+      
+        <li>
+          <a href="/article/简介/">简介</a>
+        </li>
+      
+        <li>
           <a href="/InnoD引擎/InnoDB-事务原理/">InnoDB-事务原理</a>
         </li>
       
@@ -554,14 +635,6 @@ ArrayList是平时特别常用的java集合类，非常适合做随机读取，�
       
         <li>
           <a href="/SpringBoot/SpringBoot自动配置/">SpringBoot自动配置</a>
-        </li>
-      
-        <li>
-          <a href="/InnoD引擎/InnoDB-Redo-Log/">InnoDB Redo Log</a>
-        </li>
-      
-        <li>
-          <a href="/InnoD引擎/InnoDB-执行计划/">InnoDB-执行计划</a>
         </li>
       
     </ul>
@@ -586,7 +659,7 @@ ArrayList是平时特别常用的java集合类，非常适合做随机读取，�
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/keji_favicon.ico">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          分布式ID生成方案 - 郭守敬 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://www.corgiboy.com/分布式/分布式ID生成方案/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/2020-11-5/天空 云 少女 草地 唯美人物风景4k动漫壁纸3840x2160_彼岸图网.jpg')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#分布式" title="分布式">分布式</a>
+                            
+                        </div>
+                        <h1>分布式ID生成方案</h1>
+                        <h2 class="subheading">本文介绍了常见的几种分布式ID生成方案和他们的优缺点</h2>
+                        <span class="meta">
+                            Posted by 郭守敬 on
+                            2020-11-05
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">郭守敬</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1 id="为什么需要分布式id">为什么需要分布式ID</h1>
+<p>随着系统数据量越来越大，单数据库压力太大无法维持性能，所以可能就需要变成一主多从这样读写分离，随着继续扩大一主多从也无法支撑了。这时就需要分库分表，这样的话就会出现不同库表之间的数据id不能再依赖数据库自增的id，而需要外部一种方式生成全局统一的唯一id。</p>
+<h1 id="分布式id需要满足什么条件">分布式ID需要满足什么条件</h1>
+<ul>
+<li>唯一性，全局必须唯一。</li>
+<li>高性能，不能在生成id上浪费过多的时间，使其成为功能的性能瓶颈。</li>
+<li>高可用，必须保证可用性。</li>
+<li>趋势递增，这个不是必须的，但是最好还是满足，因为比如innodb索引就是按照键值排序的，所以有序性可以让维护索引的效率提高。</li>
+</ul>
+<p>递增的id可能会有安全问题，别人爬取数据的话，可以让id一直增加回去数据。</p>
+<h1 id="几种方案">几种方案</h1>
+<h2 id="uuid">UUID</h2>
+<p>Java本身提供了UUID，这是一个唯一的字符串，它可以不依赖其他工具在本地生成。</p>
+<h3 id="优点">优点</h3>
+<p>方便、简单。不需要借助其他中间件，在程序中就可以生成。</p>
+<h3 id="缺点">缺点</h3>
+<p>无序，当存储到db中时会频繁的造成索引结构的调整，会影响性能。<br>
+字符串过长，在db中占用的内存比较高，会导致数据库在内存中缓存的数据页变少，也会降低性能。所以id最好是越短、占用空间越小越好。</p>
+<h2 id="依靠数据库自增字段生成">依靠数据库自增字段生成</h2>
+<p>在db中建议里一个表，当外部需要获取分布式id时就去这个表里插入一条数据，拿到这行数据的id作为分布式id。</p>
+<h3 id="优点">优点</h3>
+<p>方便、简单。满足id的趋势递增和唯一性。</p>
+<h3 id="缺点">缺点</h3>
+<p>单点问题，如果数据库宕机则所有需要分布式id的服务都不可用了。<br>
+压力问题，所有的服务都来插入新的数据，数据库压力会非常大而且生成id的效率很低。</p>
+<h2 id="多数据库自增方式">多数据库自增方式</h2>
+<p>一个数据库压力大就搞多个数据库，之后搞一个Step步长的概念，每个数据库的自增起始值不同，但是他们的增长Step相同。如下图所示。三个DB分别从1、2、3开始自增，每次增加3，这样就可以让多个DB分散压力并且返回的id是不同的。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/分布式/A8AA98E15A197D5C34508D6E4183C5FD.jpg">
+<h3 id="优点">优点</h3>
+<p>返回的分布式ID是趋势递增的。id唯一。解决了单点问题，即使一个宕机其他的还可以提供服务。</p>
+<h3 id="缺点">缺点</h3>
+<p>单点压力还是很大，因为DB本身写操作就耗时间。<br>
+最主要的问题还是扩容困难，比如要加一台DB4，因为Step是3，这个DB4是很难加进来的，除非停机，将所有DB的id进行修改，同时修改步长。</p>
+<h2 id="号段方案">号段方案</h2>
+<p>网上说这种方案是很多公司常用的，我当前公司没有分布式id场景所以我也不了解。<br>
+当然这个方案的确很好。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> id_generator (</span><br><span class="line">  <span class="keyword">id</span> <span class="built_in">int</span>(<span class="number">10</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  max_id <span class="built_in">bigint</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'当前最大id'</span>,</span><br><span class="line">  step <span class="built_in">int</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'号段的布长'</span>,</span><br><span class="line">  biz_type	<span class="built_in">int</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'业务类型'</span>,</span><br><span class="line">  <span class="keyword">version</span> <span class="built_in">int</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'版本号'</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>它没有采用新插入记录返回id的方案，而是一个业务类型就是一行数据，用一行数据来维护这个业务的自增id。<br>
+服务来修改这行数据的max_id，比如当前max_id值是0，那么来给max_id加上1000，如果返回成功，就代表这个服务获得了1-1000这段分布式id，之后将这段缓存在服务内部，用光之后再来表中取。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> id_generator <span class="keyword">set</span> max_id = max_id + #&#123;step&#125;, <span class="keyword">version</span> = <span class="keyword">version</span> + <span class="number">1</span> <span class="keyword">where</span> biz_type = #&#123;biz_type&#125; <span class="keyword">and</span> <span class="keyword">version</span> = #&#123;<span class="keyword">version</span>&#125;;</span><br></pre></td></tr></table></figure>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/分布式/EDAB6EB1F3BBEBFD471A6A587DB0D84B.jpg">
+<p>version用于乐观锁，防止并发修改。</p>
+<h3 id="优点">优点</h3>
+<p>效率很高，db的压力减小，而且一张表可以维护很多业务的分布式id。</p>
+<h3 id="缺点">缺点</h3>
+<p>复杂性提高，需要系统为了这个生成方案对号段进行缓存。不过可以搞成专门的生成服务给其他服务调用。</p>
+<h2 id="redis自增key方案">Redis自增key方案</h2>
+<p>通过incr命令让一个key自增，自增后的值作为分布式id。这个在我之前搞es的时候，是我选的一种id生成方案。</p>
+<h3 id="优点">优点</h3>
+<p>极其简单，所以我也选择了这种。效率高。</p>
+<h3 id="缺点">缺点</h3>
+<p>Redis数据的持久化问题。<br>
+RDB持久化会生成数据快照，虽然重新启动加载速度快，但是RDB是定时生成快照的，那么在快照生成之前宕机，那么这部分已经生成的id在启动后就会发生重复。<br>
+AOF虽然可以保证每次操作都对数据持久化，但是重新启动的加载恢复速度很慢。</p>
+<h2 id="雪花算法snowflake">雪花算法SnowFlake</h2>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/分布式/44F32AB6A7DE11D000EA3D75344EAF23.jpg">
+<p>SnowFlake生成的是一个Long类型的值，Long类型的数据占用8个字节，也就是64位。SnowFlake将64进行拆分，每个部分具有不同的含义，当然机器码、序列号的位数可以自定义也可以。</p>
+<p>为了让可以使用的范围更大，可以让41位的时间戳不是当前时间戳，而是当前时间戳减去一个时间戳。<br>
+机器码代表的是服务所在服务器的机器码，这个需要自定义而且不要重复。<br>
+序列号代表的是在一毫秒内，一台机器可以生成2的12次幂个不相同的id。</p>
+<h3 id="优点">优点</h3>
+<p>本地生成，不依赖中间件。<br>
+生成的分布式id足够小，只有8个字节，而且是递增的。</p>
+<h3 id="缺点">缺点</h3>
+<p>时钟回拨问题，强烈依赖于服务器的时间，如果时间出现时间回拨就可能出现重复的id。</p>
+<h2 id="美团leaf服务">美团Leaf服务</h2>
+<p>Leaf服务使用的就是号段方案，但是加了很多优化。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/分布式/A94971F4AA2506A093AAFB86205863ED.jpg" width="75%">
+<p>服务访问分布式id的生成服务Leaf获取分别是id。之后Leaf服务使用号段方案维护对应业务的分布式id。</p>
+<p>首先Leaf服务就是多个节点，保证了高可用性。<br>
+为了解决Leaf服务所缓存的id同时用完之后同时访问db造成压力的问题，采取了双Buffer的方案，每个Leaf服务内部有两个Buffer，Buffer会切换使用，当一个使用完切换到另一个上，是用光的那个再去获取下一段id。</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/article/简介/" data-toggle="tooltip" data-placement="top" title="简介">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
+<!--                  -->
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#为什么需要分布式id"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4E3A;&#x4EC0;&#x4E48;&#x9700;&#x8981;&#x5206;&#x5E03;&#x5F0F;ID</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分布式id需要满足什么条件"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x5206;&#x5E03;&#x5F0F;ID&#x9700;&#x8981;&#x6EE1;&#x8DB3;&#x4EC0;&#x4E48;&#x6761;&#x4EF6;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#几种方案"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x51E0;&#x79CD;&#x65B9;&#x6848;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#uuid"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">UUID</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#优点"><span class="toc-nav-number">3.1.1.</span> <span class="toc-nav-text">&#x4F18;&#x70B9;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#缺点"><span class="toc-nav-number">3.1.2.</span> <span class="toc-nav-text">&#x7F3A;&#x70B9;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#依靠数据库自增字段生成"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">&#x4F9D;&#x9760;&#x6570;&#x636E;&#x5E93;&#x81EA;&#x589E;&#x5B57;&#x6BB5;&#x751F;&#x6210;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#优点"><span class="toc-nav-number">3.2.1.</span> <span class="toc-nav-text">&#x4F18;&#x70B9;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#缺点"><span class="toc-nav-number">3.2.2.</span> <span class="toc-nav-text">&#x7F3A;&#x70B9;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#多数据库自增方式"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">&#x591A;&#x6570;&#x636E;&#x5E93;&#x81EA;&#x589E;&#x65B9;&#x5F0F;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#优点"><span class="toc-nav-number">3.3.1.</span> <span class="toc-nav-text">&#x4F18;&#x70B9;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#缺点"><span class="toc-nav-number">3.3.2.</span> <span class="toc-nav-text">&#x7F3A;&#x70B9;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#号段方案"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">&#x53F7;&#x6BB5;&#x65B9;&#x6848;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#优点"><span class="toc-nav-number">3.4.1.</span> <span class="toc-nav-text">&#x4F18;&#x70B9;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#缺点"><span class="toc-nav-number">3.4.2.</span> <span class="toc-nav-text">&#x7F3A;&#x70B9;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#redis自增key方案"><span class="toc-nav-number">3.5.</span> <span class="toc-nav-text">Redis&#x81EA;&#x589E;key&#x65B9;&#x6848;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#优点"><span class="toc-nav-number">3.5.1.</span> <span class="toc-nav-text">&#x4F18;&#x70B9;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#缺点"><span class="toc-nav-number">3.5.2.</span> <span class="toc-nav-text">&#x7F3A;&#x70B9;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#雪花算法snowflake"><span class="toc-nav-number">3.6.</span> <span class="toc-nav-text">&#x96EA;&#x82B1;&#x7B97;&#x6CD5;SnowFlake</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#优点"><span class="toc-nav-number">3.6.1.</span> <span class="toc-nav-text">&#x4F18;&#x70B9;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#缺点"><span class="toc-nav-number">3.6.2.</span> <span class="toc-nav-text">&#x7F3A;&#x70B9;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#美团leaf服务"><span class="toc-nav-number">3.7.</span> <span class="toc-nav-text">&#x7F8E;&#x56E2;Leaf&#x670D;&#x52A1;</span></a></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#分布式" title="分布式">分布式</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://www.jianshu.com/u/100b3e7a68b5" target="_blank">老高的博客</a></li>
+                    
+                        <li><a href="http://www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+<!-- chrome Firefox 中文锚点定位失效-->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<!-- smooth scroll behavior polyfill  -->
+<script type="text/javascript" src="/js/smoothscroll.js"></script>
+<script>
+        $('#toc').on('click','a',function(a){
+            // var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+            // console.log(window.navigator.userAgent,isChrome)
+                // if(isChrome) {
+                    // console.log(a.currentTarget.outerHTML);
+                    // console.log($(a.currentTarget).attr("href"));
+                    //跳转到指定锚点
+                    // document.getElementById(a.target.innerText.toLowerCase()).scrollIntoView(true);
+                    document.getElementById($(a.currentTarget).attr("href").replace("#","")).scrollIntoView({behavior: 'smooth' });
+                // }
+        })  
+</script>
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 郭守敬 2020
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://www.corgiboy.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = 'xxx';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://www.corgiboy.com/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
