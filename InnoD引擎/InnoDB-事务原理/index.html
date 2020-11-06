@@ -142,13 +142,6 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
                             <a href="/archive/">Archives</a>
                         </li>
                         
@@ -157,6 +150,13 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -287,8 +287,8 @@
 <li>ROLLBACK_POINTER：回滚指针，用于指向该行数据的上一个版本的指针。</li>
 </ul>
 <h3 id="read-view">Read View</h3>
-<p>ReadView中属性的值依赖于当前系统中活跃的事务，版本比较的也是数据的版本和ReadView中的属性。<br>
-已提交读级别会在每一次执行select的时候生成ReadView，而可重复读级别只会在事务第一次执行select的时候生成ReadView，之后就不会改变了。</p>
+<p>ReadView中属性的值依赖于当前系统中活跃的事务，版本可见性比较的就是ReadView中的属性和版本链数据的trx_id。<br>
+已提交读级别会在每一次执行select的时候生成ReadView，而可重复读级别只会在事务第一次执行select的时候生成ReadView，在事务结束之前不会改变了。</p>
 <p>已提交读之所以会出现不可重复读的问题，就是因为他每次select都生成新的ReadView，所以可以看到两次select之间提交的事务的修改结果。</p>
 <p>Read View的结构如下：</p>
 <ul>
