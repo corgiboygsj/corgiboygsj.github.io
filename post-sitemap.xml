@@ -8,6 +8,22 @@
     </url>
 
     <url>
+        <loc>http://www.corgiboy.com/InnoD%E5%BC%95%E6%93%8E/InnoDB-%E4%BA%8B%E5%8A%A1%E5%8E%9F%E7%90%86/</loc>
+        <lastmod>2020-11-06T10:10:14.201Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>http://www.corgiboy.com/InnoD%E5%BC%95%E6%93%8E/InnoDB-%E7%BC%93%E5%86%B2%E6%B1%A0/</loc>
+        <lastmod>2020-11-06T06:43:09.876Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://www.corgiboy.com/article/%E7%AE%80%E4%BB%8B/</loc>
         <lastmod>2020-11-05T08:09:51.477Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -26,14 +42,6 @@
     <url>
         <loc>http://www.corgiboy.com/Java%E5%9F%BA%E7%A1%80/Java-HashMap-jdk8/</loc>
         <lastmod>2020-11-05T03:45:04.471Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>http://www.corgiboy.com/InnoD%E5%BC%95%E6%93%8E/InnoDB-%E4%BA%8B%E5%8A%A1%E5%8E%9F%E7%90%86/</loc>
-        <lastmod>2020-11-05T03:45:04.468Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -90,14 +98,6 @@
     <url>
         <loc>http://www.corgiboy.com/InnoD%E5%BC%95%E6%93%8E/InnoDB-Redo-Log/</loc>
         <lastmod>2020-11-03T10:09:51.490Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>http://www.corgiboy.com/InnoD%E5%BC%95%E6%93%8E/InnoDB-%E7%BC%93%E5%86%B2%E6%B1%A0/</loc>
-        <lastmod>2020-11-03T06:48:13.780Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
