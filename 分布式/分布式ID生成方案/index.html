@@ -142,14 +142,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -239,7 +239,7 @@
 压力问题，所有的服务都来插入新的数据，数据库压力会非常大而且生成id的效率很低。</p>
 <h2 id="多数据库自增方式">多数据库自增方式</h2>
 <p>一个数据库压力大就搞多个数据库，之后搞一个Step步长的概念，每个数据库的自增起始值不同，但是他们的增长Step相同。如下图所示。三个DB分别从1、2、3开始自增，每次增加3，这样就可以让多个DB分散压力并且返回的id是不同的。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/分布式/A8AA98E15A197D5C34508D6E4183C5FD.jpg">
+<img src="http://guoshoujing.gitee.io/mark-down-photo/分布式/A8AA98E15A197D5C34508D6E4183C5FD.jpg" width="60%">
 <h3 id="优点">优点</h3>
 <p>返回的分布式ID是趋势递增的。id唯一。解决了单点问题，即使一个宕机其他的还可以提供服务。</p>
 <h3 id="缺点">缺点</h3>
@@ -252,7 +252,7 @@
 <p>它没有采用新插入记录返回id的方案，而是一个业务类型就是一行数据，用一行数据来维护这个业务的自增id。<br>
 服务来修改这行数据的max_id，比如当前max_id值是0，那么来给max_id加上1000，如果返回成功，就代表这个服务获得了1-1000这段分布式id，之后将这段缓存在服务内部，用光之后再来表中取。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> id_generator <span class="keyword">set</span> max_id = max_id + #&#123;step&#125;, <span class="keyword">version</span> = <span class="keyword">version</span> + <span class="number">1</span> <span class="keyword">where</span> biz_type = #&#123;biz_type&#125; <span class="keyword">and</span> <span class="keyword">version</span> = #&#123;<span class="keyword">version</span>&#125;;</span><br></pre></td></tr></table></figure>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/分布式/EDAB6EB1F3BBEBFD471A6A587DB0D84B.jpg">
+<img src="http://guoshoujing.gitee.io/mark-down-photo/分布式/EDAB6EB1F3BBEBFD471A6A587DB0D84B.jpg" width="30%">
 <p>version用于乐观锁，防止并发修改。</p>
 <h3 id="优点">优点</h3>
 <p>效率很高，db的压力减小，而且一张表可以维护很多业务的分布式id。</p>
