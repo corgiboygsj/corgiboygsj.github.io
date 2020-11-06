@@ -134,6 +134,13 @@
 
                         
                         <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/archive/">Archives</a>
                         </li>
                         
@@ -142,13 +149,6 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -198,9 +198,9 @@
             <!-- 标签云 -->
             <div id='tag_cloud' class="tags">
                 
-                    <a href="#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
-                
                     <a href="#Java" title="Java" rel="12">Java</a>
+                
+                    <a href="#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
                 
                     <a href="#Redis" title="Redis" rel="4">Redis</a>
                 
@@ -214,8 +214,8 @@
 
             
             <div class="one-tag-list">
-                <span class="fa fa-tag listing-seperator" id="InnoD引擎">
-                    <span class="tag-text">InnoD引擎</span>
+                <span class="fa fa-tag listing-seperator" id="Java">
+                    <span class="tag-text">Java</span>
                 </span>
                 
                   <!-- <li class="listing-item">
@@ -223,19 +223,227 @@
                   <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
                   </li> -->
                  <div class="post-preview">
-                     <a href="/InnoD引擎/InnoDB-执行计划/">
+                     <a href="/Java基础/对象逃逸分析/">
                         <h2 class="post-title">
-                            InnoDB-执行计划
+                            对象逃逸分析
                         </h2>
                         
                             <h3 class="post-subtitle">
-                                本文主要介绍怎么查看Sql语句的执行计划，看自己sql的性能
+                                本文介绍为什么对象不全都是分配到堆上的。
                             </h3>
                         
                     </a>
                     <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
                 </div>
                 <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java基础-线程池/">
+                        <h2 class="post-title">
+                            线程池
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文介绍了线程池的执行流程，并且基于源码解析了不同种类线程池的区别。
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java基础-ConcurrentHashMap源码解析/">
+                        <h2 class="post-title">
+                            ConcurrentHashMap源码解析
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文解读了JDK8中ConcurrentHashMap源码，如何保证并发安全，并且探究了其设计的精妙之处。
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java基础-动态代理/">
+                        <h2 class="post-title">
+                            Java动态代理
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文介绍动态代理模式的设计，以及动态代理在实际项目的应用
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Exception和Error的区别/">
+                        <h2 class="post-title">
+                            Exception和Error的区别
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                介绍Java中Exception的基本使用原则
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java基础-线程中断/">
+                        <h2 class="post-title">
+                            线程中断
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文介绍了线程中断的作用，以及如何响应中断。
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java-IO/">
+                        <h2 class="post-title">
+                            BIO、NIO、AIO模型区别
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文介绍IO模型以及它们的区别
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java基础-AQS源码分析/">
+                        <h2 class="post-title">
+                            AbstractQueuedSynchronizer源码分析
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文详细解读了AQS框架控制并发的原理，以及基于AQS怎么实现不同的锁
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java-Synchronized原理/">
+                        <h2 class="post-title">
+                            Synchronized关键字原理
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文介绍Synchronized关键字的实现原理，以及Java对它的优化
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java-包装类/">
+                        <h2 class="post-title">
+                            Java包装类
+                        </h2>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java-HashMap-jdk8/">
+                        <h2 class="post-title">
+                            HashMap源码分析
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文解析JDK8的HashMap的源码
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Java基础/Java-ArrayList-jdk8/">
+                        <h2 class="post-title">
+                            ArrayList源码分析
+                        </h2>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+            </div>
+            
+            <div class="one-tag-list">
+                <span class="fa fa-tag listing-seperator" id="InnoD引擎">
+                    <span class="tag-text">InnoD引擎</span>
+                </span>
                 
                   <!-- <li class="listing-item">
                   <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
@@ -261,6 +469,25 @@
                   <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
                   </li> -->
                  <div class="post-preview">
+                     <a href="/InnoD引擎/InnoDB-缓冲池/">
+                        <h2 class="post-title">
+                            InnoDB-缓冲池
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                介绍InnoDB的缓冲池内部结构，以及如何管理内存数据，和其他特性。
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
                      <a href="/InnoD引擎/InnoDB-Redo-Log/">
                         <h2 class="post-title">
                             InnoDB Redo Log
@@ -268,6 +495,44 @@
                         
                             <h3 class="post-subtitle">
                                 本文介绍InnoDB中保证事务持久性的重做日志
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/InnoD引擎/InnoDB-执行计划/">
+                        <h2 class="post-title">
+                            InnoDB-执行计划
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文主要介绍怎么查看Sql语句的执行计划，看自己sql的性能
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/">
+                        <h2 class="post-title">
+                            InnoDB-索引生效失效条件分析
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文从索引结构出发讲解索引的失效、生效条件
                             </h3>
                         
                     </a>
@@ -318,44 +583,6 @@
                   <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
                   </li> -->
                  <div class="post-preview">
-                     <a href="/InnoD引擎/InnoDB-缓冲池/">
-                        <h2 class="post-title">
-                            InnoDB-缓冲池
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                介绍InnoDB的缓冲池内部结构，以及如何管理内存数据，和其他特性。
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/">
-                        <h2 class="post-title">
-                            InnoDB-索引生效失效条件分析
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文从索引结构出发讲解索引的失效、生效条件
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
                      <a href="/InnoD引擎/InnoDB引擎-行格式/">
                         <h2 class="post-title">
                             InnoDB-数据行
@@ -373,236 +600,28 @@
             </div>
             
             <div class="one-tag-list">
-                <span class="fa fa-tag listing-seperator" id="Java">
-                    <span class="tag-text">Java</span>
-                </span>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Exception和Error的区别/">
-                        <h2 class="post-title">
-                            Exception和Error的区别
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                介绍Java中Exception的基本使用原则
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java-HashMap-jdk8/">
-                        <h2 class="post-title">
-                            HashMap源码分析
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文解析JDK8的HashMap的源码
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java-ArrayList-jdk8/">
-                        <h2 class="post-title">
-                            ArrayList源码分析
-                        </h2>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java-IO/">
-                        <h2 class="post-title">
-                            BIO、NIO、AIO模型区别
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文介绍IO模型以及它们的区别
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java-Synchronized原理/">
-                        <h2 class="post-title">
-                            Synchronized关键字原理
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文介绍Synchronized关键字的实现原理，以及Java对它的优化
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java基础-动态代理/">
-                        <h2 class="post-title">
-                            Java动态代理
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文介绍动态代理模式的设计，以及动态代理在实际项目的应用
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java-包装类/">
-                        <h2 class="post-title">
-                            Java包装类
-                        </h2>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java基础-线程中断/">
-                        <h2 class="post-title">
-                            线程中断
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文介绍了线程中断的作用，以及如何响应中断。
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java基础-AQS源码分析/">
-                        <h2 class="post-title">
-                            AbstractQueuedSynchronizer源码分析
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文详细解读了AQS框架控制并发的原理，以及基于AQS怎么实现不同的锁
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java基础-ConcurrentHashMap源码解析/">
-                        <h2 class="post-title">
-                            ConcurrentHashMap源码解析
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文解读了JDK8中ConcurrentHashMap源码，如何保证并发安全，并且探究了其设计的精妙之处。
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/Java基础-线程池/">
-                        <h2 class="post-title">
-                            线程池
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文介绍了线程池的执行流程，并且基于源码解析了不同种类线程池的区别。
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Java基础/对象逃逸分析/">
-                        <h2 class="post-title">
-                            对象逃逸分析
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文介绍为什么对象不全都是分配到堆上的。
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-            </div>
-            
-            <div class="one-tag-list">
                 <span class="fa fa-tag listing-seperator" id="Redis">
                     <span class="tag-text">Redis</span>
                 </span>
+                
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/Redis/Redis哨兵模式/">
+                        <h2 class="post-title">
+                            Redis哨兵模式
+                        </h2>
+                        
+                            <h3 class="post-subtitle">
+                                本文Redis哨兵模式故障发现、故障转移的原理
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
                 
                   <!-- <li class="listing-item">
                   <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
@@ -635,25 +654,6 @@
                         
                             <h3 class="post-subtitle">
                                 本文Redis中aof、rdb两种持久化的原理，以及它们的区别。
-                            </h3>
-                        
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </div>
-                <hr>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <div class="post-preview">
-                     <a href="/Redis/Redis哨兵模式/">
-                        <h2 class="post-title">
-                            Redis哨兵模式
-                        </h2>
-                        
-                            <h3 class="post-subtitle">
-                                本文Redis哨兵模式故障发现、故障转移的原理
                             </h3>
                         
                     </a>
