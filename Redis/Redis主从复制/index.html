@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('http://guoshoujing.gitee.io/天空 夕阳 电车 动漫人物风景4k壁纸3840x2160_彼岸图网.jpg')
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/窗台 日落 女孩 è 书本 alena aenami 4k壁纸_彼岸图网.jpg')
             /*post*/
         
     }
@@ -213,90 +213,58 @@
                 post-container">
 
                 <blockquote>
-<p>为了解决单点问题，实现故障恢复、数据备份、负载均衡，所以需要多个数据相同的redis节点，在节点挂掉的时候，其他节点拥有相同的数据可以服务或者实现多个节点分摊负载的功能，就出现了redis主从复制，这是解决redis高可用的基础。</p>
+<p>单个Redis节点会存在单点问题。Redis节点需要承担读写压力，当Redis宕机后服务将不可用，没有数据备份。所以Redis提供了主从复制功能，用于将节点作为主节点的备份，可以做到读写分离、故障切换功能。同时主从复制是实现哨兵模式、集群模式的基石。</p>
 </blockquote>
-<a id="more"></a>
 <h1 id="主从复制">主从复制</h1>
-<p>在节点上执行slaveof命令可以将节点指定为某个节点的从节点，slaveof同样可以取消某个节点的主从关系。</p>
 <h2 id="指定主从关系">指定主从关系</h2>
-<p>slaveof host port<br>
-slaveof，从节点保存了ip和port之后这个命令就会返回，之后从节点会去建立与主节点的连接、复制主节点的数据等操作。</p>
+<p>通过slaveof {host} {port}可以让一个Redis节点成为另一个Redis节点的从节点。成功建立连接后，从节点会同步主节点的数据，之后主节点每次执行的命令都会发送给从节点。从节点执行主节点发送的命令就可以完成与主节点的数据一致。</p>
 <h2 id="取消主从关系">取消主从关系</h2>
-<p>slaveof no one<br>
-在从节点上执行这个命令，从节点会取消与主节点之间的连接，不会继续从主节点上复制数据，但是并不会删除掉自己节点的数据，只是与主节点的复制关系取消了。<br>
-但是如果执行的是切还自己的主节点操作的话，就会先断开与老主节点的连接，建立与新主节点的连接，删除自己的数据，复制新主节点的数据。</p>
+<p>通过slaveof no one可以让Redis从点不再继续做主节点的从节点。从节点会取消与主节点之间的连接，不会继续从主节点上复制数据，但是并不会删除掉自己节点的数据，只是与主节点的复制关系取消了。<br>
+但是如果是更改自己的主节点，那么会先断开与老主节点的连接，建立与新主节点的连接，删除自己的数据，复制新主节点的数据。</p>
 <h1 id="主从复制原理">主从复制原理</h1>
-<h2 id="主从复制流程">主从复制流程</h2>
-<ul>
-<li>
-<p>保存主节点的信息<br>
-首先在从节点上执行slaveof host port命令，从节点会保存host和port信息之后命令返回。</p>
-</li>
-<li>
-<p>从节点定时任务建立与主节点的连接<br>
-从节点上的会执行一个每秒一次的定时任务，这个定时任务会拿着保存的ip和port尝试与主节点建立tcp连接。如果连接失败则会每秒一次尝试连接直到成功或者执行了slaveof no one命令。当建立了连接后，从节点会向主节点发送一个ping，如果主节点没有回复或者超时则从节点会断开与主节点的连接，之后每秒继续重复之前的操作。</p>
-</li>
-<li>
-<p>校验主节点权限<br>
-当ping命令收到回复后，则代表连接建立并且可用了，则会校验master的权限配置与从节点是否相同。</p>
-</li>
-<li>
-<p>主节点发送数据给从节点<br>
-之后主节点会触发一次bgsave，生成rdb文件，之后将这个rdb文件发送给从节点。这是一次全量复制，如果数据很多，则会很慢。</p>
-</li>
-<li>
-<p>从节点删除自身数据并加载主节点发送的数据文件<br>
-从节点收到之后会清空自身的数据，之后加载rdb文件。加载完毕后，如果从节点开启了aof持久化则会立刻进行一次aof的重写操作，保存一份aof文件。</p>
-</li>
-<li>
-<p>持续维持数据复制<br>
-后续主节点的写命令都会同步到从节点保持两端的数据一致性。</p>
-</li>
-</ul>
-<h2 id="复制原理">复制原理</h2>
-<p>复制分为<strong>全量复制</strong>和<strong>部分复制</strong>。全亮复制会生成rdb文件，可能会过大导致网络阻塞。部分复制是对全量复制的优化，防止每次都传输那么大的文件。</p>
-<h3 id="全量复制">全量复制</h3>
-<p>前面说的复制流程其实就是一次全量复制的流程，从节点连接上主机点之后就会进行一次全量复制，将所有的数据拉过来。<br>
-1、主节点通过bgsave生成一个rdb文件，之后将rdb文件发送给从节点。<br>
-2、从节点收到rdb文件后，会清空自己的数据，之后加载rdb文件。<br>
-3、rdb文件加载完成后，如果开启了aof持久化就会立刻进行aof文件的生成。</p>
-<h3 id="部分复制">部分复制</h3>
-<p>部分复制需要三个组件：</p>
-<ul>
-<li>
-<p>节点运行id<br>
-当redis节点启动后就会生成运行id，作为自己的唯一标识，当重启后就会生成新的id。</p>
-</li>
-<li>
-<p>复制积压缓冲区<br>
-这个缓冲区会存储主节点的写命令，用于因为网络问题导致的主从数据复制不完整，通过这个缓冲区进行数据的修复。</p>
-</li>
-<li>
-<p>复制偏移量<br>
-主从节点都会存储这个复制偏移量，当主节点进行写操作时，会给偏移量追加命令占用字节数，从节点接收到数据，也会追加偏移量。部分复制时从节点会发送自己的复制偏移量和自己主节点的运行id。主节点收到命令后，会判断id和自己相不相同，之后根据主从各自的偏移量，从复制积压缓冲区中把命令同步给从节点。</p>
-</li>
-</ul>
-<p>这样可以防止大大减少复制时传输的数据大小。</p>
-<h3 id="异步复制">异步复制</h3>
-<p>复制的过程是一个异步的操作，也就是说主节点发生写命令之后会直接将命令发送给从节点，主节点处理完写命令直接就返回了，并不会等待同步完成。这样就会造成主从之间的数据延迟，主节点写完数据，从节点可能读到的还是老数据。</p>
+<h2 id="保存主节点信息">保存主节点信息</h2>
+<p>在从节点上执行完slaveof {host} {port}后，命令就会直接返回成功。此时从节点只是保存了主节点的ip和port信息，并不会去建立连接。所以这个命令只是告诉从节点主节点的信息而已。</p>
+<h2 id="与主节点建立socket连接">与主节点建立socket连接</h2>
+<p>从节点通过主节点的信息，先尝试和主节点建立socket连接。成功建立连接之后，从节点会发送ping命令并且等待主节点响应pong命令。这个步骤是为了验证连接的可用性。如果没有收到主节点的响应，那么从节点会断开连接，之后每一秒都尝试和主节点建立连接并且发送ping命令。</p>
+<h2 id="全量复制">全量复制</h2>
+<p>全量复制是主从第一次建立复制是必须发生的，因为从节点没有数据，一开始需要将Redis的数据都同步过来。全量复制就是通过RDB持久化的rdb文件实现的，主节点生成rdb文件发送给从节点，从节点从内存快照文件恢复数据。</p>
+<p>在2.8之前全量同步是sync命令，2.8之后是psync，也就是部分复制的命令实现了全量复制。</p>
+<blockquote>
+<p>psync命令格式psync {runId} {offset}<br>
+runId是主节点的运行id。<br>
+offset是从节点的复制偏移量，主节点通过从节点发送的复制偏移量来计算应该把哪些命令发送给从节点。主从节点每次执行完命令就会增大复制偏移量。</p>
+</blockquote>
+<p>（1）从节点发送psync ? -1<br>
+从节点复制偏移量为-1，表示没有复制过。返回FULLRESYNC {runId} {offset}响应信息。</p>
+<p>（2）从节点保存响应信息<br>
+从节点保存主节点的runID和复制偏移量信息。</p>
+<p>（3）主节点生成rdb文件<br>
+主节点通过bgsave命令生成rdb文件，并且将文件发送给从节点。当从节点接收到rdb文件后会加载数据。<br>
+如果rdb文件过大的话，在超时时间之内从节点没有完成文件的接收。那么主节点会断开复制，全量复制失败。</p>
+<p>（4）主节点发送复制积压缓冲区命令<br>
+主节点生成rdb文件、从节点加载rdb文件期间，主节点会继续的响应客户端的命令，并且将这些命令保存在主节点的复制缓冲区中。从节点加载完rdb文件后，主节点把缓冲区的内存发送给从节点。</p>
+<p>（5）从节点重写AOF文件<br>
+如果从节点开启了AOF持久化，那么从节点会立刻进行AOF文件重写，保证aof文件可用。</p>
+<h2 id="部分复制">部分复制</h2>
+<p>主从节点之间可能会出现网络闪断之类的问题，当主从节点间出现网络中断超过一定时间后，主从节点之间的复制连接就会关闭。<br>
+当网络恢复后，从节点通过psync runID offset上报自己的复制偏移量，主节点会从复制积压缓冲区中发送对应的命令给从节点，这样就可以不用再次全量复制了。</p>
+<h2 id="心跳">心跳</h2>
+<p>主从节点之间会保持心跳连接。主节点每10秒发送ping命令给从节点，如果没有回复或者超时则会断开复制连接。同时从节点也会每1秒发送心跳命令上报自己的复制偏移量，用于检查自己的复制是不是有丢失。</p>
 <h1 id="主从结构">主从结构</h1>
 <h2 id="一主一从">一主一从</h2>
 <p>一主一从是简单的结构，可以关闭主节点的持久化，在从节点上进行持久化。这种结构支持主节点宕机从节点进行顶替的情况，但是当主节点宕机之后不要进行主节点的重启，因为主节点一旦重启，主节点并没有持久化数据，所以主节点是空的，那么通过主从复制会将从节点的数据也清空。<br>
 这种时候可以在从节点上执行salveof no one去掉主节点。</p>
 <h2 id="一主多从">一主多从</h2>
-<p>这种情况有多个从节点，数据备份比较多，而且可以做读写分离，但是会对主节点造成压力，因为要同步多个从节点。</p>
+<p>这种情况可以做Redis读写分离，主节点只负责写数据，客户端通过从节点读取数据。但是有多个从节点，数据备份比较多，会对主节点造成压力，因为要同步多个从节点。</p>
 <h2 id="树状主从">树状主从</h2>
-<img src="https://github.com/corgiboygsj/MarkDownPhoto/blob/master/redis/tree.png?raw=true" width="516" hegiht="342" align="center">
-<p>这种结构是一个主节点，下面有从节点，从节点又是其他节点的主节点。这样的结构可以减轻主节点同步从节点的压力。</p>
-<h1 id="其他">其他</h1>
-<h2 id="读写分离">读写分离</h2>
-<p>这种结构是读取操作请求都打到从节点上，写的操作都放到主节点上执行，这样可以减轻主节点的压力，但是会有主从复制引起的数据延迟。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/redis/6C0DBC2F3A1B78C83CCD9F95229B5BB7.jpg" width="50%">
+<p>一主多从的架构可能会出现复制风暴，也就是大量从节点需要主节点产生rdb文件，造成主节点的压力很大。这时可以通过树状架构解决。这种结构是一个主节点，下面有从节点，从节点又是其他节点的主节点。这样主节点继续负责写操作，由从节点进行rdb文件的生成，使用最下层的从节点提供读服务。</p>
 <h2 id="什么时候会全量复制">什么时候会全量复制</h2>
 <p>全量复制会将主节点所有的数据生成rdb文件发送给从节点，这会非常消耗资源，阻塞网络。</p>
 <ul>
 <li>当从节点第一次连接上主节点：因为从节点没有数据，必须将主节点的数据同步过来。</li>
 <li>当运行id与主节点的不匹配的时候：这说明主节点重启了，或者从节点切换了主节点，则必须清空从节点进行一次全量的复制保证数据一致。</li>
-<li>当主节点的复制积压缓冲区溢出时：因为缓冲区移除了，则无法将完整的数据补偿给从节点，则必须进行一次全量复制以保证主从节点数据一致性。</li>
+<li>当主节点的复制积压缓冲区溢出时：因为复制积压缓冲区溢出，则无法将完整的数据补偿给从节点，则必须进行一次全量复制以保证主从节点数据一致性。</li>
 </ul>
 
                 
@@ -361,7 +329,7 @@ slaveof，从节点保存了ip和port之后这个命令就会返回，之后从�
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#主从复制"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4E3B;&#x4ECE;&#x590D;&#x5236;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#指定主从关系"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x6307;&#x5B9A;&#x4E3B;&#x4ECE;&#x5173;&#x7CFB;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#取消主从关系"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x53D6;&#x6D88;&#x4E3B;&#x4ECE;&#x5173;&#x7CFB;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#主从复制原理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x4E3B;&#x4ECE;&#x590D;&#x5236;&#x539F;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#主从复制流程"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x4E3B;&#x4ECE;&#x590D;&#x5236;&#x6D41;&#x7A0B;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#复制原理"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">&#x590D;&#x5236;&#x539F;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#全量复制"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">&#x5168;&#x91CF;&#x590D;&#x5236;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#部分复制"><span class="toc-nav-number">2.2.2.</span> <span class="toc-nav-text">&#x90E8;&#x5206;&#x590D;&#x5236;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#异步复制"><span class="toc-nav-number">2.2.3.</span> <span class="toc-nav-text">&#x5F02;&#x6B65;&#x590D;&#x5236;</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#主从结构"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x4E3B;&#x4ECE;&#x7ED3;&#x6784;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#一主一从"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">&#x4E00;&#x4E3B;&#x4E00;&#x4ECE;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#一主多从"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">&#x4E00;&#x4E3B;&#x591A;&#x4ECE;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#树状主从"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">&#x6811;&#x72B6;&#x4E3B;&#x4ECE;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#其他"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x5176;&#x4ED6;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#读写分离"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">&#x8BFB;&#x5199;&#x5206;&#x79BB;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#什么时候会全量复制"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x4F1A;&#x5168;&#x91CF;&#x590D;&#x5236;</span></a></li></ol></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#主从复制"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4E3B;&#x4ECE;&#x590D;&#x5236;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#指定主从关系"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x6307;&#x5B9A;&#x4E3B;&#x4ECE;&#x5173;&#x7CFB;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#取消主从关系"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x53D6;&#x6D88;&#x4E3B;&#x4ECE;&#x5173;&#x7CFB;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#主从复制原理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x4E3B;&#x4ECE;&#x590D;&#x5236;&#x539F;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#保存主节点信息"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x4FDD;&#x5B58;&#x4E3B;&#x8282;&#x70B9;&#x4FE1;&#x606F;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#与主节点建立socket连接"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">&#x4E0E;&#x4E3B;&#x8282;&#x70B9;&#x5EFA;&#x7ACB;socket&#x8FDE;&#x63A5;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#全量复制"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">&#x5168;&#x91CF;&#x590D;&#x5236;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#部分复制"><span class="toc-nav-number">2.4.</span> <span class="toc-nav-text">&#x90E8;&#x5206;&#x590D;&#x5236;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#心跳"><span class="toc-nav-number">2.5.</span> <span class="toc-nav-text">&#x5FC3;&#x8DF3;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#主从结构"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x4E3B;&#x4ECE;&#x7ED3;&#x6784;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#一主一从"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">&#x4E00;&#x4E3B;&#x4E00;&#x4ECE;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#一主多从"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">&#x4E00;&#x4E3B;&#x591A;&#x4ECE;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#树状主从"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">&#x6811;&#x72B6;&#x4E3B;&#x4ECE;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#什么时候会全量复制"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x4F1A;&#x5168;&#x91CF;&#x590D;&#x5236;</span></a></li></ol></li></ol>
         
         </div>
       </aside>
