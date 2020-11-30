@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/山湖泊倒影风景5K高清壁纸_彼岸图网.jpg') 
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/窗台 日落 女孩 è 书本 alena aenami 4k壁纸_彼岸图网.jpg') 
             /*config*/
         
     }
@@ -134,14 +134,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -221,13 +221,11 @@
         </h3>
         <div class="post-content-preview">
             
-Redis持久化是为了防止内存中的数据在Redis重启后丢失，所以生成了一个持久化文件，用来保存在内存中的数据，当redis重启之后通过持久化文件恢复内存中的数据。
-Redis提供了两种持久化方式，分别是RDB和AOF。
+Redis的数据存储于内存中。当Redis重启后，内存中的数据就会丢失。为了保证重新启动后之前的数据还存在，就需要提供一种持久化机制。Redis为使用者提供了RDB、AOF两种持久化功能。
 
-
-RDB
-RDB是如何进行的
-RDB方式是通过生成redis内存快照文件的方式来进行持久化的，rdb文件是一个二进制文件。一共有两个命令，分别是save个bgsave。......
+RDB持久化
+什么是RDB持久化
+RDB持久化通过保存当时的内存快照文件（二进制文件）来完成持久化。当Redis再次启动的时候会去加载RDB文件，用于恢复内存的数据。因为是二进制文件，所以恢复的速度很......
         </div>
     </a>
     
@@ -250,20 +248,18 @@ RDB方式是通过生成redis内存快照文件的方式来进行持久化的，
     <a href="/Redis/Redis是什么/">
         <h2 class="post-title">
                                  
-            Redis是什么
+            Redis概览
         </h2>
         <h3 class="post-subtitle">
             本文介绍Redis的基本架构以及优势，另外还说了它具备的特性。
         </h3>
         <div class="post-content-preview">
             
-Redis一种基于内存的键值存储数据库，拥有非常高的吞吐量与极高的性能。Redis支持多种数据类型的值，用于降低使用者的开发效率。Redis在3.0实现了集群模式，实现了真正的分布式，而且支持主从复制等等特性。
-
+Redis是基于内存的KV数据库。Redis拥有极高的吞吐量，单点可以达到10W/s的读取。同时Redis支持多种数据类型的值，可以实现各种不同的功能。同时Redis可以保证实现读写分离、高可用架构、集群模式等。
 
 Redis为什么快
 
-Redis是单线程的，防止了多线程模式线程状态的切换引起的性能消耗。而且单线程还免去了并发情况的竞争情况，使得代码编写更加容易，也方便提升性能。
-Redi......
+Redis是单线程的（请求处理方面是单线程，命令排队处理），防止了多线程模式线程状态的切换引起的性能消耗。另外Redis是非CPU密集型的，它的瓶颈在于内......
         </div>
     </a>
     
