@@ -142,14 +142,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -213,50 +213,50 @@
                 post-container">
 
                 <blockquote>
-<p>Redis主从模式就是为了提高Redis的可用性，但是正常的Redis主从模式无法进行故障的及时发现和自动的故障转移等操作，为了保证高可用就出现了Redis Sentinel。</p>
+<p>Redis主从模式就是为了提高Redis的可用性，当主节点异常后需要人为进行故障转移十分麻烦而且不及时，为了保证高可用就出现了Redis Sentinel。</p>
 </blockquote>
 <h1 id="为什么需要redis-sentinel">为什么需要Redis Sentinel</h1>
 <p>一个主从结构的Redis服务，当Master故障之后都要做什么？<br>
 1、要挑选出一个slave节点手动设置为master节点。<br>
 2、改变其他slave节点的master指向。<br>
 3、通知客户端master节点的信息变化。</p>
-<p>当前主从结构的Redis的整个故障转移过程都需要人工干预，而且并不能及时的发现主节点故障。为了解决这些问题保证redis的高可用，就出现了redis sentinel。redis sentinel可以监控每个redis的状态并及时发现故障，自动进行故障转移、保存节点信息、通知客户端。</p>
+<p>当前主从结构的Redis的整个故障转移过程都需要人工干预，而且并不能及时的发现主节点故障。为了解决这些问题保证redis的高可用，就出现了redis sentinel。sentinel节点可以监控每个redis的状态并及时发现故障，自动进行故障转移，完成上面的三个步骤。</p>
 <h1 id="redis-sentinel原理">Redis Sentinel原理</h1>
 <h2 id="三个定时任务">三个定时任务</h2>
 <p>Sentinel只需要主节点的信息就可以开始工作了，原因是因为有下面的三个定时任务。</p>
 <ul>
-<li>每10秒给主节点发送info命令，主机点会回复自己的信息，包括从节点的信息，这样sentinel就可以获得整个主从redis结构的拓扑结构，也可以及时发现新加入的从节点。</li>
-<li>每2秒给master节点的_sentine_:hello频道发送自己对主节点的判断和自己的信息。所有的sentienl节点都会订阅这个频道，所以sentinel发送信息之后，其他的节点都会收到这个消息，他们就彼此知道了对方的信息，就可以进行互相的连通。</li>
+<li>每10秒给主节点发送info命令。主节点会回复自己的信息，包括从节点的信息。这样sentinel就可以获得整个主从redis结构的拓扑结构，也可以及时发现新加入的从节点。</li>
+<li>每2秒给master节点的_sentine_:hello频道发送自己对主节点的判断和自己的信息。所有的sentienl节点都会订阅这个频道，所以sentinel发送信息之后，其他的节点都会收到这个消息。这样sentinel节点彼此就知道了对方的信息，就可以进行互相的连通。</li>
 <li>每1秒sentinel给master节点、slave节点、其他sentinel节点发送ping命令来检测是否存活，因为前两个定时任务让sentinel节点知道了这个架构中其他节点的信息，所以就可以进行连接并且进行心跳检测。</li>
 </ul>
+<p>通过这三个定时任务，sentinel节点会知道整个架构中所有节点的信息（主节点、从节点、其他sentinel节点），并且与它们建立连接，同时检测对方是否存活。</p>
 <h2 id="主观下线-客观下线">主观下线、客观下线</h2>
+<p>通过一秒一次的心跳检测，sentinel节点监控其他节点的存活状态。但是sentinel节点可能只是因为和其他节点之间网络出现临时问题导致的心跳检测失败。所以一个sentinel说节点下线是不准确的，因此出现了主观下线和客观下线。只有客观下线的节点才是真的下线了。</p>
 <ul>
 <li>
 <p>主观下线<br>
-每一秒Sentinel节点都会向其他的节点发送心跳命令，如果超时了还没有获得响应，则会认为目标节点下线了，并且会将目标节点标记为主观下线状态。</p>
+每一秒Sentinel节点都会向其他的节点发送心跳命令，如果超时了还没有获得响应，则会认为目标节点下线了，并且会将目标节点标记为主观下线状态。如果主观下线的节点是主节点，那么在每两秒的定时任务中会把主观下线意见告诉其他sentinel节点。</p>
 </li>
 <li>
 <p>客观下线<br>
-当sentinel节点主观下线了Master节点，他会给其他的sentinel节点发送sentinel is-master-down-by-addr命令，响应就是目标sentinel是否也将Master节点主观下线了，如果当前sentinel收集到了足够的主观下线意见，那么master就会被标记为客观下线。</p>
+通过sentinel:hello频道，sentinel节点收集到其他sentinel节点的主观下线意见之后，sentinel节点会把主观下线意见维护成链表。意见会有过期时间，如果在过期时间之内sentinel收到了超过 (sentinel数量/2)+1 个不同sentinel节点对主节点的主管下线意见（超过半数），那么就会把这个主节点标记成客观下线状态。</p>
 </li>
 </ul>
-<p>sentinel is-master-down-by-addr命令通过参数的不同可以表示为两种请求。一种是‘*’参数，一总是携带自己runid的‘runid’参数。‘*’参数的时候代表询问目标节点对于master节点的主观下线意见，而‘runid’的命令表示让目标节点给自己投票。</p>
 <h2 id="故障转移流程">故障转移流程</h2>
 <h3 id="选举领导者sentinel节点">选举领导者Sentinel节点</h3>
-<p>当sentinel对master进行了客观下线后，那么需要挑选出一个sentinel节点进行master节点的故障转移操作。<br>
-sentinel领导者的选择是通过Raft算法实现的。流程如下：<br>
-1、将master客观下线之后，这个sentinel节点向其他的sentinel节点发送sentinel is-master-down-by-addr命令，携带自己的runid参数，表示需要别的节点对自己投票。<br>
-2、每个节点都只有一次投票的机会，它会将票投给第一个给自己发送命令的人，后续的投票请求将会被忽略。<br>
+<p>当sentinel节点对主节点进行了客观下线后，就需要从sentinel节点中选出一个sentinel节点作为leader来进行故障转移。这个选举的过程是通过Raft算法实现的，流程大致如下：<br>
+1、sentinel对主节点进行客观下线后，sentinel节点会给其他所有的sentinel节点发送请求。请求让它们给自己投票，让自己成为Leader。<br>
+2、每一个sentinel节点都只有一票。没投票的节点会给自己第一个收到的请求节点投票，后续再收到的请求会忽略。<br>
 3、当sentinel节点收到了max（quorum，(sentinel节点数/2)+1）的票数后，就会成为领导者。quorum是客观下线master所需的主观下线数。<br>
-4、如果没有选出领导者会进行下一轮的选举。</p>
+4、如果这一轮没有选出Leader，那么配置纪元会自增，并且开始下一轮选举。</p>
 <h3 id="转移过程">转移过程</h3>
-<p>1、首先这个领导者sentinel会按照规则在slave节点中挑选出一个节点，规则如下，按照从上到下的顺序选择：</p>
+<p>sentinel leader会按照规则在slave节点中挑选出一个节点，规则如下，按照从上到下的顺序选择：</p>
 <ul>
 <li>节点优先级配置最高</li>
-<li>复制偏移量最大（表示与master的数据最相近）</li>
+<li>复制偏移量最大（表示与主节点的数据最相近）</li>
 <li>runid最小</li>
 </ul>
-<p>2、选择出来之后，会对其进行slave of no one，之后将其他的slave的master指向它，之后将新的master的消息发布，客户端就可以根据订阅的频道感知到新的master。</p>
+<p>2、选择出来之后，会对其进行slave of no one，之后将其他的slave的master指向它，之后将新的master的信息在频道发布，客户端通过订阅就可以感知到新的master之后更新本地信息。</p>
 
                 
 
