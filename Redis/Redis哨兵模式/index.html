@@ -142,14 +142,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -235,11 +235,11 @@
 <ul>
 <li>
 <p>主观下线<br>
-每一秒Sentinel节点都会向其他的节点发送心跳命令，如果超时了还没有获得响应，则会认为目标节点下线了，并且会将目标节点标记为主观下线状态。如果主观下线的节点是主节点，那么在每两秒的定时任务中会把主观下线意见告诉其他sentinel节点。</p>
+每一秒Sentinel节点都会向其他的节点发送心跳命令，如果超时了还没有获得响应，则会认为目标节点下线了，并且会将目标节点标记为主观下线状态。</p>
 </li>
 <li>
 <p>客观下线<br>
-通过sentinel:hello频道，sentinel节点收集到其他sentinel节点的主观下线意见之后，sentinel节点会把主观下线意见维护成链表。意见会有过期时间，如果在过期时间之内sentinel收到了超过 (sentinel数量/2)+1 个不同sentinel节点对主节点的主管下线意见（超过半数），那么就会把这个主节点标记成客观下线状态。</p>
+单个sentinel节点主观下线是不准确的，因此如果sentinel节点主观下线的是主节点，那么sentinel节点会立刻询问其他sentinel对该主节点的意见。如果超过quonum（配置的主节点掉线阀值）个sentinel认为主节点主管下线，那么就会标记为客观下线。</p>
 </li>
 </ul>
 <h2 id="故障转移流程">故障转移流程</h2>

@@ -134,14 +134,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -211,40 +211,6 @@
 
 <div class="post-preview">
 
-    <a href="/分布式/分布式ID生成方案/">
-        <h2 class="post-title">
-                                 
-            分布式ID生成方案
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍了常见的几种分布式ID生成方案和他们的优缺点
-        </h3>
-        <div class="post-content-preview">
-            为什么需要分布式ID
-随着系统数据量越来越大，单数据库压力太大无法维持性能，所以可能就需要变成一主多从这样读写分离，随着继续扩大一主多从也无法支撑了。这时就需要分库分表，这样的话就会出现不同库表之间的数据id不能再依赖数据库自增的id，而需要外部一种方式生成全局统一的唯一id。
-分布式ID需要满足什么条件
-
-唯一性，全局必须唯一。
-高性能，不能在生成id上浪费过多的时间，使其成为功能的性能瓶......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-11-05
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#分布式" title="分布式">分布式</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
     <a href="/article/简介/">
         <h2 class="post-title">
             
@@ -284,6 +250,146 @@ JDK源码、基础、JVM持续更新中
             2020-11-05
         </p>
         <div class="tags">
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Redis/Redis内存管理/">
+        <h2 class="post-title">
+                                 
+            Redis内存回收
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍Redis内存淘汰策略、过期键回收等
+        </h3>
+        <div class="post-content-preview">
+            过期键回收策略
+由于内存中存在大量的键，如果精准维护过期时间会很耗费cpu资源。因此Redis通过定时删除和惰性删除来解决过期键的淘汰。
+定时删除
+Redis随机获取部分的键，并且删除其中过期的键值对。根据过期键的比例，回收分为快模式和慢模式。流程如下
+（1）首先通过慢模式进行回收，Redis默认每10秒随机获取20个键。
+（2）其中如果25%的键是过期的，那么Redis会执行顺序回收，直到......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-12-01
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Redis" title="Redis">Redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Redis/缓存雪崩、穿透、击穿/">
+        <h2 class="post-title">
+                                 
+            缓存雪崩、穿透、击穿
+        </h2>
+        <h3 class="post-subtitle">
+            本文简单介绍Redis常见问题的解决方案
+        </h3>
+        <div class="post-content-preview">
+            流程
+正常使用Redis做缓存时，一个请求的访问顺序一般为：
+（1）访问缓存是否存在数据，存在则直接通过缓存返回。
+（2）缓存不存在则去DB加载数据
+（3）将数据写入缓存，之后将数据返回给客户端。
+缓存击穿
+缓存击穿指的是大量的请求访问一个key，而恰巧key的过期时间到了。这时大量的请求都会去DB去加载数据，因为DB相对于Redis这种是十分薄弱的，可能会出现问题。
+解决方案
+通过互斥锁的......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-12-01
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Redis" title="Redis">Redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Redis/Redis集群原理/">
+        <h2 class="post-title">
+                                 
+            Redis集群原理
+        </h2>
+        <h3 class="post-subtitle">
+            本文讲解Redis集群模式的原理
+        </h3>
+        <div class="post-content-preview">
+            
+Redis主从复制了提供了故障转移的基础。Sentinel模式提供了自动故障发现、故障转移的功能。但是主节点的存储、写入性能还是受到单机器的限制。因此Redis推出了Reids集群模式，将数据分散到多个节点上，共同向外提供服务。
+
+数据分布
+分布式系统下有很多种数据的分布方式：顺序分布、一致性哈希分布、虚拟槽哈希分布。
+顺序分布
+这种分布方式一般是将数据进行hash处理，使用hash值和节......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-12-01
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Redis" title="Redis">Redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/分布式/分布式ID生成方案/">
+        <h2 class="post-title">
+                                 
+            分布式ID生成方案
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍了常见的几种分布式ID生成方案和他们的优缺点
+        </h3>
+        <div class="post-content-preview">
+            为什么需要分布式ID
+随着系统数据量越来越大，单数据库压力太大无法维持性能，所以可能就需要变成一主多从这样读写分离，随着继续扩大一主多从也无法支撑了。这时就需要分库分表，这样的话就会出现不同库表之间的数据id不能再依赖数据库自增的id，而需要外部一种方式生成全局统一的唯一id。
+分布式ID需要满足什么条件
+
+唯一性，全局必须唯一。
+高性能，不能在生成id上浪费过多的时间，使其成为功能的性能瓶......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-11-05
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#分布式" title="分布式">分布式</a>
             
         </div>
     
@@ -467,108 +573,6 @@ explain各个列的含义
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/">
-        <h2 class="post-title">
-                                 
-            InnoDB-索引生效失效条件分析
-        </h2>
-        <h3 class="post-subtitle">
-            本文从索引结构出发讲解索引的失效、生效条件
-        </h3>
-        <div class="post-content-preview">
-            索引结构回顾
-
-InnoDB与磁盘操作的基本单位是数据页，一个数据页是16kb。数据页中数据按照主键盘或者人为指定索引列从小到大排序，并且将数据行分组并且建立槽，查找时通过槽进行二分查找定位数据行所在位置。在由多个列组成的索引中，按照声明列的顺序排序，前面的先排序，相同的话再按照后面列排序。
-索引是一个B+树结构，B+树的节点是数据页。
-
-非叶子节点是目录数据页，里面存储的是很多目录行，一个......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-02
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB-索引/">
-        <h2 class="post-title">
-                                 
-            InnoDB-索引
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍InnoDB索引的原理
-        </h3>
-        <div class="post-content-preview">
-            
-查询数据的时候，如果没有一种好的查询方式，直接进行数据的遍历筛选的话是十分慢的，尤其在数据量庞大的情况之下。所以需要一种组织数据的方式，可以让我们快速的定位到想要查询的数据行，这就是索引。
-
-什么是索引
-索引是一种数据的组织方式，类似于字典的目录，可以直接定位到要查的东西的大概位置或者准确位置。在InnoDB中，索引通过B+树结构进行数据的组织，通过根节点依次下找可以快速定位数据。
-有索引......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-09-29
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB-数据页/">
-        <h2 class="post-title">
-                                 
-            InnoDB-数据页
-        </h2>
-        <h3 class="post-subtitle">
-            介绍InnoDB数据页面的组织方式
-        </h3>
-        <div class="post-content-preview">
-            
-InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条读取到内存修改后再刷新回去的话，效率是十分底下的。InnoDB通过大小为16kb的数据页来管理数据行。数据页是InnoDB和磁盘交互的基本单位，一次最少读取一个数据页，同步磁盘也是最少一个数据页。
-
-页结构
-
-这里我们只关心行记录部分。infimun+supermum部分是数据页自带的。UserRecords部分存储用户操作的数据......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-09-29
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -577,7 +581,7 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
     
     
         <li class="next">
-            <a href="/archives/2/">Older Posts &rarr;</a>
+            <a href="/page/2/">Older Posts &rarr;</a>
         </li>
     
 </ul>
@@ -618,7 +622,7 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
             
         
             
-            <a href="/tags/#Redis" title="Redis" rel="4">Redis</a>
+            <a href="/tags/#Redis" title="Redis" rel="7">Redis</a>
             
         
             
@@ -682,23 +686,23 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
     <ul>
       
         <li>
+          <a href="/Redis/Redis内存管理/">Redis内存回收</a>
+        </li>
+      
+        <li>
+          <a href="/Redis/缓存雪崩、穿透、击穿/">缓存雪崩、穿透、击穿</a>
+        </li>
+      
+        <li>
+          <a href="/Redis/Redis集群原理/">Redis集群原理</a>
+        </li>
+      
+        <li>
           <a href="/分布式/分布式ID生成方案/">分布式ID生成方案</a>
         </li>
       
         <li>
           <a href="/article/简介/">简介</a>
-        </li>
-      
-        <li>
-          <a href="/InnoD引擎/InnoDB-事务原理/">InnoDB-事务原理</a>
-        </li>
-      
-        <li>
-          <a href="/InnoD引擎/InnoDB-缓冲池/">InnoDB-缓冲池</a>
-        </li>
-      
-        <li>
-          <a href="/SpringBoot/SpringBoot自动配置/">SpringBoot自动配置</a>
         </li>
       
     </ul>
@@ -723,7 +727,7 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>
