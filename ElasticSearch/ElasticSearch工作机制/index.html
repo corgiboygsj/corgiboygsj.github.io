@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          Redis内存回收 - 郭守敬 | Blog
+          ElasticSearch工作机制 - 郭守敬 | Blog
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/Redis/Redis内存管理/">
+    <link rel="canonical" href="http://www.corgiboy.com/ElasticSearch/ElasticSearch工作机制/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/我等你 女孩 窗前 日出 日落 唯美背影 艺术站设计4k壁纸3840x2160_彼岸图网.jpg')
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/2020-12/好年 新年 孔明灯 女孩 4k动漫壁纸_彼岸图网.jpg')
             /*post*/
         
     }
@@ -88,14 +88,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#Redis" title="Redis">Redis</a>
+                              <a class="tag" href="/tags/#ElasticSearch" title="ElasticSearch">ElasticSearch</a>
                             
                         </div>
-                        <h1>Redis内存回收</h1>
-                        <h2 class="subheading">本文介绍Redis内存淘汰策略、过期键回收等</h2>
+                        <h1>ElasticSearch工作机制</h1>
+                        <h2 class="subheading">本文讲述ElasticSearch的基本工作流程架构，详细的后出现在后续的文章中</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
-                            2020-12-01
+                            2020-12-03
                         </span>
                     </div>
                 
@@ -212,30 +212,76 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h1 id="过期键回收策略">过期键回收策略</h1>
-<p>由于内存中存在大量的键，如果精准维护过期时间会很耗费cpu资源。因此Redis通过定时删除和惰性删除来解决过期键的淘汰。</p>
-<h2 id="定时删除">定时删除</h2>
-<p>Redis随机获取部分的键，并且删除其中过期的键值对。根据过期键的比例，回收分为快模式和慢模式。流程如下</p>
-<p>（1）首先通过慢模式进行回收，Redis默认每10秒随机获取20个键。<br>
-（2）其中如果25%的键是过期的，那么Redis会执行顺序回收，直到获取的20个键中过期的不足25%或者回收时间超过25ms。<br>
-（3）如果之前触发了超时，那么在Redis内部事件发生时会进行一次快回收，超时时间是1ms。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/redis/BB60FF39DF0FF779A1AB162E2C402007.jpg" width="60%">
-<h2 id="惰性删除">惰性删除</h2>
-<p>惰性删除指的是，当Redis访问键的时候会先查看这个键是否已经过期了。如果过期的话就会把找个键删除并且返回null。</p>
-<h1 id="内存淘汰策略">内存淘汰策略</h1>
-<p>内存淘汰策略指当Redis内存满了的情况下，再次往里面插入键值，就会触发内存淘汰策略。</p>
-<p>（1）noeviction<br>
-不做处理，只是返回错误。这个是默认策略。</p>
-<p>（2）allkeys-random<br>
-随机从所有key中删除，直到释放的空间满足新的键值对。</p>
-<p>（3）volatile-random<br>
-从所有过期的key中删除，直到释放的空间满足新的简直对。</p>
-<p>（4）allkeys-lru<br>
-从所有的key中按照lru算法，删除最老使用的key直到空间满足。</p>
-<p>（5）volatile-lru<br>
-从设置了过期时间的key中按照lru算法，删除最老使用的key直到空间满足。</p>
-<p>（6）volatile-ttl<br>
-删除剩余过期时间最短的key，直到空间满足。</p>
+                <blockquote>
+<p>本篇文章只是对ElasticSearch做一个简单的介绍，大概讲述ES一些基本概念、分布式下的请求处理流程。分片原理、故障等机制后续文章再详细探讨。</p>
+</blockquote>
+<h1 id="简介">简介</h1>
+<p>ElasticSearch是一个分布式全文搜素引擎，可以承担上百个节点的服务扩展，并且存储PB级别的结构化、非结构化数据。ElasticSearch内部通过Lucene实现，Lucene实现和使用很复杂，但是ElasticSearch屏蔽这些复杂的使用，给使用者提供一套Rest Api。ElasticSearch不仅仅是Lucene，它还实现了分布式架构，多节点提供服务，通过副本分片保证整个集群的高可用性。</p>
+<h1 id="相关名词">相关名词</h1>
+<p>索引：作为动词，在ElasticSearch中相当于写入文档。作为名词，相当于数据库中的一个数据库实例。<br>
+类型：类比于数据库中的表结构，通过mapping进行设置。<br>
+文档：类比于数据库表中的一行记录。在ElasticSearch中一个文档是以JSON结构存储的。ElasticSearch可以对一个文档所有的字段进行索引和检索。</p>
+<h1 id="集群">集群</h1>
+<p>ElasticSearch集群由多个ElasticSearch节点组成，通过配置集群节点，节点之间会进行通信了解到整个集群的结构并且彼此之间建立连接。集群的整体向外提供服务，每个节点都具有响应请求、广播请求、聚合结果的功能。集群具有高可用性，通过存储数据的副本实现，数据和数据的副本不会分布在同一个节点上。</p>
+<p>集群健康状态</p>
+<ul>
+<li>red：所有的主分片没有办法全部进行分配，集群无法提供服务。</li>
+<li>yellow：集群可以正常提供服务。主分片都分配到节点上了，但是所有主分片的副本分片没有全部分配，会有节点故障而没有副本顶上的危险。</li>
+<li>green：所有的主分片和副本分配都分配下去了，即使主分片节点故障也有副本分片节点顶上，集群可以实现高可用。</li>
+</ul>
+<h1 id="分片shard">分片（Shard）</h1>
+<p>ElasticSearch的索引上的数据是分散存储在分片上的，分片的数据组合起来才是完整的数据，一个节点上可以存在多个分片。一个分片就是一个Lucene实例，也就是说一个ElasticSearch节点上可能会运行很多的Lucene实例。通过分片的概念，数据和节点的绑定关系就被解耦了，因此ElasticSearch天然就是分布式的。扩容缩容只需要对分片进行迁移就可以了，有点Redis集群的意思。</p>
+<p>ElasticSearch中的分片分为两种，一种是主分片（Primary Shard），另外一种是副本分片（Replica Shard）<br>
+主分片负责数据的写入操作，之后将变更同步给其他的副本分片。主分片和副本分片都可以处理数据检索请求。分片一方面提供了扩展ElasticSearch数据存储能力、负载均衡的作用，还起到了数据备份的作用，当主分片所在节点出现问题时，可以使用副本分片进行主分片的替换，让整个集群继续正常提供服务。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/elasticsearch/A5950619C9104D976F51584C4755B2CA.jpg" width="70%">
+<p>一个索引中在创建时就需要指定主分片、副本分片的数量，其中主分片的数量确定后就不可以更改了，而副本分片的数量可以随机进行更改。</p>
+<h1 id="节点角色">节点角色</h1>
+<p>在ElasticSearch配置文件中可以通过node.data和node.master配置节点的角色，其中node.data表示节点是否是数据节点，node.master表示节点是否有成为master节点的资格，默认这两个配置都是true。正常一个集群中第一个启动的有master资格节点就会成为master节点。</p>
+<p>节点角色</p>
+<ul>
+<li>master节点：master节点负责对集群的状态进行管理，例如新建、删除索引，规定哪些分片在哪些节点上、扩容节点、缩容节点。</li>
+<li>数据节点：负责数据的存储、索引、检索，负责数据存储的意思是说节点上可以有分片，如果节点不是数据节点，那么节点上不会有分片存在。</li>
+<li>协调节点：协调节点的工作就是接收客户端请求，并且将收集数据所在分片的数据到自己这里，整合后返回给客户端。ElasticSearch集群中每个节点都可以作为协调节点（master、data都可以作为协调节点）。</li>
+</ul>
+<p>默认情况下，每个节点都具有成为master和存储数据的能力。但是并不推荐这样配置，一般master不要配置成数据节点。因为大数据量时master如果承担客户端请求，那么维护集群状态就会不及时，可能会出现问题。</p>
+<h1 id="分布式文档存储">分布式文档存储</h1>
+<h2 id="文档路由">文档路由</h2>
+<p>文档在写入ElasticSearch的时候，如果客户端指定了id就使用客户端指定的，否则会自动生成一个唯一的id。</p>
+<p>在路由的时候通过 [hash(routing) % 主分片数 = 所属分片] 获得数据所在的分片，每个节点都知道集群中分片的位置。</p>
+<p>这个数据的分布方式也是为什么主分片在索引创建后就不能改变的原因。</p>
+<p>其中是客户端指定的值，ElasticSearch通过请求中这个属性进行hash计算。如果请求没有这个参数就会默认使用文档的id。</p>
+<h2 id="分布式文档索引">分布式文档索引</h2>
+<p>直接引用ElasticSearch官网的图片，下图是一个文档的索引过程，下图是一个三个节点的集群，其中包含两个主分片，四个副本分片。主分片才负责数据的写操作。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/elasticsearch/ABB878D6D3099325B95EEC8D4CB1CE0D.jpg" width="60%">
+<p>（1）Node1接收到客户端请求，首先通过公式假设计算出文档属于分片0。Node1发现主分片在Node3上，因此将请求转发给Node3。<br>
+（2）Node3完成了数据的写入，将数据同步给分片0的副本分片。于是把同步给Node1和Node2。<br>
+（3）Node3收到了Node1和Node2的写入成功响应，返回成功给客户端。</p>
+<h2 id="分布式文档检索">分布式文档检索</h2>
+<p>检索分为两个阶段，分别是query和fetch。</p>
+<p>（1）query检索阶段</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/elasticsearch/D7C001CD082341B91FF89F7EDE5C902F.jpg" width="60%">
+<ul>
+<li>Node3接收到查询请求</li>
+<li>Node3将请求转发给其他的主分片、副本分片</li>
+<li>Node1和Node2收到检索请求后，查出符合条件的文档的id、相关性打分、排序字段值返回给Node3。</li>
+</ul>
+<p>（2）fetch取回阶段</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/elasticsearch/B9FFF067143E1E13180C1A7E6E51C3CD.jpg" width="60%">
+<ul>
+<li>Node3把query阶段返回的id通过hash计算，得到id所在的分片。</li>
+<li>给Node1和Node2发送请求，并且取回_source属性指定的属性。也就是对文档进行丰富。</li>
+<li>Node3把数据返回给客户端。</li>
+</ul>
+<p>有两点需要注意：</p>
+<p>（1）为什么要分成两个阶段，为什么不是query阶段直接返回_source的属性，而是要fetch去获取？<br>
+比如ElasticSearch的分页查询。例如每页10条，要获取第5页数据。那么该节点广播请求后，每个涉及检索的节点都会返回50条数据。之后在Node3上做聚合，Node3将这些数据重新排序只取对应第41-50条的数据的id，再去通过id查询其他属性就可以了。</p>
+<p>（2）协调节点会轮询主节点和副本节点，达到负载均衡的作用。也就是说比如要去分片2上查数据，那就轮询所有分片2的主分片和副本分片。例如只有5个主分片，但是有10个节点，加节点是会提高整个集群的查询吞吐量的。</p>
+<h1 id="扩容-缩容">扩容 缩容</h1>
+<p>当前有一个集群有两个节点，其中索引opertae_log有5个主分片，副本分片设置为1个。数字是分片号，带红框的是主分片。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/elasticsearch/5EDF37CFD863F3C8E9079FB3621AB371.jpg" width="50%">
+<p>现在执行扩容，再添加一个节点，ElasticSearch会自动完成分片的迁移工作。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/elasticsearch/2B9A8207DAAC7727F9248E2407D26132.jpg" width="50%">
+<p>可以看到节点上分片的分布发生了变化，node1和node2都迁移了部分的分片到了node3上。但是还是会保证每个分片的主分片和副本是不在同一台机器上的。</p>
 
                 
 
@@ -243,13 +289,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/ElasticSearch/ElasticSearch工作机制/" data-toggle="tooltip" data-placement="top" title="ElasticSearch工作机制">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/Redis/缓存雪崩、穿透、击穿/" data-toggle="tooltip" data-placement="top" title="缓存雪崩、穿透、击穿">Next Post &rarr;</a>
+                            <a href="/Redis/Redis内存管理/" data-toggle="tooltip" data-placement="top" title="Redis内存回收">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -299,7 +341,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#过期键回收策略"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x8FC7;&#x671F;&#x952E;&#x56DE;&#x6536;&#x7B56;&#x7565;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#定时删除"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x5B9A;&#x65F6;&#x5220;&#x9664;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#惰性删除"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x60F0;&#x6027;&#x5220;&#x9664;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#内存淘汰策略"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x5185;&#x5B58;&#x6DD8;&#x6C70;&#x7B56;&#x7565;</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#简介"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x7B80;&#x4ECB;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#相关名词"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x76F8;&#x5173;&#x540D;&#x8BCD;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#集群"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x96C6;&#x7FA4;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分片shard"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x5206;&#x7247;&#xFF08;Shard&#xFF09;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#节点角色"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x8282;&#x70B9;&#x89D2;&#x8272;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分布式文档存储"><span class="toc-nav-number">6.</span> <span class="toc-nav-text">&#x5206;&#x5E03;&#x5F0F;&#x6587;&#x6863;&#x5B58;&#x50A8;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#文档路由"><span class="toc-nav-number">6.1.</span> <span class="toc-nav-text">&#x6587;&#x6863;&#x8DEF;&#x7531;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#分布式文档索引"><span class="toc-nav-number">6.2.</span> <span class="toc-nav-text">&#x5206;&#x5E03;&#x5F0F;&#x6587;&#x6863;&#x7D22;&#x5F15;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#分布式文档检索"><span class="toc-nav-number">6.3.</span> <span class="toc-nav-text">&#x5206;&#x5E03;&#x5F0F;&#x6587;&#x6863;&#x68C0;&#x7D22;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#扩容-缩容"><span class="toc-nav-number">7.</span> <span class="toc-nav-text">&#x6269;&#x5BB9; &#x7F29;&#x5BB9;</span></a></li></ol>
         
         </div>
       </aside>
@@ -319,7 +361,7 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#Redis" title="Redis">Redis</a>
+                          <a class="tag" href="/tags/#ElasticSearch" title="ElasticSearch">ElasticSearch</a>
                         
                     </div>
                 </section>
