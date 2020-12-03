@@ -282,6 +282,9 @@
 <p>现在执行扩容，再添加一个节点，ElasticSearch会自动完成分片的迁移工作。</p>
 <img src="http://guoshoujing.gitee.io/mark-down-photo/elasticsearch/2B9A8207DAAC7727F9248E2407D26132.jpg" width="50%">
 <p>可以看到节点上分片的分布发生了变化，node1和node2都迁移了部分的分片到了node3上。但是还是会保证每个分片的主分片和副本是不在同一台机器上的。</p>
+<blockquote>
+<p>协调节点在处理检索请求的时候，会去轮询分片。例如数据在分片2上，分片2一共存在五个节点上，那么协调节点会轮着给这个几个节点发送请求，达到负载均衡。同时也代表给集群增加节点可以提高集群的吞吐量。</p>
+</blockquote>
 
                 
 
