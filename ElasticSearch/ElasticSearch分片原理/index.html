@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          郭守敬 | Blog
+          ElasticSearch分片原理 - 郭守敬 | Blog
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/page/4/">
+    <link rel="canonical" href="http://www.corgiboy.com/ElasticSearch/ElasticSearch分片原理/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -71,8 +71,8 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/我等你 女孩 窗前 日出 日落 唯美背影 艺术站设计4k壁纸3840x2160_彼岸图网.jpg') 
-            /*config*/
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/2020-12/三体智子高清4k动漫壁纸_彼岸图网.jpg')
+            /*post*/
         
     }
     
@@ -85,10 +85,18 @@
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 
-                    <div class="site-heading">
-                        <h1>郭守敬</h1>
-                        <!--<hr class="small">-->
-                        <span class="subheading">爱技术、爱游戏、爱美食</span>
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#ElasticSearch" title="ElasticSearch">ElasticSearch</a>
+                            
+                        </div>
+                        <h1>ElasticSearch分片原理</h1>
+                        <h2 class="subheading">本文讲述ElasticSearch分片内部的工作原理</h2>
+                        <span class="meta">
+                            Posted by 郭守敬 on
+                            2020-12-04
+                        </span>
                     </div>
                 
 
@@ -191,346 +199,185 @@
 
 
     <!-- Main Content -->
-    <!-- Main Content -->
-<div class="container">
-    <div class="row">
-        
+    <!-- Modify by Yu-Hsuan Yen -->
 
-<!-- USE SIDEBAR -->
-    <!-- Post Container -->
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                post-container
-            ">
-            
-                <!-- Main Content -->
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
 
+                
+                
 
-<div class="post-preview">
-
-    <a href="/Java基础/Java-Synchronized原理/">
-        <h2 class="post-title">
-                                 
-            Synchronized关键字原理
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍Synchronized关键字的实现原理，以及Java对它的优化
-        </h3>
-        <div class="post-content-preview">
-            
-在多线程情况下，共享资源的写操作可能会出现数据不准确的问题，锁是控制并发情况下资源访问的重要工具。本文讲述我个人理解的Synchronized的原理。
-
-
-Synchronized的使用
-
-同步代码块
-
-12345public void doSomething()&#123;	synchronized(obj)&#123;		//doSomething...	&#125;&#125;
-用于......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2019-10-09
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/Java基础/Java-包装类/">
-        <h2 class="post-title">
-                                 
-            Java包装类
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            
-包装类是Java使用极其频繁的类型，他们代表着基本类型的引用形式，并且提供了丰富的方法。
-
-
-Java数据类型
-
-基本数据类型
-引用数据类型
-
-基本数据类型
-基本数据类型有8种，分别是byte，short，int，float，double，long，char，boolean。
-占用大小和范围请自行搜索。
-引用类型
-
-非基本数据类型的对象都是引用类型的，存储在堆中。
-引用类型的变量类似于指针......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2019-10-08
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/Java基础/Java-HashMap-jdk8/">
-        <h2 class="post-title">
-                                 
-            HashMap源码分析
-        </h2>
-        <h3 class="post-subtitle">
-            本文解析JDK8的HashMap的源码
-        </h3>
-        <div class="post-content-preview">
-            
-HashMap是平时使用非常广泛的集合工具之一。其内部的数据结构是哈希表，哈希表的查找效率是O（1），效率很高。本文通过增删改查的顺序阅读源码，并且分析了一下并发情况的问题和其他的拓展。JDK版本是1.8。
-
-
-HashMap数据结构
-解决哈希冲突的方式
-
-开放定址法
-链地址法
-
-HashMap内部是一个哈希表的数据结构，存储的是键值对，通过key的hash值与数组长度取模计算出value......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2019-09-23
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/Java基础/Java-ArrayList-jdk8/">
-        <h2 class="post-title">
-                                 
-            ArrayList源码分析
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            
-ArrayList是平时特别常用的java集合类，非常适合做随机读取，本文对java8中的ArrayList源码进行分析。
-
-属性
-12345678910//默认容量private static final int DEFAULT_CAPACITY = 10;//空数组，当指定数组长度为0的时候使用。private static final Object[] EMPTY_ELEMENTDA......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2019-09-20
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-
-
-<!-- Pager -->
-
-<ul class="pager">
-    
-        <li class="previous">
-            <a href="/page/3/">&larr; Newer Posts</a>
-        </li>
-    
-    
-</ul>
-
-
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/ElasticSearch/ElasticSearch集群原理/" data-toggle="tooltip" data-placement="top" title="ElasticSearch集群原理">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/ElasticSearch/ElasticSearch工作机制/" data-toggle="tooltip" data-placement="top" title="ElasticSearch工作机制">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
 
                 <br>
 
-<!--                  --><!-- require APlayer -->
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
 <!--                  -->
 
-                <!-- 如果开启评论功能 -->
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="nav">none</ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#ElasticSearch" title="ElasticSearch">ElasticSearch</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://www.jianshu.com/u/100b3e7a68b5" target="_blank">老高的博客</a></li>
+                    
+                        <li><a href="http://www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
+                    
+                </ul>
                 
             </div>
-
-          <!-- Sidebar Container -->
-<div class="
-    col-lg-3 col-lg-offset-0
-    col-md-3 col-md-offset-0
-    col-sm-12
-    col-xs-12
-    sidebar-container
-">
-    
-        <!-- Featured Tags -->
-
-<section>
-    <!-- no hr -->
-    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-    <div class="tags">
-        
-            
-            <a href="/tags/#ElasticSearch" title="ElasticSearch" rel="3">ElasticSearch</a>
-            
-        
-            
-            <a href="/tags/#Java" title="Java" rel="12">Java</a>
-            
-        
-            
-            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
-            
-        
-            
-            <a href="/tags/#Redis" title="Redis" rel="7">Redis</a>
-            
-        
-            
-            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
-            
-        
-            
-            <a href="/tags/#分布式" title="分布式" rel="2">分布式</a>
-            
-        
+        </div>
     </div>
-</section>
+</article>
 
-        <hr>
-    
-        <!-- Short About -->
-<section class="visible-md visible-lg">
-    <h5><a href="/about/">ABOUT ME</a></h5>
-    <div class="short-about">
 
-        
-            <img id = "avatar_pic" src="/img/avatar/柯基.jpeg" />
-        
 
-        
-            <p>我要养一只猫、一只柯基，一只叫卧龙，一只叫凤雏。</p>
-        
 
-        <!-- SNS Link -->
-        <ul class="list-inline">
-            
-            
-            
 
-            
 
-            
 
-            
-                <li>
-                    <a target="_blank"  href="https://github.com/corgiboygsj">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </a>
-                </li>
-            
-            
-            
-            
-        </ul>
-    </div>
-</section>
 
-        <hr>
-    
-        
-  <h5>RECENT POSTS</h3>
-  <div class="widget">
-    <ul>
-      
-        <li>
-          <a href="/ElasticSearch/ElasticSearch集群原理/">ElasticSearch集群原理</a>
-        </li>
-      
-        <li>
-          <a href="/ElasticSearch/ElasticSearch分片原理/">ElasticSearch分片原理</a>
-        </li>
-      
-        <li>
-          <a href="/ElasticSearch/ElasticSearch工作机制/">ElasticSearch工作机制</a>
-        </li>
-      
-        <li>
-          <a href="/Redis/Redis内存管理/">Redis内存回收</a>
-        </li>
-      
-        <li>
-          <a href="/Redis/缓存雪崩、穿透、击穿/">缓存雪崩、穿透、击穿</a>
-        </li>
-      
-    </ul>
-  </div>
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
 
-        <hr>
-    
-        <!-- Friends Blog -->
 
-<h5>FRIENDS</h5>
-<ul class="list-inline">
-
-    
-        <li><a href="https://www.jianshu.com/u/100b3e7a68b5" target="_blank">老高的博客</a></li>
-    
-        <li><a href="http://www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
-    
-</ul>
-
-        <hr>
-    
-        
-    <h5>ARCHIVES</h5>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
-    </div>
-
-        <hr>
-    
-</div>
-
-        
-    </div>
-</div>
+<!-- chrome Firefox 中文锚点定位失效-->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<!-- smooth scroll behavior polyfill  -->
+<script type="text/javascript" src="/js/smoothscroll.js"></script>
+<script>
+        $('#toc').on('click','a',function(a){
+            // var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+            // console.log(window.navigator.userAgent,isChrome)
+                // if(isChrome) {
+                    // console.log(a.currentTarget.outerHTML);
+                    // console.log($(a.currentTarget).attr("href"));
+                    //跳转到指定锚点
+                    // document.getElementById(a.target.innerText.toLowerCase()).scrollIntoView(true);
+                    document.getElementById($(a.currentTarget).attr("href").replace("#","")).scrollIntoView({behavior: 'smooth' });
+                // }
+        })  
+</script>
 
 
     <!-- Footer -->

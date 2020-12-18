@@ -211,6 +211,75 @@
 
 <div class="post-preview">
 
+    <a href="/SpringBoot/SpringBoot自动配置/">
+        <h2 class="post-title">
+                                 
+            SpringBoot自动配置
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍SpringBoot版本2.3.4.RELEASE的自动配置原理
+        </h3>
+        <div class="post-content-preview">
+            @Import注入对象的三种方式
+https://juejin.im/post/6844903946155212813
+自动配置原理
+@SpringBootApplication是SpringBoot启动类的注解，如下图。
+
+自动配置就是通过其内部的@EnableAutoConfiguration注解来实现，EnableAutoConfiguration的内部如下图。
+
+上图重要的部分是其内......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-13
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-Redo-Log/">
+        <h2 class="post-title">
+                                 
+            InnoDB Redo Log
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍InnoDB中保证事务持久性的重做日志
+        </h3>
+        <div class="post-content-preview">
+            
+InnoDB操作的都是内存中的数据，那么为什么数据库宕机后重新启动还可以恢复之前提交的数据呢，而且一条sql语句可能更改很多在磁盘上不在同一个位置的数据，那么数据同步回磁盘的随机io开销InnoDB是怎么避免的呢？Redo Log的设计解决了这部分问题，在故障恢复中和数据页落盘策略上它起到了很大的作用。
+
+什么是redo log？
+redo log是用来持久化事务的，记录数据的物理更改。因......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-11
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/InnoD引擎/InnoDB-执行计划/">
         <h2 class="post-title">
                                  
@@ -484,78 +553,6 @@ maximumPoolSize：核心线程数量+非核心线......
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/Java基础/Java基础-ConcurrentHashMap源码解析/">
-        <h2 class="post-title">
-                                 
-            ConcurrentHashMap源码解析
-        </h2>
-        <h3 class="post-subtitle">
-            本文解读了JDK8中ConcurrentHashMap源码，如何保证并发安全，并且探究了其设计的精妙之处。
-        </h3>
-        <div class="post-content-preview">
-            
-之前我们说过HashMap无论是1.7还是1.8，在并发情况下都会出现各种各样的问题。虽然JDK中提供了同步集合包装器和HashTable，但是他们都是简单的对方法进行上锁，锁的粒度很粗，因此他们在高并发下的性能都不会很好。本文章都是围绕JDK1.8来说的。
-
-
-Java中如何使用线程安全的Map
-HashTable
-
-HashTable不支持null的key和value。
-HashTab......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-07-15
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/Java基础/Java基础-动态代理/">
-        <h2 class="post-title">
-                                 
-            Java动态代理
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍动态代理模式的设计，以及动态代理在实际项目的应用
-        </h3>
-        <div class="post-content-preview">
-            
-代理就是给对象的方法增加新的逻辑。代理类代替委托类接受请求，但是实际处理请求的还是委托类，在委托类处理的前后可以添加新的逻辑以达到对对象行为的增强。
-比如我希望给一个对象或者某一类的对象的方法记录执行的时间，这时可以使用代理模式。代理模式分为静态代理和动态代理。
-
-
-静态代理
-静态代理是由程序员手动编写代理类，在程序编译之后这个代理类的class文件已经确实的存在了。下面例子是需要记录一个......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-06-28
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -601,7 +598,7 @@ HashTab......
     <div class="tags">
         
             
-            <a href="/tags/#ElasticSearch" title="ElasticSearch" rel="1">ElasticSearch</a>
+            <a href="/tags/#ElasticSearch" title="ElasticSearch" rel="3">ElasticSearch</a>
             
         
             
@@ -677,6 +674,14 @@ HashTab......
     <ul>
       
         <li>
+          <a href="/ElasticSearch/ElasticSearch集群原理/">ElasticSearch集群原理</a>
+        </li>
+      
+        <li>
+          <a href="/ElasticSearch/ElasticSearch分片原理/">ElasticSearch分片原理</a>
+        </li>
+      
+        <li>
           <a href="/ElasticSearch/ElasticSearch工作机制/">ElasticSearch工作机制</a>
         </li>
       
@@ -686,14 +691,6 @@ HashTab......
       
         <li>
           <a href="/Redis/缓存雪崩、穿透、击穿/">缓存雪崩、穿透、击穿</a>
-        </li>
-      
-        <li>
-          <a href="/Redis/Redis集群原理/">Redis集群原理</a>
-        </li>
-      
-        <li>
-          <a href="/分布式/分布式ID生成方案/">分布式ID生成方案</a>
         </li>
       
     </ul>
@@ -718,7 +715,7 @@ HashTab......
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>

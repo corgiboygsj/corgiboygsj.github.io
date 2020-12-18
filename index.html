@@ -259,20 +259,78 @@ JDK源码、基础、JVM持续更新中
 
 <div class="post-preview">
 
+    <a href="/ElasticSearch/ElasticSearch集群原理/">
+        <h2 class="post-title">
+                                 
+            ElasticSearch集群原理
+        </h2>
+        <h3 class="post-subtitle">
+            本文讲述ElasticSearch分片内部的工作原理
+        </h3>
+        <div class="post-content-preview">
+            ...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-12-04
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#ElasticSearch" title="ElasticSearch">ElasticSearch</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/ElasticSearch/ElasticSearch分片原理/">
+        <h2 class="post-title">
+                                 
+            ElasticSearch分片原理
+        </h2>
+        <h3 class="post-subtitle">
+            本文讲述ElasticSearch分片内部的工作原理
+        </h3>
+        <div class="post-content-preview">
+            ...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-12-04
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#ElasticSearch" title="ElasticSearch">ElasticSearch</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/ElasticSearch/ElasticSearch工作机制/">
         <h2 class="post-title">
                                  
             ElasticSearch工作机制
         </h2>
         <h3 class="post-subtitle">
-            本文讲述ElasticSearch的基本工作流程架构，详细的后出现在后续的文章中
+            本文讲述ElasticSearch的基本架构与工作机制
         </h3>
         <div class="post-content-preview">
             
-本篇文章只是对ElasticSearch做一个简单的介绍，大概讲述ES一些基本概念、分布式下的请求处理流程。分片原理、故障等机制后续文章再详细探讨。
+本篇文章是对ElasticSearch的工作机制和架构原理做一个介绍，不够详细的地方以后可能再研究。
 
 简介
-ElasticSearch是一个分布式全文搜素引擎，可以承担上百个节点的服务扩展，并且存储PB级别的结构化、非结构化数据。ElasticSearch内部通过Lucene实现，Lucene实现和使用很复杂，但是ElasticSearch......
+ElasticSearch是一个分布式全文搜素引擎，可以承担上百个节点的服务扩展，并且存储PB级别的结构化、非结构化数据。ElasticSearch内部通过Lucene实现，Lucene实现和使用很复杂，但是ElasticSearch屏蔽这些复杂的使用，给使用者提供一套Rest A......
         </div>
     </a>
     
@@ -503,75 +561,6 @@ Free List
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/SpringBoot/SpringBoot自动配置/">
-        <h2 class="post-title">
-                                 
-            SpringBoot自动配置
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍SpringBoot版本2.3.4.RELEASE的自动配置原理
-        </h3>
-        <div class="post-content-preview">
-            @Import注入对象的三种方式
-https://juejin.im/post/6844903946155212813
-自动配置原理
-@SpringBootApplication是SpringBoot启动类的注解，如下图。
-
-自动配置就是通过其内部的@EnableAutoConfiguration注解来实现，EnableAutoConfiguration的内部如下图。
-
-上图重要的部分是其内......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-13
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB-Redo-Log/">
-        <h2 class="post-title">
-                                 
-            InnoDB Redo Log
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍InnoDB中保证事务持久性的重做日志
-        </h3>
-        <div class="post-content-preview">
-            
-InnoDB操作的都是内存中的数据，那么为什么数据库宕机后重新启动还可以恢复之前提交的数据呢，而且一条sql语句可能更改很多在磁盘上不在同一个位置的数据，那么数据同步回磁盘的随机io开销InnoDB是怎么避免的呢？Redo Log的设计解决了这部分问题，在故障恢复中和数据页落盘策略上它起到了很大的作用。
-
-什么是redo log？
-redo log是用来持久化事务的，记录数据的物理更改。因......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-11
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -613,7 +602,7 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
     <div class="tags">
         
             
-            <a href="/tags/#ElasticSearch" title="ElasticSearch" rel="1">ElasticSearch</a>
+            <a href="/tags/#ElasticSearch" title="ElasticSearch" rel="3">ElasticSearch</a>
             
         
             
@@ -689,6 +678,14 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
     <ul>
       
         <li>
+          <a href="/ElasticSearch/ElasticSearch集群原理/">ElasticSearch集群原理</a>
+        </li>
+      
+        <li>
+          <a href="/ElasticSearch/ElasticSearch分片原理/">ElasticSearch分片原理</a>
+        </li>
+      
+        <li>
           <a href="/ElasticSearch/ElasticSearch工作机制/">ElasticSearch工作机制</a>
         </li>
       
@@ -698,14 +695,6 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
       
         <li>
           <a href="/Redis/缓存雪崩、穿透、击穿/">缓存雪崩、穿透、击穿</a>
-        </li>
-      
-        <li>
-          <a href="/Redis/Redis集群原理/">Redis集群原理</a>
-        </li>
-      
-        <li>
-          <a href="/分布式/分布式ID生成方案/">分布式ID生成方案</a>
         </li>
       
     </ul>
@@ -730,7 +719,7 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>

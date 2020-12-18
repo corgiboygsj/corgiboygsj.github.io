@@ -8,8 +8,32 @@
     </url>
 
     <url>
+        <loc>http://www.corgiboy.com/InnoD%E5%BC%95%E6%93%8E/InnoDB-%E4%BA%8B%E5%8A%A1%E5%8E%9F%E7%90%86/</loc>
+        <lastmod>2020-12-18T09:46:38.773Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>http://www.corgiboy.com/ElasticSearch/ElasticSearch%E9%9B%86%E7%BE%A4%E5%8E%9F%E7%90%86/</loc>
+        <lastmod>2020-12-04T08:32:28.518Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>http://www.corgiboy.com/ElasticSearch/ElasticSearch%E5%88%86%E7%89%87%E5%8E%9F%E7%90%86/</loc>
+        <lastmod>2020-12-04T08:32:28.515Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://www.corgiboy.com/ElasticSearch/ElasticSearch%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6/</loc>
-        <lastmod>2020-12-03T12:44:18.260Z</lastmod>
+        <lastmod>2020-12-04T08:29:23.072Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -74,14 +98,6 @@
     <url>
         <loc>http://www.corgiboy.com/Redis/Redis%E6%98%AF%E4%BB%80%E4%B9%88/</loc>
         <lastmod>2020-11-30T08:13:12.044Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>http://www.corgiboy.com/InnoD%E5%BC%95%E6%93%8E/InnoDB-%E4%BA%8B%E5%8A%A1%E5%8E%9F%E7%90%86/</loc>
-        <lastmod>2020-11-06T10:21:17.976Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
