@@ -142,14 +142,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -301,7 +301,8 @@
 <p>使用Read View读取数据时的规则如下，满足规则的版本才是事务可见的。比较成功后就会返回数据，版本链后续数据就不会再比较了。</p>
 <ul>
 <li>min_trx_id大于等于行trx_id，该行可读，否则拿下个版本比较。</li>
-<li>m_ids中包含行trx_id，该行不可读，因为该行的事务未提交。注意是m_ids包含trx_id，而不是trx_id在集合最大最小事务id的范围之内，trx_id必须是存在于m_ids集合内的元素。</li>
+<li>min_trx_id等于trx_id，该行可见，因为是自己修改的。</li>
+<li>m_ids中包含行trx_id（不算min_trx_id本身），该行不可读，因为该行的事务未提交。注意是m_ids包含trx_id，而不是trx_id在集合最大最小事务id的范围之内，trx_id必须是存在于m_ids集合内的元素。</li>
 <li>行trx_id位于m_ids最大值和max_trx_id之间，行可读，因为事务已提交。</li>
 <li>行trx_id大于等于max_trx_id，行不可读。</li>
 </ul>
