@@ -18,7 +18,7 @@
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/page/3/">
+    <link rel="canonical" href="http://www.corgiboy.com/archives/3/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -211,73 +211,6 @@
 
 <div class="post-preview">
 
-    <a href="/分布式/分布式锁/">
-        <h2 class="post-title">
-                                 
-            分布式锁
-        </h2>
-        <h3 class="post-subtitle">
-            本文主要讲解基于数据库、Zookeeper、Redis三种中间件实现分布式锁的操作，以及它们的比较。
-        </h3>
-        <div class="post-content-preview">
-            
-现在的架构都是分布式架构，服务部署在多个服务器上，因此他们的虚拟机不共享也不是同一个进程，所以jdk原生的Synchronized和并发包提供的锁都无法满足共享资源的单独占用。因此出现了分布式场景下的分布式锁。
-
-分布式锁
-分布式锁是为了解决分布式场景下对共享资源的访问问题。比如查询库存并且消费，两个请求都查询出为1，之后A对库存-1，之后B也对库存-1，就会发生超卖现象。这时就需要将查库......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-08-11
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#分布式" title="分布式">分布式</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/Java基础/对象逃逸分析/">
-        <h2 class="post-title">
-                                 
-            对象逃逸分析
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍为什么对象不全都是分配到堆上的。
-        </h3>
-        <div class="post-content-preview">
-            
-Java对象是否都分配到堆上？答案是否定的，通过逃逸分析可以将不会被外界引用的对象分配在栈上，可以随着栈一起被回收，同时减少了堆的压力也就减少了gc次数，达到了优化程序执行时间的目的。
-
-
-什么是逃逸分析
-逃逸分析通过分析对象的作用域来判断对象是否会被分配方法之外的地方所引用和持有。逃逸分析可以有效的减少线程同步开销和堆内存分配的压力。通过分析如果发现了没有发生逃逸的对象，则可以将对象直接......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-08-11
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
     <a href="/InnoD引擎/InnoDB引擎-行格式/">
         <h2 class="post-title">
                                  
@@ -331,6 +264,50 @@ InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说�
 
 corePoolSize：核心线程数量
 maximumPoolSize：核心线程数量+非核心线......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-07-15
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java基础-ConcurrentHashMap源码解析/">
+        <h2 class="post-title">
+            
+                <i class="fa fa-thumb-tack" style="color:#F4711F" ></i>
+                <!-- <i class="fa fa-thumb-tack" style="color:#F89E8C" ></i> -->
+                <!-- <i class="fa fa-thumb-tack" style="color:#1CB7ED" ></i> -->
+                <font color=#F4711F>置顶</font>
+                <!-- <font color=#F89E8C>置顶</font>  -->
+                <!-- <font color=#1CB7ED>置顶</font>  -->
+                                 
+            ConcurrentHashMap源码解析
+        </h2>
+        <h3 class="post-subtitle">
+            本文解读了JDK8中ConcurrentHashMap源码，如何保证并发安全，并且探究了其设计的精妙之处。
+        </h3>
+        <div class="post-content-preview">
+            
+之前我们说过HashMap无论是1.7还是1.8，在并发情况下都会出现各种各样的问题。虽然JDK中提供了同步集合包装器和HashTable，但是他们都是简单的对方法进行上锁，锁的粒度很粗，因此他们在高并发下的性能都不会很好。本文章都是围绕JDK1.8来说的。
+
+
+Java中如何使用线程安全的Map
+HashTable
+
+HashTable不支持null的key和value。
+HashTab......
         </div>
     </a>
     
@@ -487,6 +464,47 @@ Java IO模型
 
 <div class="post-preview">
 
+    <a href="/Java基础/Java基础-AQS源码分析/">
+        <h2 class="post-title">
+            
+                <i class="fa fa-thumb-tack" style="color:#F4711F" ></i>
+                <!-- <i class="fa fa-thumb-tack" style="color:#F89E8C" ></i> -->
+                <!-- <i class="fa fa-thumb-tack" style="color:#1CB7ED" ></i> -->
+                <font color=#F4711F>置顶</font>
+                <!-- <font color=#F89E8C>置顶</font>  -->
+                <!-- <font color=#1CB7ED>置顶</font>  -->
+                                 
+            AbstractQueuedSynchronizer源码分析
+        </h2>
+        <h3 class="post-subtitle">
+            本文详细解读了AQS框架控制并发的原理，以及基于AQS怎么实现不同的锁
+        </h3>
+        <div class="post-content-preview">
+            
+Java并发包中的锁工具都是基于AQS来实现的。AQS是并发包的核心，它是一个加强版的CLH队列，它实现了线程阻塞唤醒、取消节点、支持重入、支持独占、共享锁等多种基础功能，其他并发工具直接基于AQS实现自己的特殊的功能即可。
+
+
+什么是CLH队列
+CLH队列是一个先进先出队列，本质是通过队列与节点的状态控制节点的阻塞与唤醒。其中每一个线程代表队列中的一个节点，它不断自旋监听前驱节点的状态（......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2019-10-12
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/Java基础/Java-Synchronized原理/">
         <h2 class="post-title">
                                  
@@ -574,12 +592,12 @@ Java数据类型
 <ul class="pager">
     
         <li class="previous">
-            <a href="/page/2/">&larr; Newer Posts</a>
+            <a href="/archives/2/">&larr; Newer Posts</a>
         </li>
     
     
         <li class="next">
-            <a href="/page/4/">Older Posts &rarr;</a>
+            <a href="/archives/4/">Older Posts &rarr;</a>
         </li>
     
 </ul>
@@ -628,11 +646,11 @@ Java数据类型
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="2">分布式</a>
+            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
             
         
             
-            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
+            <a href="/tags/#分布式" title="分布式" rel="2">分布式</a>
             
         
     </div>

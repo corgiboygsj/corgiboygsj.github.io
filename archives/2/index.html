@@ -18,7 +18,7 @@
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/page/4/">
+    <link rel="canonical" href="http://www.corgiboy.com/archives/2/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -211,36 +211,31 @@
 
 <div class="post-preview">
 
-    <a href="/Java基础/Java-HashMap-jdk8/">
+    <a href="/Redis/Redis是什么/">
         <h2 class="post-title">
                                  
-            HashMap源码分析
+            Redis概览
         </h2>
         <h3 class="post-subtitle">
-            本文解析JDK8的HashMap的源码
+            本文介绍Redis的基本架构以及优势，另外还说了它具备的特性。
         </h3>
         <div class="post-content-preview">
             
-HashMap是平时使用非常广泛的集合工具之一。其内部的数据结构是哈希表，哈希表的查找效率是O（1），效率很高。本文通过增删改查的顺序阅读源码，并且分析了一下并发情况的问题和其他的拓展。JDK版本是1.8。
+Redis是基于内存的KV数据库。Redis拥有极高的吞吐量，单点可以达到10W/s的读取。同时Redis支持多种数据类型的值，可以实现各种不同的功能。同时Redis可以保证实现读写分离、高可用架构、集群模式等。
 
+Redis为什么快
 
-HashMap数据结构
-解决哈希冲突的方式
-
-开放定址法
-链地址法
-
-HashMap内部是一个哈希表的数据结构，存储的是键值对，通过key的hash值与数组长度取模计算出value......
+Redis是单线程的（请求处理方面是单线程，命令排队处理），防止了多线程模式线程状态的切换引起的性能消耗。另外Redis是非CPU密集型的，它的瓶颈在于内......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2019-09-23
+            2020-10-13
         </p>
         <div class="tags">
             
-              <a href="/tags/#Java" title="Java">Java</a>
+              <a href="/tags/#Redis" title="Redis">Redis</a>
             
         </div>
     
@@ -250,26 +245,302 @@ HashMap内部是一个哈希表的数据结构，存储的是键值对，通过k
 
 <div class="post-preview">
 
-    <a href="/Java基础/Java-ArrayList-jdk8/">
+    <a href="/SpringBoot/SpringBoot自动配置/">
         <h2 class="post-title">
                                  
-            ArrayList源码分析
+            SpringBoot自动配置
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍SpringBoot版本2.3.4.RELEASE的自动配置原理
         </h3>
         <div class="post-content-preview">
-            
-ArrayList是平时特别常用的java集合类，非常适合做随机读取，本文对java8中的ArrayList源码进行分析。
+            @Import注入对象的三种方式
+https://juejin.im/post/6844903946155212813
+自动配置原理
+@SpringBootApplication是SpringBoot启动类的注解，如下图。
 
-属性
-12345678910//默认容量private static final int DEFAULT_CAPACITY = 10;//空数组，当指定数组长度为0的时候使用。private static final Object[] EMPTY_ELEMENTDA......
+自动配置就是通过其内部的@EnableAutoConfiguration注解来实现，EnableAutoConfiguration的内部如下图。
+
+上图重要的部分是其内......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2019-09-20
+            2020-10-13
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-Redo-Log/">
+        <h2 class="post-title">
+                                 
+            InnoDB Redo Log
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍InnoDB中保证事务持久性的重做日志
+        </h3>
+        <div class="post-content-preview">
+            
+InnoDB操作的都是内存中的数据，那么为什么数据库宕机后重新启动还可以恢复之前提交的数据呢，而且一条sql语句可能更改很多在磁盘上不在同一个位置的数据，那么数据同步回磁盘的随机io开销InnoDB是怎么避免的呢？Redo Log的设计解决了这部分问题，在故障恢复中和数据页落盘策略上它起到了很大的作用。
+
+什么是redo log？
+redo log是用来持久化事务的，记录数据的物理更改。因......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-11
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Redis/Redis内存管理/">
+        <h2 class="post-title">
+                                 
+            Redis内存回收
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍Redis内存淘汰策略、过期键回收等
+        </h3>
+        <div class="post-content-preview">
+            过期键回收策略
+由于内存中存在大量的键，如果精准维护过期时间会很耗费cpu资源。因此Redis通过定时删除和惰性删除来解决过期键的淘汰。
+定时删除
+Redis随机获取部分的键，并且删除其中过期的键值对。根据过期键的比例，回收分为快模式和慢模式。流程如下
+（1）首先通过慢模式进行回收，Redis默认每10秒随机获取20个键。
+（2）其中如果25%的键是过期的，那么Redis会执行顺序回收，直到......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-05
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Redis" title="Redis">Redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-执行计划/">
+        <h2 class="post-title">
+                                 
+            InnoDB-执行计划
+        </h2>
+        <h3 class="post-subtitle">
+            本文主要介绍怎么查看Sql语句的执行计划，看自己sql的性能
+        </h3>
+        <div class="post-content-preview">
+            什么是执行计划
+一条sql会经过mysql优化器的优化后变成一个所谓的执行计划，这个执行计划可以看出来这条sql是如何被mysql来使用的。explain可以帮助我们来查看执行计划，从而我们可以通过执行计划对sql进行优化来提升性能。
+explain各个列的含义
+
+建立一张表来举例
+123456789101112131415CREATE TABLE single_table (    id ......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-02
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/">
+        <h2 class="post-title">
+                                 
+            InnoDB-索引生效失效条件分析
+        </h2>
+        <h3 class="post-subtitle">
+            本文从索引结构出发讲解索引的失效、生效条件
+        </h3>
+        <div class="post-content-preview">
+            索引结构回顾
+
+InnoDB与磁盘操作的基本单位是数据页，一个数据页是16kb。数据页中数据按照主键盘或者人为指定索引列从小到大排序，并且将数据行分组并且建立槽，查找时通过槽进行二分查找定位数据行所在位置。在由多个列组成的索引中，按照声明列的顺序排序，前面的先排序，相同的话再按照后面列排序。
+索引是一个B+树结构，B+树的节点是数据页。
+
+非叶子节点是目录数据页，里面存储的是很多目录行，一个......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-02
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/InnoD引擎/InnoDB-数据页/">
+        <h2 class="post-title">
+                                 
+            InnoDB-数据页
+        </h2>
+        <h3 class="post-subtitle">
+            介绍InnoDB数据页面的组织方式
+        </h3>
+        <div class="post-content-preview">
+            
+InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条读取到内存修改后再刷新回去的话，效率是十分底下的。InnoDB通过大小为16kb的数据页来管理数据行。数据页是InnoDB和磁盘交互的基本单位，一次最少读取一个数据页，同步磁盘也是最少一个数据页。
+
+页结构
+
+这里我们只关心行记录部分。infimun+supermum部分是数据页自带的。UserRecords部分存储用户操作的数据......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-09-29
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Redis/缓存雪崩、穿透、击穿/">
+        <h2 class="post-title">
+                                 
+            缓存雪崩、穿透、击穿
+        </h2>
+        <h3 class="post-subtitle">
+            本文简单介绍Redis常见问题的解决方案
+        </h3>
+        <div class="post-content-preview">
+            流程
+正常使用Redis做缓存时，一个请求的访问顺序一般为：
+（1）访问缓存是否存在数据，存在则直接通过缓存返回。
+（2）缓存不存在则去DB加载数据
+（3）将数据写入缓存，之后将数据返回给客户端。
+缓存击穿
+缓存击穿指的是大量的请求访问一个key，而恰巧key的过期时间到了。这时大量的请求都会去DB去加载数据，因为DB相对于Redis这种是十分薄弱的，可能会出现问题。
+解决方案
+通过互斥锁的......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-09-21
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Redis" title="Redis">Redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/分布式/分布式锁/">
+        <h2 class="post-title">
+                                 
+            分布式锁
+        </h2>
+        <h3 class="post-subtitle">
+            本文主要讲解基于数据库、Zookeeper、Redis三种中间件实现分布式锁的操作，以及它们的比较。
+        </h3>
+        <div class="post-content-preview">
+            
+现在的架构都是分布式架构，服务部署在多个服务器上，因此他们的虚拟机不共享也不是同一个进程，所以jdk原生的Synchronized和并发包提供的锁都无法满足共享资源的单独占用。因此出现了分布式场景下的分布式锁。
+
+分布式锁
+分布式锁是为了解决分布式场景下对共享资源的访问问题。比如查询库存并且消费，两个请求都查询出为1，之后A对库存-1，之后B也对库存-1，就会发生超卖现象。这时就需要将查库......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-08-11
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#分布式" title="分布式">分布式</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/对象逃逸分析/">
+        <h2 class="post-title">
+                                 
+            对象逃逸分析
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍为什么对象不全都是分配到堆上的。
+        </h3>
+        <div class="post-content-preview">
+            
+Java对象是否都分配到堆上？答案是否定的，通过逃逸分析可以将不会被外界引用的对象分配在栈上，可以随着栈一起被回收，同时减少了堆的压力也就减少了gc次数，达到了优化程序执行时间的目的。
+
+
+什么是逃逸分析
+逃逸分析通过分析对象的作用域来判断对象是否会被分配方法之外的地方所引用和持有。逃逸分析可以有效的减少线程同步开销和堆内存分配的压力。通过分析如果发现了没有发生逃逸的对象，则可以将对象直接......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-08-11
         </p>
         <div class="tags">
             
@@ -288,9 +559,13 @@ ArrayList是平时特别常用的java集合类，非常适合做随机读取，�
 <ul class="pager">
     
         <li class="previous">
-            <a href="/page/3/">&larr; Newer Posts</a>
+            <a href="/">&larr; Newer Posts</a>
         </li>
     
+    
+        <li class="next">
+            <a href="/archives/3/">Older Posts &rarr;</a>
+        </li>
     
 </ul>
 
@@ -338,11 +613,11 @@ ArrayList是平时特别常用的java集合类，非常适合做随机读取，�
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="2">分布式</a>
+            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
             
         
             
-            <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
+            <a href="/tags/#分布式" title="分布式" rel="2">分布式</a>
             
         
     </div>
