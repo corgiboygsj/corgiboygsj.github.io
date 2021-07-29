@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/keji_favicon.ico">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          SpringBoot自动配置 - 郭守敬 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://www.corgiboy.com/SpringBoot/SpringBoot自动配置/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/home.jpg')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+                            
+                        </div>
+                        <h1>SpringBoot自动配置</h1>
+                        <h2 class="subheading">本文介绍SpringBoot版本2.3.4.RELEASE的自动配置原理</h2>
+                        <span class="meta">
+                            Posted by 郭守敬 on
+                            2020-10-13
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">郭守敬</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1 id="import注入对象的三种方式">@Import注入对象的三种方式</h1>
+<p><a href="https://juejin.im/post/6844903946155212813" target="_blank" rel="noopener">https://juejin.im/post/6844903946155212813</a></p>
+<h1 id="自动配置原理">自动配置原理</h1>
+<p>@SpringBootApplication是SpringBoot启动类的注解，如下图。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/1.jpg">
+<p>自动配置就是通过其内部的@EnableAutoConfiguration注解来实现，EnableAutoConfiguration的内部如下图。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/2.jpg" width="50%">
+<p>上图重要的部分是其内部的AutoConfigurationImportSelector这个类，这个类通过配合@Import进行了自动配置类的生成。点开这个类，其内部有一个selectImports方法，如下图，这个方法就用于筛选出SpringBoot中的@EnableAutoConfiguration对应的自动配置类，下面几张图片是这个方法内部执行过程。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/3.jpg">
+<p>在下图中横线看到return返回的configurations这个集合，上面代码找到获得这个集合的代码，方法为getCandidateConfigurations，之后点进去。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/4.jpg">
+<p>如下图，这个地方有两个方法，一个是getSpringFactoriesLoaderFactoryClass，只一个是SpringFactoriesLoader.loadFactoryNames。点进去一个是getSpringFactoriesLoaderFactoryClass可以发现他就是返回了一个@EnableAutoConfiguration这个类，之后点进去loadFactoryNames方法，看到loadSpringFactories这个方法，这个方法才是重点。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/5.jpg">
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/6.jpg">
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/7.jpg">
+<p>loadSpringFactories方法如下图</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/8.jpg">
+<h1 id="loadspringfactories方法">loadSpringFactories方法</h1>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//重点。这是存储自动配置类信息的资源文件位置，下图为这个文件存储的内容信息。</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String FACTORIES_RESOURCE_LOCATION = <span class="string">"META-INF/spring.factories"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, List&lt;String&gt;&gt; loadSpringFactories(<span class="meta">@Nullable</span> ClassLoader classLoader) &#123;</span><br><span class="line">		MultiValueMap&lt;String, String&gt; result = cache.get(classLoader);</span><br><span class="line">		<span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> result;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="comment">//通过getResources方法获取所有jar包下的META-INF/spring.factories文件</span></span><br><span class="line">			Enumeration&lt;URL&gt; urls = (classLoader != <span class="keyword">null</span> ?</span><br><span class="line">					classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :    </span><br><span class="line">					ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));</span><br><span class="line">			result = <span class="keyword">new</span> LinkedMultiValueMap&lt;&gt;();     <span class="comment">//一键多值的map</span></span><br><span class="line">			<span class="comment">//遍历前面获取到的所有spring.factories文件</span></span><br><span class="line">			<span class="keyword">while</span> (urls.hasMoreElements()) &#123;</span><br><span class="line">				URL url = urls.nextElement();</span><br><span class="line">				UrlResource resource = <span class="keyword">new</span> UrlResource(url);</span><br><span class="line">				<span class="comment">//将文件转化为Properties对象</span></span><br><span class="line">				Properties properties = PropertiesLoaderUtils.loadProperties(resource);</span><br><span class="line">				<span class="comment">//获取文件内部的键值信息</span></span><br><span class="line">				<span class="keyword">for</span> (Map.Entry&lt;?, ?&gt; entry : properties.entrySet()) &#123;</span><br><span class="line">				  <span class="comment">//拿到key，例如org.springframework.boot.autoconfigure.EnableAutoConfiguration这个键</span></span><br><span class="line">					String factoryTypeName = ((String) entry.getKey()).trim();</span><br><span class="line">					<span class="comment">//将等号后面的值按照逗号进行拆分，并且加入到这个一键多值map中。</span></span><br><span class="line">					<span class="keyword">for</span> (String factoryImplementationName : StringUtils.commaDelimitedListToStringArray((String) entry.getValue())) &#123;</span><br><span class="line">						result.add(factoryTypeName, factoryImplementationName.trim());</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			cache.put(classLoader, result);</span><br><span class="line">			<span class="keyword">return</span> result;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Unable to load factories from location ["</span> +</span><br><span class="line">					FACTORIES_RESOURCE_LOCATION + <span class="string">"]"</span>, ex);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/9.jpg">
+<p>通过上面的方法，最后可以得到一个map，键是文件中等号前面的那个类名。值是多个的，就是等号后面对应的值按照逗号拆分开，下图为debug的结果，可以看到的确是将这个文件形成了这样一键多值的映射。<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/10.jpg"></p>
+<p>之后回到调用它的方法loadFactoryNames。<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/11.jpg"><br>
+前面图上有，factoryType这个Class就是EnableAutoConfiguration类，之后获取名称从返回的map中获取值，就会获得spring.factories中该类对应的那些类的名称。</p>
+<h1 id="配置类">配置类</h1>
+<p>在上面的spring.factories中随便找一个类看下是怎么自动配置的，例如：org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration。<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/12.jpg"><br>
+可以看到自动配置类都是xxxAutoConfiguration形式的，通过上面的@Configuration注解标示这是一个配置类。下面两个Conditionalxxxx注解用于判断是否满足加载这个自动配置类的条件，第一个表示必须是web项目，第二表示项目中必须有DispatcherServlet这个类，才会生成这个自动配置类，否则不生成。</p>
+<p>看类内部白框，@EnableConfigurationProperties注解中有一个WebMvcProperties类，通过这个注解可以生成一个WebMvcProperties的对象，之后在下面@Bean方法中会从容器拿到这个WebMvcProperties对象放到参数中执行dispatcherServlet方法进行DispatcherServlet类的自动配置。</p>
+<p>看一下WebMvcProperties这个类是如何生成自动配置的，类如下图。<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/13.jpg"><br>
+上图中WebMvcProperties通过@ConfigurationProperties这个注解来获取配置文件中的spring.mvc为前缀的配置的值设置到内部属性上。这些属性值都有一些默认的值，这些值存在于与spring.factories同位置的spring-configuration-metadata.json文件中，如下图所示为上图白框属性的默认值。所以我们更改默认值就可以在配置文件中指定值就可以了，未指定就会使用这个文件里的默认值，也就是自动配置，约定大于配置。<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/14.jpg"><br>
+接下来看一下@EnableConfigurationProperties这个注解是怎么生成配置类的，如下图。<br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/15.jpg"><br>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/springboot/autoconfig/16.jpg"><br>
+这是@Import的使用方法之一，通过实现ImportBeanDefinitionRegistrar接口的类，可以将bean注入到容器中。<br>
+通过给@EnableConfigurationProperties设置value为WebMvcProperties.class再配合@Import，在registerBeanDefintions方法中的metadata注解元信息获取到需要注入的类，之后添加到容器中，实现WebMvcProperties的设置，之后完成自动配置。</p>
+<h1 id="总结">总结</h1>
+<p>@EnableXXXXX的注解通过@Import配合ImportSelector的方式，在所有的jar包中搜索meta-inf/spring.factories文件，获取其中对应@EnableXXXXX的自动配置类信息，并将这些对象注入到容器中。但是这些对象会受到@Conditionalxxxx注解的限制用于判断是否需要启用这个配置类。在配置类内部有用于自动配置的XXXXProperties类，他们通过@ConfigurationProperties注解获取到springboot提供的默认配置，之后设置到对应的功能类上完成自动配置。</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/Redis/Redis是什么/" data-toggle="tooltip" data-placement="top" title="Redis概览">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/InnoD引擎/InnoDB-Redo-Log/" data-toggle="tooltip" data-placement="top" title="InnoDB Redo Log">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
+<!--                  -->
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#import注入对象的三种方式"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">@Import&#x6CE8;&#x5165;&#x5BF9;&#x8C61;&#x7684;&#x4E09;&#x79CD;&#x65B9;&#x5F0F;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#自动配置原理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x81EA;&#x52A8;&#x914D;&#x7F6E;&#x539F;&#x7406;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#loadspringfactories方法"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">loadSpringFactories&#x65B9;&#x6CD5;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#配置类"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x914D;&#x7F6E;&#x7C7B;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#总结"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x603B;&#x7ED3;</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://www.jianshu.com/u/100b3e7a68b5" target="_blank">老高的博客</a></li>
+                    
+                        <li><a href="http://www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+<!-- chrome Firefox 中文锚点定位失效-->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<!-- smooth scroll behavior polyfill  -->
+<script type="text/javascript" src="/js/smoothscroll.js"></script>
+<script>
+        $('#toc').on('click','a',function(a){
+            // var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+            // console.log(window.navigator.userAgent,isChrome)
+                // if(isChrome) {
+                    // console.log(a.currentTarget.outerHTML);
+                    // console.log($(a.currentTarget).attr("href"));
+                    //跳转到指定锚点
+                    // document.getElementById(a.target.innerText.toLowerCase()).scrollIntoView(true);
+                    document.getElementById($(a.currentTarget).attr("href").replace("#","")).scrollIntoView({behavior: 'smooth' });
+                // }
+        })  
+</script>
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 郭守敬 2021
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://www.corgiboy.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = 'xxx';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://www.corgiboy.com/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

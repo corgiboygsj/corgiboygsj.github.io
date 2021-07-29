@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/keji_favicon.ico">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          操作系统内存管理 - 郭守敬 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://www.corgiboy.com/操作系统/操作系统内存管理/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/home.jpg')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#操作系统" title="操作系统">操作系统</a>
+                            
+                        </div>
+                        <h1>操作系统内存管理</h1>
+                        <h2 class="subheading">本文介绍操作系统是如何管理分配内存</h2>
+                        <span class="meta">
+                            Posted by 郭守敬 on
+                            2021-07-29
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">郭守敬</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <a id="more"></a>
+<h1 id="虚拟地址">虚拟地址</h1>
+<h2 id="为什么需要虚拟地址">为什么需要虚拟地址</h2>
+<p>程序实际工作的时候会去操作内存，如果同时只有一个程序在运行（不切换，从开始到结束），那不会有什么问题。但是我们使用的操作系统都是多任务的，同时有多个进程在一起执行。比如进程A在一个位置写了3，进程B在这个地址位置改成了5，那么都会带来程序的不正确或者崩溃。换言之就是说希望在并发场景下，进程之间的内存需要是隔离的。最好是所有的进程能好像自己在占用操作系统的整个内存。</p>
+<h2 id="虚拟内存">虚拟内存</h2>
+<p>因此操作系统提供了虚拟地址，进程操作的内存都是操作系统分配的虚拟内存，而操作系统负责管理虚拟内存和物理内存之间的映射关系，从而做到进程之间物理内存的隔离。32位操作系统下进程的虚拟内存可以分配到4G。</p>
+<ul>
+<li>程序操作的内存是虚拟内存</li>
+<li>硬件操作的内存是物理内存</li>
+</ul>
+<p>操作系统维护虚拟内存和物理内存的映射有两种方式。分别是分段管理和分页管理。</p>
+<h1 id="分段管理">分段管理</h1>
+<h2 id="什么是分段管理">什么是分段管理</h2>
+<p>进程分为多个段：程序段、数据段、栈、堆等，因此操作系统在物理内存上分配连续的内存段分配给进程。之后段虚拟内存和物理内存段的映射维护在段表里面。</p>
+<p>虚拟地址由两个部分组成，段选择子和段偏移量。段选择子内部有段号和特权等标识位，段号就是索引标号，用于在段表中找到这个映射项。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/os/EF49DF91FE5A5B864806878DC49F2390.jpg">
+<p>其中段表项维护了段的信息，段基址表示段对应物理内存的起始位置，段偏移量表示可以的内存范围，段界限表示段的小。段偏移量位于0到段界限之间。</p>
+<h2 id="优缺点">优缺点</h2>
+<p>分段管理的有点在于段的数量不多，而且内存都是连续的。但是缺点也有，缺点就是内存碎片、内存置换效率太低的问题。</p>
+<p>内存碎片问题如下图。当前系统中有三个应用程序，游戏、浏览器、音乐。之后浏览器的进程结束了，释放了128M的内存，现在系统中有两块128M的空闲内存。之后有一个新的进程要启动，需要分配200M的内存，但是这248M的空闲内存不连续无法分配200M内存。这就是内存碎片的问题。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/os/E3196C6A950D49900245E8271E9D6577.jpg">
+<p>为了应对这个问题，可以使用内存交换来解决。将音乐的内存写出到磁盘上，再下次使用的时候再读回内存，不过读回内存分配位置要紧贴着游戏的结束位置。但是这样一段内存太大，置换的时候效率就很低，因为磁盘性能和内存比很慢。</p>
+<h1 id="分页管理">分页管理</h1>
+<h2 id="简单分表">简单分表</h2>
+<p>为了解决分段带来的内存碎片和内存交换效率低的问题，就出现了分页管理。操作系统将内存分为一个一个大小相同的内存块，一块为4KB，一个这样的块称为一页。这样的话内存的分配都是一块一块4KB，就不会有大块的内存碎片。而且在内存交换时也是以页面为单位，也不会涉及到大块内存的交换。</p>
+<p>在进程申请内存后，操作系统不会立即去申请物理内存，而是在进程实际使用内存时发现这个页面的内存还没有分配，就会触发CPU缺页异常。这时操作系统才会实际分配内存空间。当内存不够用的时候，会将一些进程最近不使用的内存置换到磁盘上，在需要的时候再读回，这样可以增大内存的大小。</p>
+<p>同样的，操作系统会来维护虚拟地址和物理地址的映射关系。这次使用的表叫做页表，每一个页面都对应页表中的一个页表项。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/os/9F335746D88DE713C524A0AA754B7275.jpg">
+<p>这时就会出现一个问题，一个页面是4KB，32位机器下进程虚拟内存大小为4GB，一个页表项大小4字节，也就是一个进程的页表需要维护4MB，100个进程就需要400MB的内存维护页表。因此就出现了多级页表。</p>
+<h2 id="多级页表">多级页表</h2>
+<p>因为很多进程都是远远使用不到4GB的内存的，所以可以将页表再进行分级，拆分成两级页表。第一级页表的页表项指向的不是物理内存而是第二级的页表。一级页表的每个页表项可以覆盖到4MB的虚拟内存，在进程没有使用到那么多内存的时候，并不会创建二级页表，只有前面几项覆盖的虚拟内存不够了，才会创建新的二级页表。<br>
+这样就不需要一下维护一百万个页表项的页表了（4MB），现在只需要有一个一级页表4KB，和后面使用的二级页表（n * 4KB）。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/os/84B277AB3559714F626F86CAB3DE64FA.jpg">
+<h2 id="tlb">TLB</h2>
+<p>现在有了多级页表可以解决页表维护占用内存过大的问题了，但是越多级的页表就会造成映射查询时多走几张表从而降低效率。因此CPU内部会维护一个缓存，将最常用的一些页表维护到缓冲中，用来直接访问。这个缓存就是TLB。</p>
+<h1 id="linux内存管理">Linux内存管理</h1>
+<p>Linux因为受限于intel处理器的段式内存管理，因而采用了段页式结合的方式，但是内部实际使用的还是分页的方式。linux的每个段都是基址从0开始，内部还是分页的管理。</p>
+<blockquote>
+<p>Linux 系统中的每个段都是从 0 地址开始的整个 4GB 虚拟空间（32 位环境下），也就是所有的段的起始地址都是一样的。这意味着，Linux 系统中的代码，包括操作系统本身的代码和应用程序代码，所面对的地址空间都是线性地址空间（虚拟地址），这种做法相当于屏蔽了处理器中的逻辑地址概念，段只被用于访问控制和内存保护。</p>
+</blockquote>
+<h1 id="文章">文章</h1>
+<ul>
+<li><a href="https://jishuin.proginn.com/p/763bfbd248c0" target="_blank" rel="noopener">https://jishuin.proginn.com/p/763bfbd248c0</a></li>
+</ul>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/article/简介/" data-toggle="tooltip" data-placement="top" title="简介">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
+<!--                  -->
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#虚拟地址"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x865A;&#x62DF;&#x5730;&#x5740;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#为什么需要虚拟地址"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x4E3A;&#x4EC0;&#x4E48;&#x9700;&#x8981;&#x865A;&#x62DF;&#x5730;&#x5740;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#虚拟内存"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x865A;&#x62DF;&#x5185;&#x5B58;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分段管理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x5206;&#x6BB5;&#x7BA1;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#什么是分段管理"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;&#x5206;&#x6BB5;&#x7BA1;&#x7406;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#优缺点"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">&#x4F18;&#x7F3A;&#x70B9;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分页管理"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x5206;&#x9875;&#x7BA1;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#简单分表"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">&#x7B80;&#x5355;&#x5206;&#x8868;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#多级页表"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">&#x591A;&#x7EA7;&#x9875;&#x8868;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#tlb"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">TLB</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#linux内存管理"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">Linux&#x5185;&#x5B58;&#x7BA1;&#x7406;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#文章"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x6587;&#x7AE0;</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#操作系统" title="操作系统">操作系统</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://www.jianshu.com/u/100b3e7a68b5" target="_blank">老高的博客</a></li>
+                    
+                        <li><a href="http://www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+<!-- chrome Firefox 中文锚点定位失效-->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<!-- smooth scroll behavior polyfill  -->
+<script type="text/javascript" src="/js/smoothscroll.js"></script>
+<script>
+        $('#toc').on('click','a',function(a){
+            // var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+            // console.log(window.navigator.userAgent,isChrome)
+                // if(isChrome) {
+                    // console.log(a.currentTarget.outerHTML);
+                    // console.log($(a.currentTarget).attr("href"));
+                    //跳转到指定锚点
+                    // document.getElementById(a.target.innerText.toLowerCase()).scrollIntoView(true);
+                    document.getElementById($(a.currentTarget).attr("href").replace("#","")).scrollIntoView({behavior: 'smooth' });
+                // }
+        })  
+</script>
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 郭守敬 2021
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://www.corgiboy.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = 'xxx';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://www.corgiboy.com/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

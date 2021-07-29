@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/keji_favicon.ico">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          InnoDB-执行计划 - 郭守敬 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://www.corgiboy.com/InnoD引擎/InnoDB-执行计划/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/home-bg-o.png')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+                            
+                        </div>
+                        <h1>InnoDB-执行计划</h1>
+                        <h2 class="subheading">本文主要介绍怎么查看Sql语句的执行计划，看自己sql的性能</h2>
+                        <span class="meta">
+                            Posted by 郭守敬 on
+                            2020-10-02
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">郭守敬</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1 id="什么是执行计划">什么是执行计划</h1>
+<p>一条sql会经过mysql优化器的优化后变成一个所谓的执行计划，这个执行计划可以看出来这条sql是如何被mysql来使用的。explain可以帮助我们来查看执行计划，从而我们可以通过执行计划对sql进行优化来提升性能。</p>
+<h1 id="explain各个列的含义">explain各个列的含义</h1>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/18A00A889E417797DC12CE82E689F7E5.jpg" width="70%">
+<p>建立一张表来举例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE single_table (</span><br><span class="line">    id INT NOT NULL AUTO_INCREMENT,</span><br><span class="line">    key1 VARCHAR(100),</span><br><span class="line">    key2 INT,</span><br><span class="line">    key3 VARCHAR(100),</span><br><span class="line">    key_part1 VARCHAR(100),</span><br><span class="line">    key_part2 VARCHAR(100),</span><br><span class="line">    key_part3 VARCHAR(100),</span><br><span class="line">    common_field VARCHAR(100),</span><br><span class="line">    PRIMARY KEY (id),</span><br><span class="line">    KEY idx_key1 (key1),</span><br><span class="line">    UNIQUE KEY idx_key2 (key2),</span><br><span class="line">    KEY idx_key3 (key3),</span><br><span class="line">    KEY idx_key_part(key_part1, key_part2, key_part3)</span><br><span class="line">) Engine=InnoDB CHARSET=utf8;</span><br></pre></td></tr></table></figure>
+<h2 id="table">table</h2>
+<p>每一条sql无论联查了多少个表，到最后都需要对每个表进行单表访问，explain列出的每一条数据代表对一个单表的访问方式信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT * FROM s1;</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+</span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+</span><br><span class="line">|  1 | SIMPLE      | s1    | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 9688 |   100.00 | NULL  |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; EXPLAIN SELECT * FROM s1 INNER JOIN s2;</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+</span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                                 |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+</span><br><span class="line">|  1 | SIMPLE      | s1    | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 9688 |   100.00 | NULL                                  |</span><br><span class="line">|  1 | SIMPLE      | s2    | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 9954 |   100.00 | Using join buffer (Block Nested Loop) |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------------+</span><br><span class="line">2 rows in set, 1 warning (0.01 sec)</span><br></pre></td></tr></table></figure>
+<h2 id="type">type</h2>
+<p>这个列描述的是表的访问类型，也就是访问方式，比如是不是走索引，怎么走的索引等。</p>
+<h3 id="const">const</h3>
+<p>当通过主键或者唯一索引进行等值搜索时就是const。</p>
+<h3 id="eq_ref">eq_ref</h3>
+<p>当连表查询并且是通过主键或者唯一索引进行相连的话才会使用eq_ref。</p>
+<h3 id="ref">ref</h3>
+<p>当通过通过二级索引进行等值匹配，查询的方式就是ref。</p>
+<h3 id="ref_or_null">ref_or_null</h3>
+<p>通过二级索引列查询，匹配时指定等于null就会走ref_or_null</p>
+<h3 id="index_merge">index_merge</h3>
+<p>这种情况是一个查询使用到了多个索引，一般出现在or取交集、and取并集这种情况，where条件对应多个索引，就可能会发生这种情况，最后将结果进行union操作。<br>
+这种情况效率不高，这种情况可以考虑建立联合索引</p>
+<h3 id="unique_subquery">unique_subquery</h3>
+<p>当mysql要将in查询转化为exists时，子查询如果可以走主键或者唯一索引，那么子查询就是unique_subquery类型。</p>
+<h3 id="index_subquery">index_subquery</h3>
+<p>与上面相同，只不过子查询走的是二级索引。</p>
+<h3 id="in和exists区别有子查询情况">in和exists区别（有子查询情况）</h3>
+<ul>
+<li>in的查询过程：先执行子查询，将结果拿到外层查询中进行查询，实则是一个范围查询。</li>
+<li>exists查询过程：实则是一个循环的过程，算法叫做Block Nested-Loop Join，这个算法通过将外部表的分成组一部分一部分放入join buffer中，之后进行循环将buffer中的记录与子查询结果集的记录进行比较，这样可以减少循环次数。</li>
+</ul>
+<p>过程虽然相似，但是不同的是in的内外查询都可以走索引，而exists只有子查询可以走索引。但是这也不能代表exists的效率小于in，在外部表结果集大于子查询结果集的情况下一般in的查询效率更高，相反外部小于子查询结果集合情况exists的效率可能会更高。</p>
+<h3 id="range">range</h3>
+<p>范围查询会走range，比如&lt;、&gt;、between and。</p>
+<h3 id="index">index</h3>
+<p>使用了二级索引进行全表查询，比如使用到了覆盖，where条件没有走索引，但是where条件和查询的列都在二级索引中，就会扫描整个二级索引查询数据。</p>
+<h3 id="all">All</h3>
+<p>与index差不多，但是扫描的是聚簇索引，并且进行了整个索引的扫描，因为二级索引列更加简洁，而聚簇索引包含所有的列还有隐藏列，所以index的性能要大于all的性能。</p>
+<p>type的效率从上到下依次降低。</p>
+<h2 id="id">id</h2>
+<p>一个select就对应有一个id，但是有时候mysql会计算成本，将子查询变成连接查询，也就是说最后只会产生一个id。通过看有几个id可以知道mysql是如何进行优化的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT * FROM s1 WHERE key1 IN (SELECT key3 FROM s2 WHERE common_field = &apos;a&apos;);</span><br><span class="line">+----+-------------+-------+------------+------+---------------+----------+---------+-------------------+------+----------+------------------------------+</span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key      | key_len | ref               | rows | filtered | Extra                        |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+----------+---------+-------------------+------+----------+------------------------------+</span><br><span class="line">|  1 | SIMPLE      | s2    | NULL       | ALL  | idx_key3      | NULL     | NULL    | NULL              | 9954 |    10.00 | Using where; Start temporary |</span><br><span class="line">|  1 | SIMPLE      | s1    | NULL       | ref  | idx_key1      | idx_key1 | 303     | xiaohaizi.s2.key3 |    1 |   100.00 | End temporary                |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+----------+---------+-------------------+------+----------+------------------------------+</span><br><span class="line">2 rows in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>还有一种其他的情况。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT * FROM s1  UNION SELECT * FROM s2;</span><br><span class="line">+----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+</span><br><span class="line">| id | select_type  | table      | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra           |</span><br><span class="line">+----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+</span><br><span class="line">|  1 | PRIMARY      | s1         | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 9688 |   100.00 | NULL            |</span><br><span class="line">|  2 | UNION        | s2         | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 9954 |   100.00 | NULL            |</span><br><span class="line">| NULL | UNION RESULT | &lt;union1,2&gt; | NULL       | ALL  | NULL          | NULL | NULL    | NULL | NULL |     NULL | Using temporary |</span><br><span class="line">+----+--------------+------------+------------+------+---------------+------+---------+------+------+----------+-----------------+</span><br><span class="line">3 rows in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>可以看到多了个第三行的id为null，原因是union需要对结果进行去重，因为要去重就需要将两个查询的数据放到一起，就需要建立一个临时表，也就是第三条记录的 &lt;union1,2&gt; 表，在这个表中再进行处理，因此有了第三条记录。<br>
+但是union all就不会产生第三条记录，因为union all是将两个查询记录合并而不去重。</p>
+<h2 id="select_type">select_type</h2>
+<p>select_type表示单表的查询方式。</p>
+<h3 id="simple">simple</h3>
+<p>查询中不包含union和子查询的都是simple类型。连接查询两个表也都是simple的。</p>
+<h3 id="primary和union">primary和union</h3>
+<p>包含union、union all的查询，最前面的查询是primary，其他的查询都是union的。</p>
+<h3 id="union_result">union_result</h3>
+<p>union两个表查询，生成的临时表的select_type就是union_result。</p>
+<h3 id="subquery">subquery</h3>
+<p>如果子查询不能优化为join查询的话，而且子查询是不相关子查询的话，那么子查询就是subquery类型。</p>
+<h3 id="dependment-subquery">dependment subquery</h3>
+<p>如果子查询不能优化为join查询的话，而且子查询是相关子查询的话，那么子查询就是dependment subquery。</p>
+<p>##possible_keys和key<br>
+possible_keys是可能会使用到的索引，这个列的值越多，则mysql需要进行计算成本的时间就越多。<br>
+key是查询时候实际使用到的索引。</p>
+<h2 id="key_len">key_len</h2>
+<p>这个代表查询所使用到的索引列的字节长度。</p>
+<h2 id="ref">ref</h2>
+<p>表示的是走索引访问的时候，是用什么进行匹配的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT * FROM s1 WHERE key1 = &apos;a&apos;;</span><br><span class="line">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+</span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key      | key_len | ref   | rows | filtered | Extra |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+</span><br><span class="line">|  1 | SIMPLE      | s1    | NULL       | ref  | idx_key1      | idx_key1 | 303     | const |    8 |   100.00 | NULL  |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+</span><br><span class="line">1 row in set, 1 warning (0.01 sec)</span><br></pre></td></tr></table></figure>
+<p>可以看到就是通过常量匹配key1=a，const代表的就是常量，type为ref代表走的索引进行的等值匹配。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.id = s2.id;</span><br><span class="line">+----+-------------+-------+------------+--------+---------------+---------+---------+-----------------+------+----------+-------+</span><br><span class="line">| id | select_type | table | partitions | type   | possible_keys | key     | key_len | ref             | rows | filtered | Extra |</span><br><span class="line">+----+-------------+-------+------------+--------+---------------+---------+---------+-----------------+------+----------+-------+</span><br><span class="line">|  1 | SIMPLE      | s1    | NULL       | ALL    | PRIMARY       | NULL    | NULL    | NULL            | 9688 |   100.00 | NULL  |</span><br><span class="line">|  1 | SIMPLE      | s2    | NULL       | eq_ref | PRIMARY       | PRIMARY | 4       | xiaohaizi.s1.id |    1 |   100.00 | NULL  |</span><br><span class="line">+----+-------------+-------+------------+--------+---------------+---------+---------+-----------------+------+----------+-------+</span><br><span class="line">2 rows in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>不通过常量匹配时，通过连表两个列连接时，可以看到使用的就是连接的列在索引中进行的查找。</p>
+<h2 id="extra">Extra</h2>
+<p>用来描述额外的信息。</p>
+<h3 id="no-tables-used">No tables used</h3>
+<p>当查询没有from时会是No tables used。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT 1;</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra          |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span><br><span class="line">|  1 | SIMPLE      | NULL  | NULL       | NULL | NULL          | NULL | NULL    | NULL | NULL |     NULL | No tables used |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+<h3 id="no-matching-minmax-row">No matching min/max row</h3>
+<p>当使用min或者max函数时，没有匹配的行时会是No matching min/max row。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT MIN(key1) FROM s1 WHERE key1 = &apos;abcdefg&apos;;</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+</span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                   |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+</span><br><span class="line">|  1 | SIMPLE      | NULL  | NULL       | NULL | NULL          | NULL | NULL    | NULL | NULL |     NULL | No matching min/max row |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+<h3 id="using-index">using index</h3>
+<p>当使用覆盖索引的情况下，就会using index。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT key1 FROM s1 WHERE key1 = &apos;a&apos;;</span><br><span class="line">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+</span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key      | key_len | ref   | rows | filtered | Extra       |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+</span><br><span class="line">|  1 | SIMPLE      | s1    | NULL       | ref  | idx_key1      | idx_key1 | 303     | const |    8 |   100.00 | Using index |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+<h3 id="using-index-condition">using index condition</h3>
+<p>使用到了索引，但是不能全都走索引的时候会是using index condition。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM s1 WHERE key1 &gt; &apos;z&apos; AND key1 LIKE &apos;%a&apos;;</span><br></pre></td></tr></table></figure>
+<p>key1&gt;'z’走了索引，但是key1 like '%a’不能走索引了，这时筛选出key1&gt;'z’的数据之后，并不是立刻回表查询之后再筛选出key1 like '%a’的数据，而是直接从key1的索引中筛选完之后，再筛选出key1 like '%a’的数据，之后再回表。这样可以降低回表的数据量。</p>
+<h3 id="using-where">Using where</h3>
+<p>当查询包含索引列查询还包含非索引列查询的情况下，就会是using where。</p>
+<h3 id="using-join-buffer-block-nested-loop">Using join buffer (Block Nested Loop)</h3>
+<p>当被驱动表不能有效利用索引时，就会使用Using join buffer (Block Nested Loop)。<br>
+通过分配一块join buffer空间，将驱动表的数据放进去，之后去循环访问被驱动表。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">mysql&gt; EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.common_field = s2.common_field;</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------------------------------------------+</span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                                              |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------------------------------------------+</span><br><span class="line">|  1 | SIMPLE      | s1    | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 9688 |   100.00 | NULL                                               |</span><br><span class="line">|  1 | SIMPLE      | s2    | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 9954 |    10.00 | Using where; Using join buffer (Block Nested Loop) |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------------------------------------------+</span><br><span class="line">2 rows in set, 1 warning (0.03 sec)</span><br></pre></td></tr></table></figure>
+<h3 id="using-filesort">Using filesort</h3>
+<p>当需要对结果排序的时候，而且不能排序列不能通过索引的话，就会是filesort。<br>
+下面是通过索引列key1进行排序，之后再回表查询。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT * FROM s1 ORDER BY key1 LIMIT 10;</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key      | key_len | ref  | rows | filtered | Extra |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-------+</span><br><span class="line">|  1 | SIMPLE      | s1    | NULL       | index | NULL          | idx_key1 | 303     | NULL |   10 |   100.00 | NULL  |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+-------+</span><br><span class="line">1 row in set, 1 warning (0.03 sec)</span><br></pre></td></tr></table></figure>
+<p>下面是通过非索引列，进行排序，就是filesort。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; EXPLAIN SELECT * FROM s1 ORDER BY common_field LIMIT 10;</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra          |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span><br><span class="line">|  1 | SIMPLE      | s1    | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 9688 |   100.00 | Using filesort |</span><br><span class="line">+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/Redis/Redis内存管理/" data-toggle="tooltip" data-placement="top" title="Redis内存回收">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/" data-toggle="tooltip" data-placement="top" title="InnoDB-索引生效失效条件分析">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
+<!--                  -->
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#什么是执行计划"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;&#x6267;&#x884C;&#x8BA1;&#x5212;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#explain各个列的含义"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">explain&#x5404;&#x4E2A;&#x5217;&#x7684;&#x542B;&#x4E49;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#table"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">table</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#type"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">type</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#const"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">const</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#eq_ref"><span class="toc-nav-number">2.2.2.</span> <span class="toc-nav-text">eq_ref</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#ref"><span class="toc-nav-number">2.2.3.</span> <span class="toc-nav-text">ref</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#ref_or_null"><span class="toc-nav-number">2.2.4.</span> <span class="toc-nav-text">ref_or_null</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#index_merge"><span class="toc-nav-number">2.2.5.</span> <span class="toc-nav-text">index_merge</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#unique_subquery"><span class="toc-nav-number">2.2.6.</span> <span class="toc-nav-text">unique_subquery</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#index_subquery"><span class="toc-nav-number">2.2.7.</span> <span class="toc-nav-text">index_subquery</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#in和exists区别有子查询情况"><span class="toc-nav-number">2.2.8.</span> <span class="toc-nav-text">in&#x548C;exists&#x533A;&#x522B;&#xFF08;&#x6709;&#x5B50;&#x67E5;&#x8BE2;&#x60C5;&#x51B5;&#xFF09;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#range"><span class="toc-nav-number">2.2.9.</span> <span class="toc-nav-text">range</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#index"><span class="toc-nav-number">2.2.10.</span> <span class="toc-nav-text">index</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#all"><span class="toc-nav-number">2.2.11.</span> <span class="toc-nav-text">All</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#id"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">id</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#select_type"><span class="toc-nav-number">2.4.</span> <span class="toc-nav-text">select_type</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#simple"><span class="toc-nav-number">2.4.1.</span> <span class="toc-nav-text">simple</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#primary和union"><span class="toc-nav-number">2.4.2.</span> <span class="toc-nav-text">primary&#x548C;union</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#union_result"><span class="toc-nav-number">2.4.3.</span> <span class="toc-nav-text">union_result</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#subquery"><span class="toc-nav-number">2.4.4.</span> <span class="toc-nav-text">subquery</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#dependment-subquery"><span class="toc-nav-number">2.4.5.</span> <span class="toc-nav-text">dependment subquery</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#key_len"><span class="toc-nav-number">2.5.</span> <span class="toc-nav-text">key_len</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#ref"><span class="toc-nav-number">2.6.</span> <span class="toc-nav-text">ref</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#extra"><span class="toc-nav-number">2.7.</span> <span class="toc-nav-text">Extra</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#no-tables-used"><span class="toc-nav-number">2.7.1.</span> <span class="toc-nav-text">No tables used</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#no-matching-minmax-row"><span class="toc-nav-number">2.7.2.</span> <span class="toc-nav-text">No matching min/max row</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#using-index"><span class="toc-nav-number">2.7.3.</span> <span class="toc-nav-text">using index</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#using-index-condition"><span class="toc-nav-number">2.7.4.</span> <span class="toc-nav-text">using index condition</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#using-where"><span class="toc-nav-number">2.7.5.</span> <span class="toc-nav-text">Using where</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#using-join-buffer-block-nested-loop"><span class="toc-nav-number">2.7.6.</span> <span class="toc-nav-text">Using join buffer (Block Nested Loop)</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#using-filesort"><span class="toc-nav-number">2.7.7.</span> <span class="toc-nav-text">Using filesort</span></a></li></ol></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://www.jianshu.com/u/100b3e7a68b5" target="_blank">老高的博客</a></li>
+                    
+                        <li><a href="http://www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+<!-- chrome Firefox 中文锚点定位失效-->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<!-- smooth scroll behavior polyfill  -->
+<script type="text/javascript" src="/js/smoothscroll.js"></script>
+<script>
+        $('#toc').on('click','a',function(a){
+            // var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+            // console.log(window.navigator.userAgent,isChrome)
+                // if(isChrome) {
+                    // console.log(a.currentTarget.outerHTML);
+                    // console.log($(a.currentTarget).attr("href"));
+                    //跳转到指定锚点
+                    // document.getElementById(a.target.innerText.toLowerCase()).scrollIntoView(true);
+                    document.getElementById($(a.currentTarget).attr("href").replace("#","")).scrollIntoView({behavior: 'smooth' });
+                // }
+        })  
+</script>
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 郭守敬 2021
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://www.corgiboy.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = 'xxx';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://www.corgiboy.com/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/keji_favicon.ico">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          InnoDB-缓冲池 - 郭守敬 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://www.corgiboy.com/InnoD引擎/InnoDB-缓冲池/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/我等你 女孩 窗前 日出 日落 唯美背影 艺术站设计4k壁纸3840x2160_彼岸图网.jpg')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+                            
+                        </div>
+                        <h1>InnoDB-缓冲池</h1>
+                        <h2 class="subheading">介绍InnoDB的缓冲池内部结构，以及如何管理内存数据，和其他特性。</h2>
+                        <span class="meta">
+                            Posted by 郭守敬 on
+                            2020-11-13
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">郭守敬</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1 id="缓冲池">缓冲池</h1>
+<p>InnoDB的数据是持久化在磁盘上的，工作时从磁盘读取数据到内存中。但是磁盘的读写效率很低，而内存的读写效率很高，所以InnoDB选择将一些数据页、索引页缓存在，用来提高读写效率。<br>
+所以InnoDB会通过一定的机制，让一些最热的数据保存在缓冲池中，加速请求的响应。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/1810497152113AF80DAFDDBC5B3AC476.jpg" width="70%">
+<h1 id="缓冲池中数据组织方式">缓冲池中数据组织方式</h1>
+<h2 id="free-list">Free List</h2>
+<p>数据库启动时InnoDB向操作系统申请一片内存区域，之后InnoDB会将这个内存区域按照数据页的大小（16kb）进行划分，之后将他们的控制体连成一个链表，这个链表就叫做Free List。当InnoDB需要内存缓冲一些数据的时候，就会到Free List中取一定数量的控制体并且将它们移除Free List，当数据同步磁盘、释放内存的时候又会将被释放数据页的控制体加入到Free List中。<br>
+也就是说Free List就是InnoDB尚未使用的内存。如下图就是Free List，其中碎片部分就是整块内存按照16Kb拆分最后无法形成完整数据页的内存。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/A1902CA9CBBC5B64628F2D2375466446.jpg" width="80%">
+<h2 id="lru-list">Lru List</h2>
+<p>前面说InnoDb需要内存时会从Free List移除控制块，那么被使用的内存如何管理？就是通过这个Lru List。从Free List中拿出的控制体会被加入到Lru List中来。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/8A97D18FF7F7EDEA7B78C8F9E256B03A.jpg" width="70%">
+<p>那么InnoDB如何访问数据页呢，就是通过图中的哈希表，它会将控制块的表空间和页号进行哈希，当InnoDB需要某个数据页时就可以直接定位，而不需要从头遍历。</p>
+<p>另外InnoDB内存淘汰机制就是Lru算法，最近被使用的内存会被放到链表的首部，也就是热数据都存在链表首部，之后读入数据时内存不足就会将尾部的内存淘汰掉，并且将新的数据页放到链表头部。</p>
+<p>虽然Lru看似合理，但是InnoDB不止这么简单，它还提供了预读机制，用来提升性能。而且我们写的查询可能会进行全表扫描等大范围扫描数据的操作。</p>
+<h3 id="预读">预读</h3>
+<p>InnoDB提供预读用来优化性能，它猜测我们可能接下来会读取数据是哪些，并且提前将它们读取到内存中，这样在后续的访问中就可以提高性能。InnoDB提供了两种预读方式。</p>
+<ul>
+<li>线性预读：当在一区域（InnoDB中64个数据页为一个区域）中连续读取的数据页超过一定数量，InnoDb会将下一个区域的数据都读取到内存中，它猜测你可能在做大范围的连续搜索。</li>
+<li>随机预读：当一个区域内被读取（不要求必须顺序读）的数据页面超过一定数量，那么会讲该区域其他的数据页面读取到内存中来。</li>
+</ul>
+<p>比如有时可能会有全表扫描或者大氛围扫描数据的情况，那么这些大量的数据读入到内存中很可能会把热数据也给淘汰掉，但是这些数据并不经常使用，可能只为这个全表扫描使用一次，但是热数据却被淘汰了。所以InnoDb将Lru List进行划分，划分成Young、Old区域，热数据都存在于Young区域，新读入的数据会加到Old区域链表的头部，并且淘汰尾部的数据。</p>
+<h2 id="flush-list">Flush List</h2>
+<p>被写操作影响的数据页别叫做脏页，InnoDB会在特定的时间将它们刷新到磁盘上。InnoDB通过Flush List来管理这些脏页，当数据页发生修改时它的控制体就会被加入到Flush List中，但是并不会从Lru List中移除。</p>
+<h1 id="插入缓存">插入缓存</h1>
+<p>一般表在建立的时候，指定的主键建议都是单调递增的。原因是递增的主键在维护索引结构的时候效率更高，只需要在树的最后面加入数据就可以了，不会引起节点的分裂和数据的调整。<br>
+但是二级索引是不一样的，它虽然是排序的，但是我们插入的数据不一定是什么，为了维持这个排序就会出现新插入/修改的数据引起二级索引结构的调整。这样就会涉及到大量的磁盘随机读取，效率就会很低。<br>
+为了解决上面的问题，就出现了插入缓存。它是一块缓冲区域。在对数据进行写操作的时候，它会先判断对应的索引数据页在不在缓冲池中，如果在的话就可以直接修改缓冲池中的索引页，如果不在的话，就将修改放到插入缓冲中，InnoDB会定时进行插入的合并，将它们刷新到磁盘上，这样就做到了合并插入的效果。</p>
+<h1 id="双写缓存">双写缓存</h1>
+<p>Linux系统的一次原子性将数据写入磁盘的数据大小是4kb，而InnoDb数据页的大小是16kb，这样就会出现一种问题。问题是在数据页同步磁盘的时候，没有将完整的16kb都写到磁盘上，服务器就宕机了，这就会造成数据的不一致，数据也会发生损坏。这种问题叫做partial page write。</p>
+<h2 id="为什么不能使用redo-log恢复解决">为什么不能使用Redo Log恢复解决</h2>
+<p>Redo Log是重做日志，保存了我们对数据库的更改，那么Redo Log为什么不能解决这种异常情况呢？<br>
+引用来自http://catkang.github.io/2020/02/27/mysql-redo.html的部分文章</p>
+<blockquote>
+<p>那么我们需要什么样的REDO呢？首先，REDO的维护增加了一份写盘数据，同时为了保证数据正确，事务只有在他的REDO全部落盘才能返回用户成功，REDO的写盘时间会直接影响系统吞吐，显而易见，REDO的数据量要尽量少。其次，系统崩溃总是发生在始料未及的时候，当重启重放REDO时，系统并不知道哪些REDO对应的Page已经落盘，因此REDO的重放必须可重入，即REDO操作要保证幂等。最后，为了便于通过并发重放的方式加快重启恢复速度，REDO应该是基于Page的，即一个REDO只涉及一个Page的修改。</p>
+<p>熟悉的读者会发现，数据量小是Logical Logging的优点，而幂等以及基于Page正是Physical Logging的优点，因此InnoDB采取了一种称为Physiological Logging的方式，来兼得二者的优势。所谓Physiological Logging，就是以Page为单位，但在Page内以逻辑的方式记录。举个例子，MLOG_REC_UPDATE_IN_PLACE类型的REDO中记录了对Page中一个Record的修改，方法如下：</p>
+<p>（Page ID，Record Offset，(Filed 1, Value 1) … (Filed i, Value i) … )<br>
+其中，PageID指定要操作的Page页，Record Offset记录了Record在Page内的偏移位置，后面的Field数组，记录了需要修改的Field以及修改后的Value。</p>
+</blockquote>
+<p>也就是说，Redo Log是一种物理逻辑日志，物理是说它定位了页面和记录的位置。逻辑说的是它记录了被修改的字段和被修改之后的值，所以它需要依赖一个完整的数据页才能进行逻辑的恢复，但是上面说的那种情况会破坏页面的完整性。</p>
+<h2 id="double-write-buffer">Double Write Buffer</h2>
+<p>所以问题在于如何在同步磁盘之前保存页面的完整副本，即使出现问题也可以通过副本恢复，InnoDB推出了Double Write Buffer，也就是双写缓存。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/39552D4C32D5EC6D14C7341410F9ADED.jpg" width="70%">
+<p>双写缓存由两个部分组成，一个是位于内存的缓冲区域，大小为2MB，另一个部分是位于磁盘的共享表空间的区域，也是2MB。在数据页从缓冲池刷出时，会先将页面拷贝到内存的Double write buffer中，之后buffer会分两次一次拷贝1MB到磁盘的Double Write buffer做持久化，每次拷贝完都会调用fsyn强制刷入磁盘。之后再从内存中将数据页离散的同步到数据文件上。<br>
+在同步磁盘Double Write Buffer时是顺序写入的，在同步数据文件时是离散随机写入的。当数据库宕机发生partial page write时，重启数据库后，会去磁盘上的Double Write Buffer拿数据页的副本进行恢复，之后再通过redo log恢复尚未同步到磁盘的数据。</p>
+<h1 id="自适应哈希索引">自适应哈希索引</h1>
+<p>索引是B+树的结构，再我们通过二级索引查询的时候还需要拿着主键id再回到聚簇索引进行查询，虽然一般情况下B+树的树高不会超过3-4层，但是一个3层的树在查询的时候就需要查询3次。<br>
+InnoDb会对查询进行监控，一旦发现按照某一条件查询，那么就会认为是热点数据，就会建立自适应哈希索引，它是基于原B+树创建的，如下图。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/mysql/6516396343C2EA44B56157EDC211E8EA.jpg" width="70%">
+<p>它可以让查询的复杂度变成O(1)，直接通过条件定位到对应的叶子节点，而不需要从树根向下搜索。</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/InnoD引擎/InnoDB-索引/" data-toggle="tooltip" data-placement="top" title="InnoDB-索引">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/分布式/分布式ID生成方案/" data-toggle="tooltip" data-placement="top" title="分布式ID生成方案">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
+<!--                  -->
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#缓冲池"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x7F13;&#x51B2;&#x6C60;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#缓冲池中数据组织方式"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x7F13;&#x51B2;&#x6C60;&#x4E2D;&#x6570;&#x636E;&#x7EC4;&#x7EC7;&#x65B9;&#x5F0F;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#free-list"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">Free List</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#lru-list"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">Lru List</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#预读"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">&#x9884;&#x8BFB;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#flush-list"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">Flush List</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#插入缓存"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x63D2;&#x5165;&#x7F13;&#x5B58;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#双写缓存"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x53CC;&#x5199;&#x7F13;&#x5B58;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#为什么不能使用redo-log恢复解决"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">&#x4E3A;&#x4EC0;&#x4E48;&#x4E0D;&#x80FD;&#x4F7F;&#x7528;Redo Log&#x6062;&#x590D;&#x89E3;&#x51B3;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#double-write-buffer"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">Double Write Buffer</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#自适应哈希索引"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x81EA;&#x9002;&#x5E94;&#x54C8;&#x5E0C;&#x7D22;&#x5F15;</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://www.jianshu.com/u/100b3e7a68b5" target="_blank">老高的博客</a></li>
+                    
+                        <li><a href="http://www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+<!-- chrome Firefox 中文锚点定位失效-->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<!-- smooth scroll behavior polyfill  -->
+<script type="text/javascript" src="/js/smoothscroll.js"></script>
+<script>
+        $('#toc').on('click','a',function(a){
+            // var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+            // console.log(window.navigator.userAgent,isChrome)
+                // if(isChrome) {
+                    // console.log(a.currentTarget.outerHTML);
+                    // console.log($(a.currentTarget).attr("href"));
+                    //跳转到指定锚点
+                    // document.getElementById(a.target.innerText.toLowerCase()).scrollIntoView(true);
+                    document.getElementById($(a.currentTarget).attr("href").replace("#","")).scrollIntoView({behavior: 'smooth' });
+                // }
+        })  
+</script>
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 郭守敬 2021
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://www.corgiboy.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = 'xxx';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://www.corgiboy.com/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

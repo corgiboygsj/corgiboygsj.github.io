@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/keji_favicon.ico">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          BIO、NIO、AIO模型区别 - 郭守敬 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://www.corgiboy.com/Java基础/Java-IO/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/晚上 天空 旅行 汽车 ɽ 公路 4k壁纸_彼岸图网(1).jpg')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                            
+                        </div>
+                        <h1>BIO、NIO、AIO模型区别</h1>
+                        <h2 class="subheading">本文介绍IO模型以及它们的区别</h2>
+                        <span class="meta">
+                            Posted by 郭守敬 on
+                            2019-10-21
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">郭守敬</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>什么是IO，一般典型的如网络，磁盘文件等带有输入输出的，需要从程序到操作系统的数据传输等都算是IO，本文主要讲解几种IO模型的对比，以及举例帮助理解不同IO模型的差别，并没有大篇幅说集中模型的详细使用。</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="java-io模型">Java IO模型</h1>
+<p>想要理解IO模型首先要先明白同步、异步、阻塞、非阻塞他们的意思以及他们之间的区别，因为IO模型无非是他们四个之间的两两组合。</p>
+<h2 id="同步与异步">同步与异步</h2>
+<p><strong>同步：</strong> 多个操作按照顺序处理，前面的操作没有完成的话，后面的操作就没有办法开始。表现出来就是后面的操作被block住了。<br>
+<strong>异步：</strong> 多个操作并发处理，前面的操作没有处理完成并不会影响后面的操作的开始和完成。表现出来就是多个操作同时在进行。</p>
+<h2 id="阻塞与非阻塞">阻塞与非阻塞</h2>
+<p><strong>阻塞：</strong> 一个操作开始，发现没有满足操作条件，操作的发起者会被挂起不能继续执行。<br>
+<strong>非阻塞：</strong> 一个操作开始，发现 没有满足操作条件，会返回一个错误码或者标识代表还没有准备好。需要调用者不断的去查看是否满足操作条件，这样会非常浪费cpu的资源。</p>
+<h2 id="io操作的过程">IO操作的过程</h2>
+<p>一个完整的IO操作包括两个步骤：</p>
+<ul>
+<li>数据准备阶段</li>
+<li>逻辑处理阶段</li>
+</ul>
+<p>其中数据准备又分为两个阶段</p>
+<ul>
+<li>操作系统将磁盘/网络数据写入到内核中。</li>
+<li>将数据从内核态转化为用户态。</li>
+</ul>
+<h2 id="组合举例">组合举例</h2>
+<p>例如：我现在需要去银行取一些钱，之后买点零食回来吃。<br>
+在本例子中：取钱代表数据准备的过程，买零食代表用数据进行逻辑处理。</p>
+<ul>
+<li>同步阻塞：我自己去取钱，结果发现取钱人多需要排队，之后我什么都不干就排着队等前面的人取完，之后排到我取完之后我再去买零食。</li>
+<li>同步非阻塞：我自己去取钱，我不排队了，我取了一个号，没事看看屏幕上排号到没到我。如果到我了我就去取钱买零食，否则我也不干等着，我坐在一边玩手机，偶尔看一下屏幕的排号。</li>
+<li>异步阻塞：我不去取钱了，我找了个人帮我去取钱并且把零食买回来。他回来期间我什么都不做，就在家干等他回来。</li>
+<li>异步非阻塞：同样我找了个人帮我去取钱，并且把零食买回来给我。我在家待着看书打游戏。</li>
+</ul>
+<p>我不知道读者会不会有疑惑，觉得同步和阻塞是一个意思。我之前理解的时候就一直苦恼他们之间的区别，但是结果发现，它俩根本没有可比性，根本就不是一个纬度的事情。一个是操作处理的方式一个是线程呈现出来的状态。</p>
+<h2 id="io模型">IO模型</h2>
+<h3 id="阻塞io">阻塞IO</h3>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/java/同步阻塞io.png" width="75%">
+用户调用read方法实际是调用了recvfrom的系统调用，之后内核收到调用会进行数据从磁盘的到内核的拷贝，当数据准备好之后将数据从内核拷贝到用户进程。整个过程中用户线程都是阻塞的。
+<h3 id="非阻塞io">非阻塞IO</h3>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/java/同步非阻塞.png" width="75%">
+用户线程发起数据调用，内核收到调用开始准备数据，如果内核没有准备好数据会返回一个没有准备好数据的标识，这时用户线程不会被阻塞可以继续向下执行，但是需要用户线程轮训检查内核是否把数据准备完毕了，之后将数据从内核拷贝到用户进程。
+<h3 id="多路复用io">多路复用IO</h3>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/java/多路复用.png" width="75%">
+这个是基于非阻塞IO来实现的，是基于事件的一种模型。通过一个select选择器来同时管理多个IO操作。IO操作在将自己关心的事件组册到选择器上，之后不断轮训查询选择器有哪些事件准备就绪了，之后可以对就绪的事件进行操作。可能有人觉得和非阻塞IO相同，其实是不相同的，多路复用IO可以同时管理多个IO操作。
+<h3 id="信号驱动io">信号驱动IO</h3>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/java/信号驱动.png" width="75%">
+用户线程向内核发出数据调用，之后就继续执行，等内核准备好数据之后会发出信号通知用户进程来，之后用户线程把数据从内核拷贝到用户进程进行使用。
+<h3 id="异步io异步非阻塞">异步IO（异步非阻塞）</h3>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/java/异步io.png" width="75%">
+用户线程发起数据调用请求之后立刻返回，可以进行其他的操作，之后内核进行数据的准备，当数据准备好了之后，操作系统会帮用户线程把数据从内核拷贝到用户进程。也可以用户线程注册回调函数。
+<h3 id="总结">总结</h3>
+<ul>
+<li>除了异步IO，其他所有的IO模型都会在从内核拷贝数据到用户线程的时候阻塞。</li>
+<li>阻塞IO和非阻塞IO都是同步阻塞的IO模型。</li>
+<li>异步IO是异步非阻塞的IO模型，并不存在异步阻塞的IO模型，因为这种模型很明显是没有意义的。</li>
+</ul>
+<h1 id="从bio同步阻塞io到nio同步非阻塞io">从BIO（同步阻塞IO）到NIO（同步非阻塞IO）</h1>
+<p>从上面的文章可以发现BIO和NIO的区别是系统准备数据的过程中用户进程是否处于阻塞状态，而且我们可以看到非阻塞IO并不如多路复用IO，多路复用可以完成非阻塞IO的功能而且可以管理多个IO操作，下面看一下BIO的服务器模型实现和多路复用IO模型的服务器实现。</p>
+<h2 id="bio模型服务器实现">BIO模型服务器实现</h2>
+<p>在BIO下，一般是一个用户请求对应一个线程进行处理，这样当请求量过大就会可能会搞崩系统，这时可以使用线程池来避免线程的频繁创建和销毁，代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    ExecutorService threadPool = Executors.newCachedThreadPool();</span><br><span class="line"></span><br><span class="line">    ServerSocket serverSocket = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        serverSocket = <span class="keyword">new</span> ServerSocket();</span><br><span class="line">        serverSocket.bind(<span class="keyword">new</span> InetSocketAddress(<span class="string">"ip"</span>, <span class="number">8080</span>));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            Socket socket = serverSocket.accept();</span><br><span class="line">            threadPool.execute(() -&gt; &#123;</span><br><span class="line">                InputStream inputStream = socket.getInputStream();</span><br><span class="line">                <span class="comment">//doSomething</span></span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是如果连接数过大，根据线程池的淘汰策略还是会发生OOM或者用户请求在队列中一直没被处理等问题。</p>
+<h2 id="reactor模式多路复用io模型的实现">Reactor模式（多路复用IO模型的实现）</h2>
+<p>Reactor模式是一种多路复用IO的模式，这种模型可以只通过一个线程来管理大量的IO操作，只需要轮训准备好的事件进行操作就可以了。<br>
+下面代码将服务器socket有可接收连接的事件注册到选择器上，将socket的可读事件注册到选择器上，之后不断轮训，判断就绪的事件做对应的操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">    <span class="comment">//初始化选择器</span></span><br><span class="line">    Selector selector = Selector.open();</span><br><span class="line">    ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();</span><br><span class="line">    serverSocketChannel.bind(<span class="keyword">new</span> InetSocketAddress(<span class="string">"ip"</span>, <span class="number">8080</span>));</span><br><span class="line">    <span class="comment">//设置成非阻塞模式</span></span><br><span class="line">    serverSocketChannel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line">    <span class="comment">//在selector注册需要查询的事件</span></span><br><span class="line">    serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);</span><br><span class="line">    serverSocketChannel.register(selector, SelectionKey.OP_CONNECT);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">        <span class="keyword">if</span>(selector.select() &lt; <span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Set&lt;SelectionKey&gt; selectionKeys = selector.selectedKeys();</span><br><span class="line">        Iterator&lt;SelectionKey&gt; iterable = selectionKeys.iterator();</span><br><span class="line">        <span class="keyword">while</span>(iterable.hasNext())&#123;</span><br><span class="line">            SelectionKey selectionKey = iterable.next();</span><br><span class="line">            <span class="comment">//判断是什么事件就绪了</span></span><br><span class="line">            <span class="keyword">if</span>(selectionKey.isAcceptable())&#123;            <span class="comment">//如果有连接可以接收</span></span><br><span class="line">                <span class="comment">//获取连接</span></span><br><span class="line">                ServerSocketChannel channel = (ServerSocketChannel)selectionKey.channel();</span><br><span class="line">                SocketChannel socketChannel = channel.accept();</span><br><span class="line">                socketChannel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line">                <span class="comment">//在selector上注册自己关注的事件</span></span><br><span class="line">                socketChannel.register(selector, SelectionKey.OP_READ);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (selectionKey.isConnectable())&#123;   <span class="comment">//如果是可连接状态</span></span><br><span class="line">                <span class="comment">//doSomething...</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (selectionKey.isReadable())&#123;      <span class="comment">//如果是可读了</span></span><br><span class="line">                <span class="comment">//doSomething...</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (selectionKey.isWritable())&#123;      <span class="comment">//如果可写了</span></span><br><span class="line">                <span class="comment">//doSomething...</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="两者的对比">两者的对比</h2>
+<p>我们可以发现在BIO的服务器模式中，每一个请求就会对应一个线程进行处理，这是非常消耗资源的，如果并发量很大会影响系统。而多路复用模型可以通过一个线程管理好多好多的IO连接，只需要注册对应的事件，select就会告诉你哪些事件就绪了，你拿来进行操作就是了。<br>
+但是上面的Reactor模式并不够好，因为即使发现了就绪的事件，还是要在这个线程里进行逻辑处理，这样如果就绪的很多，还是会很慢，所以可以改造成多线程模式的，一个selector进行连接的管理，用一个线程池进行逻辑的处理。</p>
+<h1 id="从nio到aio">从NIO到AIO</h1>
+<p>AIO实际调用了操作系统底层的方法，将数据的准备与数据从内核到用户空间的拷贝都交给了操作系统来完成，通过操作系统数据准备完毕通知用户系统或者注册回调函数的方式来进行IO操作。</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/Java基础/Java基础-线程中断/" data-toggle="tooltip" data-placement="top" title="线程中断">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/Java基础/Java基础-AQS源码分析/" data-toggle="tooltip" data-placement="top" title="AbstractQueuedSynchronizer源码分析">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
+<!--                  -->
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#java-io模型"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">Java IO&#x6A21;&#x578B;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#同步与异步"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x540C;&#x6B65;&#x4E0E;&#x5F02;&#x6B65;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#阻塞与非阻塞"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x963B;&#x585E;&#x4E0E;&#x975E;&#x963B;&#x585E;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#io操作的过程"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">IO&#x64CD;&#x4F5C;&#x7684;&#x8FC7;&#x7A0B;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#组合举例"><span class="toc-nav-number">1.4.</span> <span class="toc-nav-text">&#x7EC4;&#x5408;&#x4E3E;&#x4F8B;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#io模型"><span class="toc-nav-number">1.5.</span> <span class="toc-nav-text">IO&#x6A21;&#x578B;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#阻塞io"><span class="toc-nav-number">1.5.1.</span> <span class="toc-nav-text">&#x963B;&#x585E;IO</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#非阻塞io"><span class="toc-nav-number">1.5.2.</span> <span class="toc-nav-text">&#x975E;&#x963B;&#x585E;IO</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#多路复用io"><span class="toc-nav-number">1.5.3.</span> <span class="toc-nav-text">&#x591A;&#x8DEF;&#x590D;&#x7528;IO</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#信号驱动io"><span class="toc-nav-number">1.5.4.</span> <span class="toc-nav-text">&#x4FE1;&#x53F7;&#x9A71;&#x52A8;IO</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#异步io异步非阻塞"><span class="toc-nav-number">1.5.5.</span> <span class="toc-nav-text">&#x5F02;&#x6B65;IO&#xFF08;&#x5F02;&#x6B65;&#x975E;&#x963B;&#x585E;&#xFF09;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#总结"><span class="toc-nav-number">1.5.6.</span> <span class="toc-nav-text">&#x603B;&#x7ED3;</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#从bio同步阻塞io到nio同步非阻塞io"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x4ECE;BIO&#xFF08;&#x540C;&#x6B65;&#x963B;&#x585E;IO&#xFF09;&#x5230;NIO&#xFF08;&#x540C;&#x6B65;&#x975E;&#x963B;&#x585E;IO&#xFF09;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#bio模型服务器实现"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">BIO&#x6A21;&#x578B;&#x670D;&#x52A1;&#x5668;&#x5B9E;&#x73B0;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#reactor模式多路复用io模型的实现"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">Reactor&#x6A21;&#x5F0F;&#xFF08;&#x591A;&#x8DEF;&#x590D;&#x7528;IO&#x6A21;&#x578B;&#x7684;&#x5B9E;&#x73B0;&#xFF09;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#两者的对比"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">&#x4E24;&#x8005;&#x7684;&#x5BF9;&#x6BD4;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#从nio到aio"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x4ECE;NIO&#x5230;AIO</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://www.jianshu.com/u/100b3e7a68b5" target="_blank">老高的博客</a></li>
+                    
+                        <li><a href="http://www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+<!-- chrome Firefox 中文锚点定位失效-->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<!-- smooth scroll behavior polyfill  -->
+<script type="text/javascript" src="/js/smoothscroll.js"></script>
+<script>
+        $('#toc').on('click','a',function(a){
+            // var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+            // console.log(window.navigator.userAgent,isChrome)
+                // if(isChrome) {
+                    // console.log(a.currentTarget.outerHTML);
+                    // console.log($(a.currentTarget).attr("href"));
+                    //跳转到指定锚点
+                    // document.getElementById(a.target.innerText.toLowerCase()).scrollIntoView(true);
+                    document.getElementById($(a.currentTarget).attr("href").replace("#","")).scrollIntoView({behavior: 'smooth' });
+                // }
+        })  
+</script>
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 郭守敬 2021
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://www.corgiboy.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = 'xxx';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://www.corgiboy.com/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
