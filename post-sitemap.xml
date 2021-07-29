@@ -8,6 +8,14 @@
     </url>
 
     <url>
+        <loc>http://www.corgiboy.com/article/%E7%AE%80%E4%BB%8B/</loc>
+        <lastmod>2021-07-29T11:27:14.157Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://www.corgiboy.com/Java%E5%9F%BA%E7%A1%80/Java%E5%9F%BA%E7%A1%80-AQS%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
         <lastmod>2021-07-29T09:16:24.623Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -82,14 +90,6 @@
     <url>
         <loc>http://www.corgiboy.com/Redis/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E3%80%81%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF/</loc>
         <lastmod>2021-01-11T07:17:14.092Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>http://www.corgiboy.com/article/%E7%AE%80%E4%BB%8B/</loc>
-        <lastmod>2021-01-11T07:16:52.297Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
