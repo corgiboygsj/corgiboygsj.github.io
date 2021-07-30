@@ -247,7 +247,7 @@ JDK源码、基础、JVM持续更新中
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2021-07-29
+            2021-07-30
         </p>
         <div class="tags">
             
@@ -272,6 +272,39 @@ JDK源码、基础、JVM持续更新中
 虚拟地址
 为什么需要虚拟地址
 程序实际工作的时候会去操作内存，如果同时只有一个程序在运行（不切换，从开始到结束），那不会有什么问题。但是我们使用的操作系统都是多任务的，同时有多个进程在一起执行。比如进程A在一个位置写了3，进程B在这个地址位置改成了5，那么都会带来程序的不正确或者崩溃。换言之就是说希望在并发场景下，进程之间的内存需要是隔离的。最好是所有的进程能好像自己在占用操作系统的整个内......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2021-07-29
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#操作系统" title="操作系统">操作系统</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/操作系统/操作系统进程/">
+        <h2 class="post-title">
+                                 
+            操作系统进程
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍操作系统是如何管理分配内存
+        </h3>
+        <div class="post-content-preview">
+            进程
+什么是进程
+进程是程序的抽象，CPU的一个核心同时只能运行程序，只不过在不同进程之间快速切换，造成多道程序在并行执行的假象。每个进程都有自己的元数据，比如程序计数器表示进程执行到的程序的位置，切换时操作系统会对这些数据进行保存，再次执行该进程时再将数据加载回来。
+什么是线程
+前面说进程是程序的抽象，进程拥有这个程序的资源。负责实际执行程序二进制指令的就是线程。进程创建时还会创建一个主线......
         </div>
     </a>
     
@@ -534,40 +567,6 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/Redis/Redis主从复制/">
-        <h2 class="post-title">
-                                 
-            Redis主从复制
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍了Redis主从复制的原理
-        </h3>
-        <div class="post-content-preview">
-            
-单个Redis节点会存在单点问题。Redis节点需要承担读写压力，当Redis宕机后服务将不可用，没有数据备份。所以Redis提供了主从复制功能，用于将节点作为主节点的备份，可以做到读写分离、故障切换功能。同时主从复制是实现哨兵模式、集群模式的基石。
-
-主从复制
-指定主从关系
-通过slaveof {host} {port}可以让一个Redis节点成为另一个Redis节点的从节点。成功建立连......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-16
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Redis" title="Redis">Redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -633,7 +632,7 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
             
         
             
-            <a href="/tags/#操作系统" title="操作系统" rel="1">操作系统</a>
+            <a href="/tags/#操作系统" title="操作系统" rel="2">操作系统</a>
             
         
     </div>
@@ -697,15 +696,15 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
         </li>
       
         <li>
+          <a href="/操作系统/操作系统进程/">操作系统进程</a>
+        </li>
+      
+        <li>
           <a href="/ElasticSearch/ElasticSearch工作机制/">ElasticSearch工作机制</a>
         </li>
       
         <li>
           <a href="/Redis/Redis集群原理/">Redis集群原理</a>
-        </li>
-      
-        <li>
-          <a href="/InnoD引擎/InnoDB-事务原理/">InnoDB-事务原理</a>
         </li>
       
     </ul>
@@ -730,7 +729,7 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>

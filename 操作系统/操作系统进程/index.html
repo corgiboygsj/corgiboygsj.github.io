@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          操作系统内存管理 - 郭守敬 | Blog
+          操作系统进程 - 郭守敬 | Blog
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/操作系统/操作系统内存管理/">
+    <link rel="canonical" href="http://www.corgiboy.com/操作系统/操作系统进程/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/宇宙 星空 云 一个人 心愿 愿望 3440x1440动漫壁纸_彼岸图网.jpg')
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/晚上 天空 旅行 汽车 ɽ 公路 4k壁纸_彼岸图网(1).jpg')
             /*post*/
         
     }
@@ -91,11 +91,11 @@
                               <a class="tag" href="/tags/#操作系统" title="操作系统">操作系统</a>
                             
                         </div>
-                        <h1>操作系统内存管理</h1>
+                        <h1>操作系统进程</h1>
                         <h2 class="subheading">本文介绍操作系统是如何管理分配内存</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
-                            2021-07-29
+                            2021-07-28
                         </span>
                     </div>
                 
@@ -212,49 +212,85 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <a id="more"></a>
-<h1 id="虚拟地址">虚拟地址</h1>
-<h2 id="为什么需要虚拟地址">为什么需要虚拟地址</h2>
-<p>程序实际工作的时候会去操作内存，如果同时只有一个程序在运行（不切换，从开始到结束），那不会有什么问题。但是我们使用的操作系统都是多任务的，同时有多个进程在一起执行。比如进程A在一个位置写了3，进程B在这个地址位置改成了5，那么都会带来程序的不正确或者崩溃。换言之就是说希望在并发场景下，进程之间的内存需要是隔离的。最好是所有的进程能好像自己在占用操作系统的整个内存。</p>
-<h2 id="虚拟内存">虚拟内存</h2>
-<p>因此操作系统提供了虚拟地址，进程操作的内存都是操作系统分配的虚拟内存，而操作系统负责管理虚拟内存和物理内存之间的映射关系，从而做到进程之间物理内存的隔离。32位操作系统下进程的虚拟内存可以分配到4G。</p>
+                <h1 id="进程">进程</h1>
+<h2 id="什么是进程">什么是进程</h2>
+<p>进程是程序的抽象，CPU的一个核心同时只能运行程序，只不过在不同进程之间快速切换，造成多道程序在并行执行的假象。每个进程都有自己的元数据，比如程序计数器表示进程执行到的程序的位置，切换时操作系统会对这些数据进行保存，再次执行该进程时再将数据加载回来。</p>
+<h2 id="什么是线程">什么是线程</h2>
+<p>前面说进程是程序的抽象，进程拥有这个程序的资源。负责实际执行程序二进制指令的就是线程。进程创建时还会创建一个主线程，由它来执行程序。<br>
+线程依赖进程的存活，因为线程使用的是创建它的进程的地址空间，同时进程的多个线程共享进程的资源，彼此之间可能会干扰。</p>
+<p>进程和线程的比较</p>
 <ul>
-<li>程序操作的内存是虚拟内存</li>
-<li>硬件操作的内存是物理内存</li>
+<li>线程更加轻量级，操作系统创建释放线程的成本要比创建释放进程的成本低很多。</li>
+<li>同一个进程的线程之间可以共享进程的资源，使得线程之间的交流变得很容易。但是进程和进程之间的资源是隔离的，沟通起来麻烦。</li>
+<li>CPU核心的话，使用多个线程可以增加进程的整体执行速度。比如下载大文件，可以通过多CPU核心实现多线程分段下载。</li>
 </ul>
-<p>操作系统维护虚拟内存和物理内存的映射有两种方式。分别是分段管理和分页管理。</p>
-<h1 id="分段管理">分段管理</h1>
-<h2 id="什么是分段管理">什么是分段管理</h2>
-<p>进程分为多个段：程序段、数据段、栈、堆等，因此操作系统在物理内存上分配连续的内存段分配给进程。之后段虚拟内存和物理内存段的映射维护在段表里面。</p>
-<p>虚拟地址由两个部分组成，段选择子和段偏移量。段选择子内部有段号和特权等标识位，段号就是索引标号，用于在段表中找到这个映射项。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/os/EF49DF91FE5A5B864806878DC49F2390.jpg">
-<p>其中段表项维护了段的信息，段基址表示段对应物理内存的起始位置，段偏移量表示可以的内存范围，段界限表示段的小。段偏移量位于0到段界限之间。</p>
-<h2 id="优缺点">优缺点</h2>
-<p>分段管理的优点在于段的数量不多，而且内存都是连续的。但是缺点也有，缺点就是内存碎片、内存置换效率太低的问题。</p>
-<p>内存碎片问题如下图。当前系统中有三个应用程序，游戏、浏览器、音乐。之后浏览器的进程结束了，释放了128M的内存，现在系统中有两块128M的空闲内存。之后有一个新的进程要启动，需要分配200M的内存，但是这248M的空闲内存不连续无法分配200M内存。这就是内存碎片的问题。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/os/E3196C6A950D49900245E8271E9D6577.jpg">
-<p>为了应对这个问题，可以使用内存交换来解决。将音乐的内存写出到磁盘上，再下次使用的时候再读回内存，不过读回内存分配位置要紧贴着游戏的结束位置。但是这样一段内存太大，置换的时候效率就很低，因为磁盘性能和内存比很慢。</p>
-<h1 id="分页管理">分页管理</h1>
-<h2 id="简单分表">简单分表</h2>
-<p>为了解决分段带来的内存碎片和内存交换效率低的问题，就出现了分页管理。操作系统将内存分为一个一个大小相同的内存块，一块为4KB，一个这样的块称为一页。这样的话内存的分配都是一块一块4KB，就不会有大块的内存碎片。而且在内存交换时也是以页面为单位，也不会涉及到大块内存的交换。</p>
-<p>在进程申请内存后，操作系统不会立即去申请物理内存，而是在进程实际使用内存时发现这个页面的内存还没有分配，就会触发CPU缺页异常。这时操作系统才会实际分配内存空间。当内存不够用的时候，会将一些进程最近不使用的内存置换到磁盘上，在需要的时候再读回，这样可以增大内存的大小。</p>
-<p>同样的，操作系统会来维护虚拟地址和物理地址的映射关系。这次使用的表叫做页表，每一个页面都对应页表中的一个页表项。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/os/9F335746D88DE713C524A0AA754B7275.jpg">
-<p>这时就会出现一个问题，一个页面是4KB，32位机器下进程虚拟内存大小为4GB，一个页表项大小4字节，也就是一个进程的页表需要维护4MB，100个进程就需要400MB的内存维护页表。因此就出现了多级页表。</p>
-<h2 id="多级页表">多级页表</h2>
-<p>因为很多进程都是远远使用不到4GB的内存的，所以可以将页表再进行分级，拆分成两级页表。第一级页表的页表项指向的不是物理内存而是第二级的页表。一级页表的每个页表项可以覆盖到4MB的虚拟内存，在进程没有使用到那么多内存的时候，并不会创建二级页表，只有前面几项覆盖的虚拟内存不够了，才会创建新的二级页表。<br>
-这样就不需要一下维护一百万个页表项的页表了（4MB），现在只需要有一个一级页表4KB，和后面使用的二级页表（n * 4KB）。</p>
-<img src="http://guoshoujing.gitee.io/mark-down-photo/os/84B277AB3559714F626F86CAB3DE64FA.jpg">
-<h2 id="tlb">TLB</h2>
-<p>现在有了多级页表可以解决页表维护占用内存过大的问题了，但是越多级的页表就会造成映射查询时多走几张表从而降低效率。因此CPU内部会维护一个缓存，将最常用的一些页表维护到缓冲中，用来直接访问。这个缓存就是TLB。</p>
-<h1 id="linux内存管理">Linux内存管理</h1>
-<p>Linux因为受限于intel处理器的段式内存管理，因而采用了段页式结合的方式，但是内部实际使用的还是分页的方式。linux的每个段都是基址从0开始，内部还是分页的管理。</p>
-<blockquote>
-<p>Linux 系统中的每个段都是从 0 地址开始的整个 4GB 虚拟空间（32 位环境下），也就是所有的段的起始地址都是一样的。这意味着，Linux 系统中的代码，包括操作系统本身的代码和应用程序代码，所面对的地址空间都是线性地址空间（虚拟地址），这种做法相当于屏蔽了处理器中的逻辑地址概念，段只被用于访问控制和内存保护。</p>
-</blockquote>
-<h1 id="文章">文章</h1>
+<h1 id="任务状态">任务状态</h1>
+<p>任务有以下几种状态</p>
 <ul>
-<li><a href="https://jishuin.proginn.com/p/763bfbd248c0" target="_blank" rel="noopener">https://jishuin.proginn.com/p/763bfbd248c0</a></li>
+<li>TASK_RUNNING：就绪态，还没有运行，不过可以随时被CPU分时间片执行。</li>
+<li>RUNNING：运行中，表示CPU给了时间片并且正在执行。</li>
+<li>TASK_STOPED：线程停止状态，不会让出CPU时间。</li>
+<li>TASK_INTERRUPTIBLE：可响应中断的睡眠状态，可以通过一个信号唤醒并且去处理信号。</li>
+<li>TASK_UNINTERRUPTIBLE：不可响应中断的睡眠状态，死等睡眠结束，发送信号也无法唤醒，即使是KILL也不行，因为KILL也是给进程发送信号。</li>
+<li>TASK_KILLABLE：可以响应KILL信号的不可响应中断睡眠状态。</li>
+<li>EXIT_ZOMBIE：进程已经结束了，但是它的父进程没有通过系统调用回收它，此时就是僵尸进程。</li>
+</ul>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/os/FCF6BB2EA5B807965463EC3AEEEF2169.jpg">
+<h1 id="进程通信">进程通信</h1>
+<p>进程和进程之间通信可以使用以下几种方式：</p>
+<ul>
+<li>信号Signals</li>
+<li>管道Pipe</li>
+<li>共享内存Shared Memory</li>
+<li>套接字Socket</li>
+<li>消息队列Message Queue</li>
+<li>先进先出队列FIFO Queue</li>
+</ul>
+<h2 id="信号">信号</h2>
+<p>例如Kill命令，就是给进程发送一个信号，进程可以选择响应或者不响应。但是-9和-17是必须要响应的。</p>
+<img src="http://guoshoujing.gitee.io/mark-down-photo/os/19595154EB9E9025D54A67FB01415BCE.jpg">
+<h2 id="管道">管道</h2>
+<p>比如命令ps -ef | grep xxx。这个就是建立了一个管道，把ps进程的内容通过管道交给grep进程。只从一端流向另一端。</p>
+<h2 id="共享内存">共享内存</h2>
+<p>两个进程通过shmget()（申请内存）和shmat()（绑定内存）等共享内存调用可以共享同一片内存空间，一个进程的修改可以被另一个进程读取到。但是需要注意互斥，不可以一起同时修改。</p>
+<h2 id="先进先出队列">先进先出队列</h2>
+<p>工作原理和管道类似，不过管道是无名字的，一旦中间出现问题则管道数据全部丢失。而先进先出队列具有支持文件和独立API，使得可复用并且输出不丢失。</p>
+<h2 id="套接字">套接字</h2>
+<p>套接字用于两个进程或者多个进程，用于进程之间的网络通信。网络套接字需要来自诸如TCP（传输控制协议）或较低级别UDP（用户数据报协议）等基础协议的支持。</p>
+<h1 id="进程调度">进程调度</h1>
+<p>进程分为两种，实时进程和普通进程。实时进程的优先级更高，优先级用数字表示，这个数越小代表优先级越高。实时进程优先级范围0-99，普通进程优先级范围100-139。</p>
+<h2 id="cfs调度算法">CFS调度算法</h2>
+<p>现代算法就是CFS调度算法，叫做完全公平调度。CPU有时间片，同时CPU每次分配时间片执行进程时还会分配vruntime虚拟时间用于CFS算法。随着进程的执行，进程的vruntime会不断增大，没有执行的进程vruntime就不会改变。那么就会有的进程没有执行，他的vruntime就很小，就出现了不公平情况，这时操作系统就挑选vruntime小的进程来执行，让它和其他进程的vruntime尽可能的相同，从而达到公平。<br>
+那么这时就会有进程优先级调度的问题，优先级高的进程希望分配到更多的CPU时间，但是又要保证进程vruntime相同，这怎么办呢？<br>
+操作系统给进程分配时间片时，优先级越高的进程一次执行获得的vruntime就越少。但是操作系统会保证进程之间获得执行相同的vruntime，那么优先级高的进程自然而然就会获得更多的实际时间片，从而和其他进程拥有相同的vruntime。</p>
+<h2 id="cfs算法实现">CFS算法实现</h2>
+<p>CPU会维护一个进程队列，这个队列需要做的就是每次返回当前最少vruntime的进程，之后操作系统会分配vruntime给这个进程并且去执行他。因此这个队列需要对vruntime进行频繁的修改和排序，所以vruntime排序的维护是通过红黑树来维护的，红黑树有很好的排序性能和修改性能。返回进程就将它移除，修改后加上vruntime再将它插入红黑树。</p>
+<p>这个队列一共有两个，一个是实时进程队列和普通进程队列，只有实时进程队列没有进程的时候才会去普通进程队列里拿进程出来。</p>
+<h2 id="调度是如何进行的">调度是如何进行的</h2>
+<p>调度分为两种</p>
+<ul>
+<li>主动调度：A执行到一半发现自己代码有个sleep，那么就把cpu时间让出，自己阻塞。</li>
+<li>抢占式调度：A执行到一半，突然出现了B，让A先停止了，B要先执行。</li>
+</ul>
+<h3 id="主动调度">主动调度</h3>
+<p>例如进程做了一件从网络上下载图片的操作，当用户进程去网卡读取数据时发现数据没有准备就绪，进程可以主动让出时间片去让CPU执行其他的操作，对应的系统调用是schedule()函数。<br>
+这个函数大概干了下面几件事情</p>
+<ul>
+<li>修改当前任务A的vruntime</li>
+<li>从红黑树中拿最左边的叶子节点，也就是vruntime最小的进程B</li>
+<li>将A重新加入红黑树，并调整红黑树</li>
+<li>CPU去执行任务B，B成为当前任务</li>
+</ul>
+<h3 id="抢占式调度">抢占式调度</h3>
+<p>最常见的就是进程执行时间太长了，是时候切换到下一个进程了。操作系统每段时间就会触发一次时钟中断，中断处理函数会去判断这个进程是否需要被抢占。判断逻辑如下，摘抄自文章，不过分探讨。</p>
+<blockquote>
+<p>check_preempt_tick 先是调用 sched_slice 函数计算出的 ideal_runtime。ideal_runtime 是一个调度周期中，该进程运行的实际时间。sum_exec_runtime 指进程总共执行的实际时间，prev_sum_exec_runtime 指上次该进程被调度时已经占用的实际时间。每次在调度一个新的进程时都会把它的 se-&gt;prev_sum_exec_runtime = se-&gt;sum_exec_runtime，所以 sum_exec_runtime-prev_sum_exec_runtime 就是这次调度占用实际时间。如果这个时间大于 ideal_runtime，则应该被抢占了。除了这个条件之外，还会通过 __pick_first_entity 取出红黑树中最小的进程。如果当前进程的 vruntime 大于红黑树中最小的进程的 vruntime，且差值大于 ideal_runtime，也应该被抢占了。</p>
+</blockquote>
+<p>需要被抢占的进程不会立刻被踢掉，而是设置一个抢占标志位，在后面适当的时机发生抢占。</p>
+<p>抢占时机如下</p>
+<ul>
+<li>用户态抢占时机：（1）在进程从系统调用中返回的时候可以进行抢占（2）从中断中返回的那个时刻也可以抢占。</li>
+<li>内核台抢占时机：（1）在内核态的执行中，有的操作是不能被中断的，所以在进行这些操作之前，总是先调用关闭抢占，当再次打开的时候，就是一次内核态代码被抢占的机会。（2）在内核态发生中断，结束中断时也可以发生抢占。</li>
 </ul>
 
                 
@@ -264,12 +300,12 @@
                 <ul class="pager">
                     
                         <li class="previous">
-                            <a href="/article/简介/" data-toggle="tooltip" data-placement="top" title="简介">&larr; Previous Post</a>
+                            <a href="/操作系统/操作系统内存管理/" data-toggle="tooltip" data-placement="top" title="操作系统内存管理">&larr; Previous Post</a>
                         </li>
                     
                     
                         <li class="next">
-                            <a href="/操作系统/操作系统进程/" data-toggle="tooltip" data-placement="top" title="操作系统进程">Next Post &rarr;</a>
+                            <a href="/ElasticSearch/ElasticSearch工作机制/" data-toggle="tooltip" data-placement="top" title="ElasticSearch工作机制">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -319,7 +355,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#虚拟地址"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x865A;&#x62DF;&#x5730;&#x5740;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#为什么需要虚拟地址"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x4E3A;&#x4EC0;&#x4E48;&#x9700;&#x8981;&#x865A;&#x62DF;&#x5730;&#x5740;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#虚拟内存"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x865A;&#x62DF;&#x5185;&#x5B58;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分段管理"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x5206;&#x6BB5;&#x7BA1;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#什么是分段管理"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;&#x5206;&#x6BB5;&#x7BA1;&#x7406;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#优缺点"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">&#x4F18;&#x7F3A;&#x70B9;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分页管理"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x5206;&#x9875;&#x7BA1;&#x7406;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#简单分表"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">&#x7B80;&#x5355;&#x5206;&#x8868;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#多级页表"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">&#x591A;&#x7EA7;&#x9875;&#x8868;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#tlb"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">TLB</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#linux内存管理"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">Linux&#x5185;&#x5B58;&#x7BA1;&#x7406;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#文章"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x6587;&#x7AE0;</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#进程"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x8FDB;&#x7A0B;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#什么是进程"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;&#x8FDB;&#x7A0B;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#什么是线程"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x4EC0;&#x4E48;&#x662F;&#x7EBF;&#x7A0B;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#任务状态"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x4EFB;&#x52A1;&#x72B6;&#x6001;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#进程通信"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x8FDB;&#x7A0B;&#x901A;&#x4FE1;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#信号"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">&#x4FE1;&#x53F7;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#管道"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">&#x7BA1;&#x9053;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#共享内存"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">&#x5171;&#x4EAB;&#x5185;&#x5B58;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#先进先出队列"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">&#x5148;&#x8FDB;&#x5148;&#x51FA;&#x961F;&#x5217;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#套接字"><span class="toc-nav-number">3.5.</span> <span class="toc-nav-text">&#x5957;&#x63A5;&#x5B57;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#进程调度"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">&#x8FDB;&#x7A0B;&#x8C03;&#x5EA6;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#cfs调度算法"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">CFS&#x8C03;&#x5EA6;&#x7B97;&#x6CD5;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#cfs算法实现"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">CFS&#x7B97;&#x6CD5;&#x5B9E;&#x73B0;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#调度是如何进行的"><span class="toc-nav-number">4.3.</span> <span class="toc-nav-text">&#x8C03;&#x5EA6;&#x662F;&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x7684;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#主动调度"><span class="toc-nav-number">4.3.1.</span> <span class="toc-nav-text">&#x4E3B;&#x52A8;&#x8C03;&#x5EA6;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#抢占式调度"><span class="toc-nav-number">4.3.2.</span> <span class="toc-nav-text">&#x62A2;&#x5360;&#x5F0F;&#x8C03;&#x5EA6;</span></a></li></ol></li></ol></li></ol>
         
         </div>
       </aside>
