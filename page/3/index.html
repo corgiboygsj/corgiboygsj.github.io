@@ -18,7 +18,7 @@
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/archives/2/">
+    <link rel="canonical" href="http://www.corgiboy.com/page/3/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -141,14 +141,14 @@
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -211,31 +211,30 @@
 
 <div class="post-preview">
 
-    <a href="/Redis/Redis主从复制/">
+    <a href="/分布式/分布式锁/">
         <h2 class="post-title">
                                  
-            Redis主从复制
+            分布式锁
         </h2>
         <h3 class="post-subtitle">
-            本文介绍了Redis主从复制的原理
+            本文主要讲解基于数据库、Zookeeper、Redis三种中间件实现分布式锁的操作，以及它们的比较。
         </h3>
         <div class="post-content-preview">
             
-单个Redis节点会存在单点问题。Redis节点需要承担读写压力，当Redis宕机后服务将不可用，没有数据备份。所以Redis提供了主从复制功能，用于将节点作为主节点的备份，可以做到读写分离、故障切换功能。同时主从复制是实现哨兵模式、集群模式的基石。
+现在的架构都是分布式架构，服务部署在多个服务器上，因此他们的虚拟机不共享也不是同一个进程，所以jdk原生的Synchronized和并发包提供的锁都无法满足共享资源的单独占用。因此出现了分布式场景下的分布式锁。
 
-主从复制
-指定主从关系
-通过slaveof {host} {port}可以让一个Redis节点成为另一个Redis节点的从节点。成功建立连......
+分布式锁
+分布式锁是为了解决分布式场景下对共享资源的访问问题。比如查询库存并且消费，两个请求都查询出为1，之后A对库存-1，之后B也对库存-1，就会发生超卖现象。这时就需要将查库......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-16
+            2020-08-11
         </p>
         <div class="tags">
             
-              <a href="/tags/#Redis" title="Redis">Redis</a>
+              <a href="/tags/#分布式" title="分布式">分布式</a>
             
         </div>
     
@@ -245,31 +244,31 @@
 
 <div class="post-preview">
 
-    <a href="/Redis/Redis持久化/">
+    <a href="/Java基础/对象逃逸分析/">
         <h2 class="post-title">
                                  
-            Redis持久化
+            对象逃逸分析
         </h2>
         <h3 class="post-subtitle">
-            本文Redis中aof、rdb两种持久化的原理，以及它们的区别。
+            本文介绍为什么对象不全都是分配到堆上的。
         </h3>
         <div class="post-content-preview">
             
-Redis的数据存储于内存中。当Redis重启后，内存中的数据就会丢失。为了保证重新启动后之前的数据还存在，就需要提供一种持久化机制。Redis为使用者提供了RDB、AOF两种持久化功能。
+Java对象是否都分配到堆上？答案是否定的，通过逃逸分析可以将不会被外界引用的对象分配在栈上，可以随着栈一起被回收，同时减少了堆的压力也就减少了gc次数，达到了优化程序执行时间的目的。
 
-RDB持久化
-什么是RDB持久化
-RDB持久化通过保存当时的内存快照文件（二进制文件）来完成持久化。当Redis再次启动的时候会去加载RDB文件，用于恢复内存的数据。因为是二进制文件，所以恢复的速度很......
+
+什么是逃逸分析
+逃逸分析通过分析对象的作用域来判断对象是否会被分配方法之外的地方所引用和持有。逃逸分析可以有效的减少线程同步开销和堆内存分配的压力。通过分析如果发现了没有发生逃逸的对象，则可以将对象直接......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-15
+            2020-08-11
         </p>
         <div class="tags">
             
-              <a href="/tags/#Redis" title="Redis">Redis</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -279,96 +278,26 @@ RDB持久化通过保存当时的内存快照文件（二进制文件）来完�
 
 <div class="post-preview">
 
-    <a href="/Redis/Redis是什么/">
+    <a href="/InnoD引擎/InnoDB引擎-行格式/">
         <h2 class="post-title">
                                  
-            Redis概览
+            InnoDB-数据行
         </h2>
         <h3 class="post-subtitle">
-            本文介绍Redis的基本架构以及优势，另外还说了它具备的特性。
+            本文简单介绍InnoDB数据行的构成
         </h3>
         <div class="post-content-preview">
             
-Redis是基于内存的KV数据库。Redis拥有极高的吞吐量，单点可以达到10W/s的读取。同时Redis支持多种数据类型的值，可以实现各种不同的功能。同时Redis可以保证实现读写分离、高可用架构、集群模式等。
+InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说一次将16kb的数据刷到磁盘或者从磁盘读取16kb数据到内存，数据页中包含的就是数据行。InnoDB一共提供了四种行结构，分别是Compact、Redundant、Dynamic和Compressed行格式，现在mysql从5.7之后默认使用的行结构是Dynamic。
 
-Redis为什么快
-
-Redis是单线程的（请求处理方面是单线程，命令排队处理），防止了多线程模式线程状态的切换引起的性能消耗。另外Redis是非CPU密集型的，它的瓶颈在于内......
+行结构
+一行数据是由两个部分组成：实际数据、记录额外信......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-13
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Redis" title="Redis">Redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/SpringBoot/SpringBoot自动配置/">
-        <h2 class="post-title">
-                                 
-            SpringBoot自动配置
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍SpringBoot版本2.3.4.RELEASE的自动配置原理
-        </h3>
-        <div class="post-content-preview">
-            @Import注入对象的三种方式
-https://juejin.im/post/6844903946155212813
-自动配置原理
-@SpringBootApplication是SpringBoot启动类的注解，如下图。
-
-自动配置就是通过其内部的@EnableAutoConfiguration注解来实现，EnableAutoConfiguration的内部如下图。
-
-上图重要的部分是其内......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-13
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB-Redo-Log/">
-        <h2 class="post-title">
-                                 
-            InnoDB Redo Log
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍InnoDB中保证事务持久性的重做日志
-        </h3>
-        <div class="post-content-preview">
-            
-InnoDB操作的都是内存中的数据，那么为什么数据库宕机后重新启动还可以恢复之前提交的数据呢，而且一条sql语句可能更改很多在磁盘上不在同一个位置的数据，那么数据同步回磁盘的随机io开销InnoDB是怎么避免的呢？Redo Log的设计解决了这部分问题，在故障恢复中和数据页落盘策略上它起到了很大的作用。
-
-什么是redo log？
-redo log是用来持久化事务的，记录数据的物理更改。因......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-11
+            2020-07-16
         </p>
         <div class="tags">
             
@@ -382,31 +311,36 @@ redo log是用来持久化事务的，记录数据的物理更改。因......
 
 <div class="post-preview">
 
-    <a href="/Redis/Redis内存管理/">
+    <a href="/Java基础/Java基础-线程池/">
         <h2 class="post-title">
                                  
-            Redis内存回收
+            线程池
         </h2>
         <h3 class="post-subtitle">
-            本文介绍Redis内存淘汰策略、过期键回收等
+            本文介绍了线程池的执行流程，并且基于源码解析了不同种类线程池的区别。
         </h3>
         <div class="post-content-preview">
-            过期键回收策略
-由于内存中存在大量的键，如果精准维护过期时间会很耗费cpu资源。因此Redis通过定时删除和惰性删除来解决过期键的淘汰。
-定时删除
-Redis随机获取部分的键，并且删除其中过期的键值对。根据过期键的比例，回收分为快模式和慢模式。流程如下
-（1）首先通过慢模式进行回收，Redis默认每10秒随机获取20个键。
-（2）其中如果25%的键是过期的，那么Redis会执行顺序回收，直到......
+            
+因为线程是珍惜资源，无论创建还是销毁都很消耗时间和资源，所以出现线程池来管理线程，执行完任务不会销毁，而是等待新的任务或者处理别的任务。
+1、线程池解决了线程的频繁创建和销毁的代价。
+2、线程池可以对线程进行管理和监控。
+3、线程池处理新任务响应速度快，因为可以不用创建新线程。
+
+
+线程池参数
+
+corePoolSize：核心线程数量
+maximumPoolSize：核心线程数量+非核心线......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-05
+            2020-07-15
         </p>
         <div class="tags">
             
-              <a href="/tags/#Redis" title="Redis">Redis</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -416,31 +350,34 @@ Redis随机获取部分的键，并且删除其中过期的键值对。根据过
 
 <div class="post-preview">
 
-    <a href="/InnoD引擎/InnoDB-执行计划/">
+    <a href="/Java基础/Java基础-ConcurrentHashMap源码解析/">
         <h2 class="post-title">
                                  
-            InnoDB-执行计划
+            ConcurrentHashMap源码解析
         </h2>
         <h3 class="post-subtitle">
-            本文主要介绍怎么查看Sql语句的执行计划，看自己sql的性能
+            本文解读了JDK8中ConcurrentHashMap源码，如何保证并发安全，并且探究了其设计的精妙之处。
         </h3>
         <div class="post-content-preview">
-            什么是执行计划
-一条sql会经过mysql优化器的优化后变成一个所谓的执行计划，这个执行计划可以看出来这条sql是如何被mysql来使用的。explain可以帮助我们来查看执行计划，从而我们可以通过执行计划对sql进行优化来提升性能。
-explain各个列的含义
+            
+之前我们说过HashMap无论是1.7还是1.8，在并发情况下都会出现各种各样的问题。虽然JDK中提供了同步集合包装器和HashTable，但是他们都是简单的对方法进行上锁，锁的粒度很粗，因此他们在高并发下的性能都不会很好。本文章都是围绕JDK1.8来说的。
 
-建立一张表来举例
-123456789101112131415CREATE TABLE single_table (    id ......
+
+Java中如何使用线程安全的Map
+HashTable
+
+HashTable不支持null的key和value。
+HashTab......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-02
+            2020-07-15
         </p>
         <div class="tags">
             
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -450,31 +387,32 @@ explain各个列的含义
 
 <div class="post-preview">
 
-    <a href="/InnoD引擎/InnoDB-索引生效失效条件分析/">
+    <a href="/Java基础/Java基础-动态代理/">
         <h2 class="post-title">
                                  
-            InnoDB-索引生效失效条件分析
+            Java动态代理
         </h2>
         <h3 class="post-subtitle">
-            本文从索引结构出发讲解索引的失效、生效条件
+            本文介绍动态代理模式的设计，以及动态代理在实际项目的应用
         </h3>
         <div class="post-content-preview">
-            索引结构回顾
+            
+代理就是给对象的方法增加新的逻辑。代理类代替委托类接受请求，但是实际处理请求的还是委托类，在委托类处理的前后可以添加新的逻辑以达到对对象行为的增强。
+比如我希望给一个对象或者某一类的对象的方法记录执行的时间，这时可以使用代理模式。代理模式分为静态代理和动态代理。
 
-InnoDB与磁盘操作的基本单位是数据页，一个数据页是16kb。数据页中数据按照主键盘或者人为指定索引列从小到大排序，并且将数据行分组并且建立槽，查找时通过槽进行二分查找定位数据行所在位置。在由多个列组成的索引中，按照声明列的顺序排序，前面的先排序，相同的话再按照后面列排序。
-索引是一个B+树结构，B+树的节点是数据页。
 
-非叶子节点是目录数据页，里面存储的是很多目录行，一个......
+静态代理
+静态代理是由程序员手动编写代理类，在程序编译之后这个代理类的class文件已经确实的存在了。下面例子是需要记录一个......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-02
+            2020-06-28
         </p>
         <div class="tags">
             
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -484,31 +422,29 @@ InnoDB与磁盘操作的基本单位是数据页，一个数据页是16kb。数�
 
 <div class="post-preview">
 
-    <a href="/InnoD引擎/InnoDB-数据页/">
+    <a href="/Java基础/Exception和Error的区别/">
         <h2 class="post-title">
                                  
-            InnoDB-数据页
+            Exception和Error的区别
         </h2>
         <h3 class="post-subtitle">
-            介绍InnoDB数据页面的组织方式
+            介绍Java中Exception的基本使用原则
         </h3>
         <div class="post-content-preview">
-            
-InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条读取到内存修改后再刷新回去的话，效率是十分底下的。InnoDB通过大小为16kb的数据页来管理数据行。数据页是InnoDB和磁盘交互的基本单位，一次最少读取一个数据页，同步磁盘也是最少一个数据页。
+            典型回答
 
-页结构
-
-这里我们只关心行记录部分。infimun+supermum部分是数据页自带的。UserRecords部分存储用户操作的数据......
+它们在Java中都代表了异常情况。Exception和Error都是继承于Throwable接口，只有Throwable的类是可以抛出。
+Exception和Error的区别：Exception是一种可以提前预想到的异常情况，通过捕获对应的异常并且提供相应的处理方案可以使程序恢复正常工作，比如操作的文件不存在就会出现FileNotFoundException，这时我们可以选择创建......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-09-29
+            2020-06-22
         </p>
         <div class="tags">
             
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -518,34 +454,101 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
 
 <div class="post-preview">
 
-    <a href="/Redis/缓存雪崩、穿透、击穿/">
+    <a href="/Java基础/Java基础-线程中断/">
         <h2 class="post-title">
                                  
-            缓存雪崩、穿透、击穿
+            线程中断
         </h2>
         <h3 class="post-subtitle">
-            本文简单介绍Redis常见问题的解决方案
+            本文介绍了线程中断的作用，以及如何响应中断。
         </h3>
         <div class="post-content-preview">
-            流程
-正常使用Redis做缓存时，一个请求的访问顺序一般为：
-（1）访问缓存是否存在数据，存在则直接通过缓存返回。
-（2）缓存不存在则去DB加载数据
-（3）将数据写入缓存，之后将数据返回给客户端。
-缓存击穿
-缓存击穿指的是大量的请求访问一个key，而恰巧key的过期时间到了。这时大量的请求都会去DB去加载数据，因为DB相对于Redis这种是十分薄弱的，可能会出现问题。
-解决方案
-通过互斥锁的......
+            
+一个运行中的线程如何停止它呢，我们可能会想到stop方法，但是stop方法已经被弃用了。因为stop方法会强制释放掉线程的锁资源，给数据的一致性带来问题。stop是一种独占模式，直接将线程杀死，而中断是一种协作模式。
+
+
+什么是线程中断
+每个线程都维护了一个boolean类型的中断状态，通过调用该线程的interrupt方法，将这个线程设置为中断状态，后续该线程可以isInterrupte......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-09-21
+            2020-05-15
         </p>
         <div class="tags">
             
-              <a href="/tags/#Redis" title="Redis">Redis</a>
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java-IO/">
+        <h2 class="post-title">
+                                 
+            BIO、NIO、AIO模型区别
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍IO模型以及它们的区别
+        </h3>
+        <div class="post-content-preview">
+            
+什么是IO，一般典型的如网络，磁盘文件等带有输入输出的，需要从程序到操作系统的数据传输等都算是IO，本文主要讲解几种IO模型的对比，以及举例帮助理解不同IO模型的差别，并没有大篇幅说集中模型的详细使用。
+
+
+Java IO模型
+想要理解IO模型首先要先明白同步、异步、阻塞、非阻塞他们的意思以及他们之间的区别，因为IO模型无非是他们四个之间的两两组合。
+同步与异步
+同步： 多个操作按照顺序处......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2019-10-21
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java基础-AQS源码分析/">
+        <h2 class="post-title">
+                                 
+            AbstractQueuedSynchronizer源码分析
+        </h2>
+        <h3 class="post-subtitle">
+            本文详细解读了AQS框架控制并发的原理，以及基于AQS怎么实现不同的锁
+        </h3>
+        <div class="post-content-preview">
+            
+Java并发包中的锁工具都是基于AQS来实现的。AQS是并发包的核心，它是一个加强版的CLH队列，它实现了线程阻塞唤醒、取消节点、支持重入、支持独占、共享锁等多种基础功能，其他并发工具直接基于AQS实现自己的特殊的功能即可。
+
+
+什么是CLH队列
+CLH队列是一个先进先出队列，本质是通过队列与节点的状态控制节点的阻塞与唤醒。其中每一个线程代表队列中的一个节点，它不断自旋监听前驱节点的状态（......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2019-10-12
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -560,12 +563,12 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
 <ul class="pager">
     
         <li class="previous">
-            <a href="/">&larr; Newer Posts</a>
+            <a href="/page/2/">&larr; Newer Posts</a>
         </li>
     
     
         <li class="next">
-            <a href="/archives/3/">Older Posts &rarr;</a>
+            <a href="/page/4/">Older Posts &rarr;</a>
         </li>
     
 </ul>
