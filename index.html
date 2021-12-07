@@ -211,6 +211,40 @@
 
 <div class="post-preview">
 
+    <a href="/分布式/分布式理论与事务/">
+        <h2 class="post-title">
+                                 
+            分布式理论与事务
+        </h2>
+        <h3 class="post-subtitle">
+            本篇介绍了cap定理和base理论以及常见的分布式事务解决方案
+        </h3>
+        <div class="post-content-preview">
+            分布式理论和分布式事务
+CAP定理
+CAP定理字母分别对应的是C（一致性）、A（可用性）、（P）分区容忍性，它是经过严格数学证明的定理而不是理论。它表示一个分布式的系统，同时只能满足上面两种特性。
+
+C一致性：表示一个请求被系统处理成功后造成的修改，在后续的请求中无论被哪一台机器处理都能看到之前请求的变动。
+A可用性：表示即使分布式系统中有一部分结点宕机，其他可用的节点还是可以接收请求并且提......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2021-12-07
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#分布式" title="分布式">分布式</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/article/简介/">
         <h2 class="post-title">
             
@@ -530,42 +564,6 @@ Free List
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/Redis/Redis哨兵模式/">
-        <h2 class="post-title">
-                                 
-            Redis哨兵模式
-        </h2>
-        <h3 class="post-subtitle">
-            本文Redis哨兵模式故障发现、故障转移的原理
-        </h3>
-        <div class="post-content-preview">
-            
-Redis主从模式就是为了提高Redis的可用性，当主节点异常后需要人为进行故障转移十分麻烦而且不及时，为了保证高可用就出现了Redis Sentinel。
-
-为什么需要Redis Sentinel
-一个主从结构的Redis服务，当Master故障之后都要做什么？
-1、要挑选出一个slave节点手动设置为master节点。
-2、改变其他slave节点的master指向。
-3、通知客户端ma......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-18
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Redis" title="Redis">Redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -574,7 +572,7 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
     
     
         <li class="next">
-            <a href="/page/2/">Older Posts &rarr;</a>
+            <a href="/archives/2/">Older Posts &rarr;</a>
         </li>
     
 </ul>
@@ -627,7 +625,7 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="2">分布式</a>
+            <a href="/tags/#分布式" title="分布式" rel="3">分布式</a>
             
         
             
@@ -687,6 +685,10 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
     <ul>
       
         <li>
+          <a href="/分布式/分布式理论与事务/">分布式理论与事务</a>
+        </li>
+      
+        <li>
           <a href="/article/简介/">简介</a>
         </li>
       
@@ -700,10 +702,6 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
       
         <li>
           <a href="/ElasticSearch/ElasticSearch工作机制/">ElasticSearch工作机制</a>
-        </li>
-      
-        <li>
-          <a href="/Redis/Redis集群原理/">Redis集群原理</a>
         </li>
       
     </ul>
@@ -728,7 +726,7 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">December 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>

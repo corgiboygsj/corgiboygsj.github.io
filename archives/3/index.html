@@ -18,7 +18,7 @@
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/page/3/">
+    <link rel="canonical" href="http://www.corgiboy.com/archives/3/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -208,6 +208,43 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/Redis/缓存雪崩、穿透、击穿/">
+        <h2 class="post-title">
+                                 
+            缓存雪崩、穿透、击穿
+        </h2>
+        <h3 class="post-subtitle">
+            本文简单介绍Redis常见问题的解决方案
+        </h3>
+        <div class="post-content-preview">
+            流程
+正常使用Redis做缓存时，一个请求的访问顺序一般为：
+（1）访问缓存是否存在数据，存在则直接通过缓存返回。
+（2）缓存不存在则去DB加载数据
+（3）将数据写入缓存，之后将数据返回给客户端。
+缓存击穿
+缓存击穿指的是大量的请求访问一个key，而恰巧key的过期时间到了。这时大量的请求都会去DB去加载数据，因为DB相对于Redis这种是十分薄弱的，可能会出现问题。
+解决方案
+通过互斥锁的......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-09-21
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Redis" title="Redis">Redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -522,40 +559,6 @@ Java IO模型
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/Java基础/Java基础-AQS源码分析/">
-        <h2 class="post-title">
-                                 
-            AbstractQueuedSynchronizer源码分析
-        </h2>
-        <h3 class="post-subtitle">
-            本文详细解读了AQS框架控制并发的原理，以及基于AQS怎么实现不同的锁
-        </h3>
-        <div class="post-content-preview">
-            
-Java并发包中的锁工具都是基于AQS来实现的。AQS是并发包的核心，它是一个加强版的CLH队列，它实现了线程阻塞唤醒、取消节点、支持重入、支持独占、共享锁等多种基础功能，其他并发工具直接基于AQS实现自己的特殊的功能即可。
-
-
-什么是CLH队列
-CLH队列是一个先进先出队列，本质是通过队列与节点的状态控制节点的阻塞与唤醒。其中每一个线程代表队列中的一个节点，它不断自旋监听前驱节点的状态（......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2019-10-12
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Java" title="Java">Java</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -563,12 +566,12 @@ CLH队列是一个先进先出队列，本质是通过队列与节点的状态�
 <ul class="pager">
     
         <li class="previous">
-            <a href="/page/2/">&larr; Newer Posts</a>
+            <a href="/archives/2/">&larr; Newer Posts</a>
         </li>
     
     
         <li class="next">
-            <a href="/page/4/">Older Posts &rarr;</a>
+            <a href="/archives/4/">Older Posts &rarr;</a>
         </li>
     
 </ul>
@@ -621,7 +624,7 @@ CLH队列是一个先进先出队列，本质是通过队列与节点的状态�
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="2">分布式</a>
+            <a href="/tags/#分布式" title="分布式" rel="3">分布式</a>
             
         
             
@@ -681,6 +684,10 @@ CLH队列是一个先进先出队列，本质是通过队列与节点的状态�
     <ul>
       
         <li>
+          <a href="/分布式/分布式理论与事务/">分布式理论与事务</a>
+        </li>
+      
+        <li>
           <a href="/article/简介/">简介</a>
         </li>
       
@@ -694,10 +701,6 @@ CLH队列是一个先进先出队列，本质是通过队列与节点的状态�
       
         <li>
           <a href="/ElasticSearch/ElasticSearch工作机制/">ElasticSearch工作机制</a>
-        </li>
-      
-        <li>
-          <a href="/Redis/Redis集群原理/">Redis集群原理</a>
         </li>
       
     </ul>
@@ -722,7 +725,7 @@ CLH队列是一个先进先出队列，本质是通过队列与节点的状态�
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">December 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>

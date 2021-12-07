@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          简介 - 郭守敬 | Blog
+          分布式理论与事务 - 郭守敬 | Blog
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/article/简介/">
+    <link rel="canonical" href="http://www.corgiboy.com/分布式/分布式理论与事务/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/2020-11-5/《赛博朋克2077》Cyberpunk 2077游戏原图4k高清壁纸_彼岸图网(1).jpg')
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/LOL1.jpg')
             /*post*/
         
     }
@@ -88,12 +88,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
+                              <a class="tag" href="/tags/#分布式" title="分布式">分布式</a>
+                            
                         </div>
-                        <h1>简介</h1>
-                        <h2 class="subheading">关于本博客的简介，持续更新。</h2>
+                        <h1>分布式理论与事务</h1>
+                        <h2 class="subheading">本篇介绍了cap定理和base理论以及常见的分布式事务解决方案</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
-                            2021-07-30
+                            2021-12-07
                         </span>
                     </div>
                 
@@ -210,20 +212,87 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h1 id="阅读须知">阅读须知</h1>
-<blockquote>
-<p>本博客内容为我个人学习总结，因为总忘所以写成博文讲给自己来看。可能有些点没有详细展开，所以阅读时最好有一些相关的基础。<br>
-<br>阅读系列文章可通过右上方<strong>Tags</strong>找到对应系列。</p>
-</blockquote>
-<h1 id="系列文章更新情况">系列文章更新情况</h1>
-<blockquote>
+                <h1 id="分布式理论和分布式事务">分布式理论和分布式事务</h1>
+<h2 id="cap定理">CAP定理</h2>
+<p>CAP定理字母分别对应的是C（一致性）、A（可用性）、（P）分区容忍性，它是经过严格数学证明的定理而不是理论。它表示一个分布式的系统，同时只能满足上面两种特性。</p>
 <ul>
-<li>InnoDB引擎系列完成</li>
-<li>Redis系列完成</li>
-<li>JDK源码、基础、JVM持续更新中</li>
-<li>分布式相关更新中</li>
+<li>C一致性：表示一个请求被系统处理成功后造成的修改，在后续的请求中无论被哪一台机器处理都能看到之前请求的变动。</li>
+<li>A可用性：表示即使分布式系统中有一部分结点宕机，其他可用的节点还是可以接收请求并且提供正常的响应。</li>
+<li>P分区容忍性：即使分布式系统中出现网络分区、一部分节点之间无法通信、通信延迟、消息丢失，任意可用节点还是可以正常处理请求并且能返回正确的结果。</li>
 </ul>
-</blockquote>
+<p>在分布式系统中，网络的问题是一定存在，所以对于一个分布式系统而言分区容忍性是一定要保证的。所以只能在一致性和可用性中做取舍。</p>
+<p>下面看一下分别选择不同两个特性会带来什么样的结果。</p>
+<ul>
+<li>AC：舍弃掉分区容忍性，意味着要让网络是可靠的，但这是不可能的。那就需要让节点共享同一份数据，例如一个服务部署多台形成集群，但是他们都共享一个存储，而不是各自存储一部分数据之后通过网络共享给节点。</li>
+<li>CP：舍弃可用性，意味着例如出现分区A和分区B，他们之间无法进行网络通信。那么当A分区处理了一个新的写入请求后，B分区是根本无法感知到A分区发生了什么变化的，如果此时有一个新的读取请求发送给了B分区，那么A分区刚刚处理的请求是不可见的。那么此时还要保证一致性就需要让B分区不提供服务，因此损失了可用性。</li>
+<li>AP：舍弃一致性，和上例相同，如果让B分区继续可以处理读取请求，那么势必就会造成A分区和B分区读取数据不相同的情况，但是整个系统每个节点、分区都是可用的。</li>
+</ul>
+<p>一般情况下A也不会舍弃掉，因为分布式的本质就是要让系统整体性能随着机器的增加而线性提升、再一个重要的原因就是实现高可用。如果系统是分布式的却让可用性降低了，这样的情况一般是无法被容忍的。</p>
+<h2 id="刚性事务">刚性事务</h2>
+<p>刚性事务表示必须强一致的事务，每个子事务必须同时提交或者同时回滚，最常见的数据库事务。在分布式系统中采用二阶段类似的方式进行刚性事务控制，主要是还是让参与者先执行事务但不提交，由协调者根据参与者的反馈进行事务是否提交的判断。</p>
+<h3 id="两阶段提交">两阶段提交</h3>
+<p>两阶段提交中有两种角色，一个全局事务管理器也就是协调者，另外就是局部资源管理器也就是参与者。局部资源管理器可以是部署在不同机器上的数据源，需要保证他们的数据一致性。</p>
+<ul>
+<li>**准备阶段：**协调者向所有的参与者下发事务请求，所有参与者本地执行事务，但是不提交事务。之后回复协调者事务操作完成，如果执行失败则回复失败。之后阻塞等待协调者的下一步动作。</li>
+<li>**提交阶段：**协调者收到了所有的参与者的回复后进行统计，如果全都是执行成功，则向所有的参与者下发commit请求，所有的参与者都进行事务的提交操作。如果但凡有一个人在准备阶段回复的是失败，则下发回滚操作，所有的参与者都要回滚。这个阶段是很快的，因为最重的日志记录、事务操作在准别阶段都已经完成了。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li>协调者单点问题：两阶段提交严格依赖协调者，如果在提交阶段协调者挂了，那么所有的参与者都必须要一直阻塞等待。</li>
+<li>性能差：协调者要等待接收所有的参与者的回复才能进行下一个阶段的执行，因此所有的参与者都要等待最慢的那个参与者。</li>
+<li>数据不一致问题：协调者下发提交请求时如果只有一部分接收到，那么还是会有人提交有人没提交。</li>
+</ul>
+<h3 id="三阶段提交">三阶段提交</h3>
+<p>三阶段提交主要是通过拆解了两阶段提交的准备阶段和引入了超时时间从而解决了两阶段提交的阻塞问题和性能差的问题。</p>
+<ul>
+<li>CanCommit阶段：协调者向所有的参与者询问是否可以正常执行事务。这个挺困惑的，其实是将事务的执行拆开了，拆成了资源锁定和实际执行，这个阶段只是让协调者去锁定所需要的资源，但是不执行，所以这步相对于两阶段提交的准备阶段要快一些。</li>
+<li>PreCommit阶段：协调者接收参与者的响应，如果都预期可以执行成功，则下发事务执行操作，让所有的参与者去实际执行事务，但是并不提交。还有一些其他情况会在这个阶段发生，如果有参与者响应的是不能预期完成事务则协调者下发事务中断请求给所有的参与者。还有情况是等待参与者响应超时，也是下发事务中断操作。</li>
+<li>DoCommit阶段：协调者等待所有的参与者的响应，如果都完成了事务的执行就让他们提交事务。否则的话就让所有人回滚。还有一种可能是参与者一直等待协调者下发操作，但是超时了，那么参与者就会默认提交事务。</li>
+</ul>
+<p><strong>优点</strong></p>
+<ul>
+<li>通过引入了超时时间，让参与者不用再像两阶段提交时一样一直阻塞等待协调者的下一步指示。</li>
+<li>将准备阶段拆开，提升了性能，因为可以尽早的发现是否要中断事务。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li>数据不一致问题还是存在的，如果提交阶段协调者和其他参与者网络出现问题，给一部分下发回滚操作，其他人都等待超时了就会自动提交事务。这时就会出现不一致问题。</li>
+</ul>
+<h3 id="base理论">BASE理论</h3>
+<p>因为CAP定理说明了在分布式系统中一定要有所取舍，因此有人相对于CAP的强一致性提出了最终一致性的方案，最终一致性的意思是说系统中节点之间可能存在数据不一致的情况，但是经过一段时间他们一定会变成一致的。</p>
+<p>BASE理论中主要是加入了S，它表示的是柔性事务，它不保证子事务必须同时成功，只要到最后一起成功了那么整个事务就成功了。</p>
+<h4 id="柔性事务">柔性事务</h4>
+<p>柔性事务是一种最终一致性的事务，子事务可以在其他事务未提交的情况下先进行提交，在经过一段时间之后，子事务最终也会提交，整个事务会到达一致性状态。例如有这样一个用户给商品下单的场景，要完成三件事情。</p>
+<ol>
+<li>用户服务给用户扣款</li>
+<li>仓库服务对库存进行减少</li>
+<li>商户服务给商家打钱</li>
+</ol>
+<h5 id="可靠消息队列方案">可靠消息队列方案</h5>
+<ul>
+<li>首先根据三个操作的易出错性排行，将最容易出错的事务放在最前面，例如最容易出错的是用户扣款这个环节。那么首先在用户服务开启本地事务，对用户进行扣款。之后有一张消息表，往里面写两条数据分别是仓库商品余量减一、商户加100元，这两条是进行中的状态，扣款操作是已完成状态。这几个操作要在用户服务的一个事务中一起完成。</li>
+<li>系统中存在一个消息服务，周期性的来扫描这张表，将进行中的消息拿出来发送给对应的其他服务让它们进行处理。</li>
+<li>其他服务处理成功后会将这个表的对应行改成已完成，如果执行失败的话，还是会定时扫表继续发送消息给对应的服务。因为一条消息可能会执行多次，所以消息需要具有幂等性。</li>
+<li>如果消息一直执行不成功，也要一直不断的发送或者人工介入。也就是说这种方式的一致性方案，一旦消息写入了消息表，后续的消息必须要被处理成功，不允许回滚。</li>
+</ul>
+<h5 id="tcc">TCC</h5>
+<p>可靠消息服务方案适合于对数据隔离型要求不高的业务，但是如果对于隔离型要求高的业务，比如数据不符合条件需要让事务失败而不是像消息方案一样必须要一直重试到成功为止。</p>
+<p>TCC是指三个步骤，Try、Confirm、Cancel三个操作。</p>
+<ul>
+<li>Try：让各个子事务对需要修改的资源进行锁定。这样可以让其他事务再进来的时候进行检查，不符合条件就可以直接终止事务。</li>
+<li>Confirm：让所有的子事务使用Try阶段锁定的资源进行事务操作，并且提交。同样的这个阶段的操作也需要服务保证操作的幂等性，因为即使某个服务的Confirm执行失败，也要不断的进行重试直到成功为止。</li>
+<li>Cancel：让事务释放自己锁定的资源。如果Try阶段有任何子事务返回锁定资源失败，那么就会执行所有子事务的Cancel释放掉资源。有点像二阶段提交的提交阶段，一旦有人失败就全员回滚。</li>
+</ul>
+<p>TCC一般需要在数据库表上进行改造，例如扣款服务在用户金钱表需要添加一个冻结资金字段，表示Try阶段锁定的金额，后续可以在Confirm阶段和Cancel阶段释放掉冻结的资金并且扣款或者什么都不做。</p>
+<h5 id="saga">SAGA</h5>
+<p>前面介绍的两种最终一致性方案都要求一旦有子事务成功提交了，那么其他的子事务必须要成功处理无论重试多少次。SAGA是一种补偿式的分布式事务方案。相比于TCC的锁定资源对事务进行补偿要更容易，例如锁定操作需要其他第三方配合的话就很麻烦。</p>
+<p>SAGA将一个大的事务拆分成很多的子事务，一样就是多个服务调用。每个事务有对应的补偿机制（将数据恢复到之前的状态），补偿机制要求一定可以执行成功绝对不可以失败。SAGA分为两种恢复机制。</p>
+<ul>
+<li>**正向恢复：**这种方式不需要上面提到的反向补偿，它和TCC的Confirm和消息服务方案类似，如果有子事务执行失败就一直重试直到成功为止。</li>
+<li>**反向恢复：**这种方式就是上面提到的补偿，例如有T1、T2…Tn这些子事务，比如执行到T3时候失败了，那么就需要调用T1和T2的补偿代码进行数据的恢复，之后事务结束。</li>
+</ul>
+<h4 id="后续">后续</h4>
+<p>有时间了解一下Seata。</p>
 
                 
 
@@ -231,13 +300,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/分布式/分布式理论与事务/" data-toggle="tooltip" data-placement="top" title="分布式理论与事务">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/操作系统/操作系统内存管理/" data-toggle="tooltip" data-placement="top" title="操作系统内存管理">Next Post &rarr;</a>
+                            <a href="/article/简介/" data-toggle="tooltip" data-placement="top" title="简介">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -287,7 +352,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#阅读须知"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x9605;&#x8BFB;&#x987B;&#x77E5;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#系列文章更新情况"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x7CFB;&#x5217;&#x6587;&#x7AE0;&#x66F4;&#x65B0;&#x60C5;&#x51B5;</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分布式理论和分布式事务"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x5206;&#x5E03;&#x5F0F;&#x7406;&#x8BBA;&#x548C;&#x5206;&#x5E03;&#x5F0F;&#x4E8B;&#x52A1;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#cap定理"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">CAP&#x5B9A;&#x7406;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#刚性事务"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x521A;&#x6027;&#x4E8B;&#x52A1;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#两阶段提交"><span class="toc-nav-number">1.2.1.</span> <span class="toc-nav-text">&#x4E24;&#x9636;&#x6BB5;&#x63D0;&#x4EA4;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#三阶段提交"><span class="toc-nav-number">1.2.2.</span> <span class="toc-nav-text">&#x4E09;&#x9636;&#x6BB5;&#x63D0;&#x4EA4;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#base理论"><span class="toc-nav-number">1.2.3.</span> <span class="toc-nav-text">BASE&#x7406;&#x8BBA;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#柔性事务"><span class="toc-nav-number">1.2.3.1.</span> <span class="toc-nav-text">&#x67D4;&#x6027;&#x4E8B;&#x52A1;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#可靠消息队列方案"><span class="toc-nav-number">1.2.3.1.1.</span> <span class="toc-nav-text">&#x53EF;&#x9760;&#x6D88;&#x606F;&#x961F;&#x5217;&#x65B9;&#x6848;</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#tcc"><span class="toc-nav-number">1.2.3.1.2.</span> <span class="toc-nav-text">TCC</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#saga"><span class="toc-nav-number">1.2.3.1.3.</span> <span class="toc-nav-text">SAGA</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#后续"><span class="toc-nav-number">1.2.3.2.</span> <span class="toc-nav-text">&#x540E;&#x7EED;</span></a></li></ol></li></ol></li></ol></li></ol>
         
         </div>
       </aside>
@@ -307,6 +372,8 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
+                          <a class="tag" href="/tags/#分布式" title="分布式">分布式</a>
+                        
                     </div>
                 </section>
                 

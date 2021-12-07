@@ -18,7 +18,7 @@
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/page/2/">
+    <link rel="canonical" href="http://www.corgiboy.com/archives/2/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -208,6 +208,42 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/Redis/Redis哨兵模式/">
+        <h2 class="post-title">
+                                 
+            Redis哨兵模式
+        </h2>
+        <h3 class="post-subtitle">
+            本文Redis哨兵模式故障发现、故障转移的原理
+        </h3>
+        <div class="post-content-preview">
+            
+Redis主从模式就是为了提高Redis的可用性，当主节点异常后需要人为进行故障转移十分麻烦而且不及时，为了保证高可用就出现了Redis Sentinel。
+
+为什么需要Redis Sentinel
+一个主从结构的Redis服务，当Master故障之后都要做什么？
+1、要挑选出一个slave节点手动设置为master节点。
+2、改变其他slave节点的master指向。
+3、通知客户端ma......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-10-18
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Redis" title="Redis">Redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -516,43 +552,6 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/Redis/缓存雪崩、穿透、击穿/">
-        <h2 class="post-title">
-                                 
-            缓存雪崩、穿透、击穿
-        </h2>
-        <h3 class="post-subtitle">
-            本文简单介绍Redis常见问题的解决方案
-        </h3>
-        <div class="post-content-preview">
-            流程
-正常使用Redis做缓存时，一个请求的访问顺序一般为：
-（1）访问缓存是否存在数据，存在则直接通过缓存返回。
-（2）缓存不存在则去DB加载数据
-（3）将数据写入缓存，之后将数据返回给客户端。
-缓存击穿
-缓存击穿指的是大量的请求访问一个key，而恰巧key的过期时间到了。这时大量的请求都会去DB去加载数据，因为DB相对于Redis这种是十分薄弱的，可能会出现问题。
-解决方案
-通过互斥锁的......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-09-21
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Redis" title="Redis">Redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -565,7 +564,7 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
     
     
         <li class="next">
-            <a href="/page/3/">Older Posts &rarr;</a>
+            <a href="/archives/3/">Older Posts &rarr;</a>
         </li>
     
 </ul>
@@ -618,7 +617,7 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
             
         
             
-            <a href="/tags/#分布式" title="分布式" rel="2">分布式</a>
+            <a href="/tags/#分布式" title="分布式" rel="3">分布式</a>
             
         
             
@@ -678,6 +677,10 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
     <ul>
       
         <li>
+          <a href="/分布式/分布式理论与事务/">分布式理论与事务</a>
+        </li>
+      
+        <li>
           <a href="/article/简介/">简介</a>
         </li>
       
@@ -691,10 +694,6 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
       
         <li>
           <a href="/ElasticSearch/ElasticSearch工作机制/">ElasticSearch工作机制</a>
-        </li>
-      
-        <li>
-          <a href="/Redis/Redis集群原理/">Redis集群原理</a>
         </li>
       
     </ul>
@@ -719,7 +718,7 @@ InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条�
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">December 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>
