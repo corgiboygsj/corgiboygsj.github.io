@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          分布式理论与事务 - 郭守敬 | Blog
+          分布式的基石-共识算法 - 郭守敬 | Blog
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/分布式/分布式理论与事务/">
+    <link rel="canonical" href="http://www.corgiboy.com/分布式/分布式的基石-共识算法/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -71,7 +71,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/LOL1.jpg')
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/2020-12/好年 新年 孔明灯 女孩 4k动漫壁纸_彼岸图网.jpg')
             /*post*/
         
     }
@@ -91,11 +91,11 @@
                               <a class="tag" href="/tags/#分布式" title="分布式">分布式</a>
                             
                         </div>
-                        <h1>分布式理论与事务</h1>
-                        <h2 class="subheading">本篇介绍了cap定理和base理论以及常见的分布式事务解决方案</h2>
+                        <h1>分布式的基石-共识算法</h1>
+                        <h2 class="subheading">本篇简单介绍了分布式系统中的共识算法</h2>
                         <span class="meta">
                             Posted by 郭守敬 on
-                            2021-12-07
+                            2021-12-15
                         </span>
                     </div>
                 
@@ -212,87 +212,90 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h1 id="分布式理论和分布式事务">分布式理论和分布式事务</h1>
-<h2 id="cap定理">CAP定理</h2>
-<p>CAP定理字母分别对应的是C（一致性）、A（可用性）、（P）分区容忍性，它是经过严格数学证明的定理而不是理论。它表示一个分布式的系统，同时只能满足上面两种特性。</p>
+                <blockquote>
+<p>本文为《凤凰架构》学习文章，图片和内容基本都出自于《凤凰架构》</p>
+</blockquote>
+<h1 id="分布式共识算法">分布式共识算法</h1>
+<p>如何在系统中保证一份数据不丢失？那就是对数据进行冗余备份。对于静态的数据我们可以手动使用磁盘之类的东西进行拷贝备份。但是在分布式系统之中，我们的数据是动态的，如何保证数据的实时备份？</p>
+<p>比较容易想到的一种方式就是节点收到变更之后，同步给所有的副本节点。当所有的副本节点都返回写入成功之后主节点再向客户端返回写入成功。这种方式就类似于2PC、3PC这种强一致性事务的方式。Mysql主从的全同步复制就是这样的。</p>
+<p>但是这样的方式会带来一些问题，例如副本机器越多，主节点需要复制的数据就越多。关键的问题是整个系统的可用性会随着副本的增多而下降。如果某一台副本机器挂了或者迟迟复制不成功则主节点会一直阻塞，影响系统的可用性。分布式架构的本质就是为了高可用和性能随着机器数量线性增长，所以这种随着机器增多可用性反而下降是不可以被接受的。因此出现了“少数服从多数”的算法，数据在过半的机器上写入成功就认为操作成功了，让整个系统在外部整体看起来是一致的就可以了，因此可以容忍不超过半数的节点发生分区或者宕机，这样保证了数据的可靠性和系统的可用性。</p>
+<p>因此就是说需要一种算法能够容忍网络分区、节点宕机，但是只要过半的节点存活就能让过半的节点对数据达成一致，对外体现出一致性的状态。例如Paxos、Raft、Zab算法。</p>
+<h2 id="容易理解错的概念">容易理解错的概念</h2>
+<p>我们所说的Raft、Paxos、Zab这类算法它们都叫做<strong>分布式共识（Consensus）算法</strong>而不是<strong>分布式一致性（Consistency）算法</strong>。之所以有人叫分布式一致性算法其实都是国内翻译的问题，一致性很容易让人在算法的理解上出现问题。很容易让人认为这些算法保证的是操作返回成功之后，所有节点的数据状态都是完全一致的。但真实情况是在系统内部是有不一致的情况的，只是保证了过半的节点写入成功，整个系统对外呈现的是一致的状态，内部节点最终会达到数据的一致。</p>
+<p>之所以说这些算法是“强一致性”的共识算法，说的都是整个系统看做一个整体，之后观察的角度是系统之外，整体来看整个系统是一致的。相反也有“最终一致性”的共识算法，就比如Gossip协议，它不保证请求返回成功时有超过半数的节点写入成功，在外部可以观察到系统的不一致状态。</p>
+<p><strong>共识</strong>指的节点之间将变更最终达成一致的状态的过程。<strong>一致性</strong>是说指节点间数据副本的差异。</p>
+<h2 id="paxos算法">Paxos算法</h2>
+<p>Basic Paxos算法给节点分配了三种角色。</p>
 <ul>
-<li><strong>C一致性：</strong> 表示一个请求被系统处理成功后造成的修改，在后续的请求中无论被哪一台机器处理都能看到之前请求的变动。</li>
-<li><strong>A可用性：</strong> 表示即使分布式系统中有一部分结点宕机，其他可用的节点还是可以接收请求并且提供正常的响应。</li>
-<li><strong>P分区容忍性：</strong> 即使分布式系统中出现网络分区、一部分节点之间无法通信、通信延迟、消息丢失，任意可用节点还是可以正常处理请求并且能返回正确的结果。</li>
+<li>提案节点：接收客户端的变更请求，生成提案发送给所有的决策节点。</li>
+<li>决策节点：接收提案，决策节点会对提案选择应答或者不应答，如果提案节点收到了超过半数决策节点的同意的话表示这条提案可以被写入了，该提案不会丢失，也不会再被更改，最终所有的节点都会接受这个提案。</li>
+<li>记录节点：记录节点会去同步提案节点和决策节点已经通过的决策，不会做其他的事情。</li>
 </ul>
-<p>在分布式系统中，网络的问题是一定存在，所以对于一个分布式系统而言分区容忍性是一定要保证的。所以只能在一致性和可用性中做取舍。</p>
-<p>下面看一下分别选择不同两个特性会带来什么样的结果。</p>
+<p>不讨论细节，在Paxos中一个提案的提出到最后被接受一共需要两个阶段（准备Promis、批准Accept），一个常规的流程如下。</p>
+<h3 id="准备阶段">准备阶段</h3>
+<p>（1）提案节点接收到请求后会生成提案，生成一个全局唯一的数字N，将&lt;N, 提案&gt;这样的对发送给所有的决策节点。</p>
+<p>（2）决策节点会提供两个承诺和一个应答</p>
+<p>两个承诺</p>
 <ul>
-<li><strong>AC：</strong> 舍弃掉分区容忍性，意味着要让网络是可靠的，但这是不可能的。那就需要让节点共享同一份数据，例如一个服务部署多台形成集群，但是他们都共享一个存储，而不是各自存储一部分数据之后通过网络共享给节点。</li>
-<li><strong>CP：</strong> 舍弃可用性，意味着例如出现分区A和分区B，他们之间无法进行网络通信。那么当A分区处理了一个新的写入请求后，B分区是根本无法感知到A分区发生了什么变化的，如果此时有一个新的读取请求发送给了B分区，那么A分区刚刚处理的请求是不可见的。那么此时还要保证一致性就需要让B分区不提供服务，因此损失了可用性。</li>
-<li><strong>AP：</strong> 舍弃一致性，和上例相同，如果让B分区继续可以处理读取请求，那么势必就会造成A分区和B分区读取数据不相同的情况，但是整个系统每个节点、分区都是可用的。</li>
+<li>决策节点不会再给小于等于N的提案回复Promise</li>
+<li>决策节点不会接受小于N的Accept请求</li>
 </ul>
-<p>一般情况下A也不会舍弃掉，因为分布式的本质就是要让系统整体性能随着机器的增加而线性提升、再一个重要的原因就是实现高可用。如果系统是分布式的却让可用性降低了，这样的情况一般是无法被容忍的。</p>
-<h2 id="刚性事务">刚性事务</h2>
-<p>刚性事务表示必须强一致的事务，每个子事务必须同时提交或者同时回滚，最常见的数据库事务。在分布式系统中采用二阶段类似的方式进行刚性事务控制，主要是还是让参与者先执行事务但不提交，由协调者根据参与者的反馈进行事务是否提交的判断。</p>
-<h3 id="两阶段提交">两阶段提交</h3>
-<p>两阶段提交中有两种角色，一个全局事务管理器也就是协调者，另外就是局部资源管理器也就是参与者。局部资源管理器可以是部署在不同机器上的数据源，需要保证他们的数据一致性。</p>
+<p>一个应答</p>
 <ul>
-<li><strong>准备阶段：</strong> 协调者向所有的参与者下发事务请求，所有参与者本地执行事务，但是不提交事务。之后回复协调者事务操作完成，如果执行失败则回复失败。之后阻塞等待协调者的下一步动作。</li>
-<li><strong>提交阶段：</strong> 协调者收到了所有的参与者的回复后进行统计，如果全都是执行成功，则向所有的参与者下发commit请求，所有的参与者都进行事务的提交操作。如果但凡有一个人在准备阶段回复的是失败，则下发回滚操作，所有的参与者都要回滚。这个阶段是很快的，因为最重的日志记录、事务操作在准别阶段都已经完成了。</li>
+<li>如果提案请求没有违反两个承诺，那么就返回接受过提案的最大id和设置的值，如果没有接受过那就返回空。如果违反了上面的两个承诺就不进行回复。</li>
 </ul>
-<p><strong>缺点</strong></p>
+<h3 id="批准阶段">批准阶段</h3>
+<p>当提案节点收到了半数以上的应答后会开始这个阶段，这个阶段会有两种情况出现。</p>
 <ul>
-<li><strong>协调者单点问题：</strong> 两阶段提交严格依赖协调者，如果在提交阶段协调者挂了，那么所有的参与者都必须要一直阻塞等待。</li>
-<li><strong>性能差：</strong> 协调者要等待接收所有的参与者的回复才能进行下一个阶段的执行，因此所有的参与者都要等待最慢的那个参与者。</li>
-<li><strong>数据不一致问题：</strong> 协调者下发提交请求时如果只有一部分接收到，那么还是会有人提交有人没提交。</li>
+<li>情况1：收到的回复都返回的是空，那么提案节点可以随便设置值，之后发送Accept请求给所有的决策节点。</li>
+<li>情况2：收到的回复中有id和值，那么提案节点要被迫放弃自己的提案，将这个id和值发送给所有的决策节点。</li>
 </ul>
-<h3 id="三阶段提交">三阶段提交</h3>
-<p>三阶段提交主要是通过拆解了两阶段提交的准备阶段和引入了超时时间从而解决了两阶段提交的阻塞问题和性能差的问题。</p>
+<p>收到Accept的决策节点，如果这个id和值没有违反自己的承诺，就将该提案持久化，否则可以忽略。</p>
+<p><img src="http://guoshoujing.gitee.io/mark-down-photo/%E5%88%86%E5%B8%83%E5%BC%8F/image-20211214152703903.png" alt="Paxos算法"></p>
+<h3 id="活锁问题">活锁问题</h3>
+<p>Paxos允许在多个节点上并发写入，通过上面的方式最后只有一个提案会被通过。但是会有下图的一种情况，两个提案节点S1和S5都发出自己的提案，S1发出后被S1、S2、S3回复了Promise，之后S1会给它们发出Accept请求，但是在S3接收到Accept之前S5发出了提案号更大的提案，S3发现这个号比自己当前最大的（S1刚刚发出的id）大，那么也会回复Promise，这时S1的Accept到了但是根据决策节点的承诺它不可以接收这个Accept请求。</p>
+<p>前面的情况S1和S5交替进行就会形成活锁，让这个提案一直无法被通过。</p>
+<p><img src="http://guoshoujing.gitee.io/mark-down-photo/%E5%88%86%E5%B8%83%E5%BC%8F/image-20211214153202671.png" alt="活锁问题"></p>
+<h2 id="multi-paxos">Multi Paxos</h2>
+<p>上面的活锁问题在于Basic Paxos算法让节点人人平等，都可以处理写请求，因此整个系统中会有并发的写存在，再加上网络的不可靠性就会出现活锁问题。</p>
+<p>为了简化这个问题，就出现了<strong>选举</strong>机制，让只有一个节点处理写请求，其他的从节点接收到写请求都会转发给主节点。这样就保证了整个系统的写入是线性的。同时有了主节点就不再需要Basic Paxos的准备阶段了。</p>
+<p>在Multi Paxos中引入任期号的概念，任期号是为了解决网络分区问题的，例如发生网络分区后当前主节点被分配到了一个少数节点的分区中，其他的从节点分配到了多数节点的分区中，那么在多数节点分区内就会产生一个新的主节点，这个新主节点的任期号会变大。当网络分区恢复之后，原主节点发现任期号自己不是最大的了就会变成从节点去复制新主节点的日志。</p>
+<p>后期出现的Raft、Zab等算法都是属于Multi Paxos的派生实现。</p>
+<h2 id="raft算法">Raft算法</h2>
+<p>Raft算法相比于Basic Paxos更容易理解，属于Multi Paxos的派生实现，在工业界比较容易落地而且很多中间件都实现了Raft算法，例如Redis、ETCD。</p>
+<p><strong>Raft中节点有三种角色</strong></p>
 <ul>
-<li><strong>CanCommit阶段：</strong> 协调者向所有的参与者询问是否可以正常执行事务。这个挺困惑的，其实是将事务的执行拆开了，拆成了资源锁定和实际执行，这个阶段只是让协调者去锁定所需要的资源，但是不执行，所以这步相对于两阶段提交的准备阶段要快一些。</li>
-<li><strong>PreCommit阶段：</strong> 协调者接收参与者的响应，如果都预期可以执行成功，则下发事务执行操作，让所有的参与者去实际执行事务，但是并不提交。还有一些其他情况会在这个阶段发生，如果有参与者响应的是不能预期完成事务则协调者下发事务中断请求给所有的参与者。还有情况是等待参与者响应超时，也是下发事务中断操作。</li>
-<li><strong>DoCommit阶段：</strong> 协调者等待所有的参与者的响应，如果都完成了事务的执行就让他们提交事务。否则的话就让所有人回滚。还有一种可能是参与者一直等待协调者下发操作，但是超时了，那么参与者就会默认提交事务。</li>
+<li>领导者Leader：负责处理客户端的写请求，将变更操作日志同步给跟随者，收到过半的确认回应就会提交日志并将其应用到状态机，之后返回客户端写入成功。</li>
+<li>跟随者Follower：负责同步Leader发送过来的日志，应用到自己的状态机，备份日志。Follower接收到的请求会转发给Leader。</li>
+<li>候选者Condidate：领导人选举时会出现的角色，向其他的节点发送投票让它们选举自己为Leader，收到过半的同意票将会转换为Leader并且在系统中广播自己成为Leader。</li>
 </ul>
-<p><strong>优点</strong></p>
+<p><strong>Raft中的两个超时</strong></p>
 <ul>
-<li>通过引入了超时时间，让参与者不用再像两阶段提交时一样一直阻塞等待协调者的下一步指示。</li>
-<li>将准备阶段拆开，提升了性能，因为可以尽早的发现是否要中断事务。</li>
+<li>跟随者超时：跟随者在一定时间内没有收到Leader的心跳、日志同步就会变成Condidate并且发起新的选举。</li>
+<li>候选者超时：候选者向其他节点发出投票后，在一定时间内没有收到半数的同意票就会提升任期发起重新发起投票。</li>
 </ul>
-<p><strong>缺点</strong></p>
+<p><strong>Raft中节点角色转换如下图</strong></p>
+<p><img src="http://guoshoujing.gitee.io/mark-down-photo/%E5%88%86%E5%B8%83%E5%BC%8F/image-20211214180139819.png" alt="Raft角色转换"></p>
 <ul>
-<li>数据不一致问题还是存在的，如果提交阶段协调者和其他参与者网络出现问题，给一部分下发回滚操作，其他人都等待超时了就会自动提交事务。这时就会出现不一致问题。</li>
+<li>起初所有的节点启动后都是Follower，在Follower超时时间过了后就会变成Condidate并且向所有节点发送投票请求。</li>
+<li>Candidate超时时间内没有收到过半的同意票就会提升任期号重新发起投票。如果收到了过半的同意就会转换成Leader，并且立即广播自己成为Leader让其他节点复制自己的日志。如果收到了其他Leader发来的消息就会变成Follower。</li>
+<li>Leader如果收到任期号大于自己的消息就会转换为Follower。</li>
 </ul>
-<h3 id="base理论">BASE理论</h3>
-<p>因为CAP定理说明了在分布式系统中一定要有所取舍，因此有人相对于CAP的强一致性提出了最终一致性的方案，最终一致性的意思是说系统中节点之间可能存在数据不一致的情况，但是经过一段时间他们一定会变成一致的。</p>
-<p>BASE理论中主要是加入了S，它表示的是柔性事务，它不保证子事务必须同时成功，只要到最后一起成功了那么整个事务就成功了。</p>
-<h4 id="柔性事务">柔性事务</h4>
-<p>柔性事务是一种最终一致性的事务，子事务可以在其他事务未提交的情况下先进行提交，在经过一段时间之后，子事务最终也会提交，整个事务会到达一致性状态。例如有这样一个用户给商品下单的场景，要完成三件事情。</p>
+<p><strong>先不考虑其他情况，就来看一个基本流程，详细的Raft算法将会在新写一篇文章探讨</strong></p>
 <ol>
-<li>用户服务给用户扣款</li>
-<li>仓库服务对库存进行减少</li>
-<li>商户服务给商家打钱</li>
+<li>节点启动后都是Follower，当超时时间到了之后会转变为Condidate同时提升自己的任期号，向所有的节点发送投票请求，希望其他节点同意自己变成Leader。</li>
+<li>Condidate接收到了超过半数的节点的同意回复，就会转变为Leader。之后立刻向所有的节点发送请求，让他们知道有新Leader产生，并且会发送日志给Follower让他们同步。（这里可能会涉及到跟随者日志的覆盖）</li>
+<li>Leader接收客户端的请求，Leader先记录日志但是不提交。将该日志发送给Follower，收到了过半的Follower回复确认，那么Leader就会提交这条日志并且应用到自己的状态机上，之后返回客户端操作成功。</li>
 </ol>
-<h5 id="可靠消息队列方案">可靠消息队列方案</h5>
-<ul>
-<li>首先根据三个操作的易出错性排行，将最容易出错的事务放在最前面，例如最容易出错的是用户扣款这个环节。那么首先在用户服务开启本地事务，对用户进行扣款。之后有一张消息表，往里面写两条数据分别是仓库商品余量减一、商户加100元，这两条是进行中的状态，扣款操作是已完成状态。这几个操作要在用户服务的一个事务中一起完成。</li>
-<li>系统中存在一个消息服务，周期性的来扫描这张表，将进行中的消息拿出来发送给对应的其他服务让它们进行处理。</li>
-<li>其他服务处理成功后会将这个表的对应行改成已完成，如果执行失败的话，还是会定时扫表继续发送消息给对应的服务。因为一条消息可能会执行多次，所以消息需要具有幂等性。</li>
-<li>如果消息一直执行不成功，也要一直不断的发送或者人工介入。也就是说这种方式的一致性方案，一旦消息写入了消息表，后续的消息必须要被处理成功，不允许回滚。</li>
-</ul>
-<h5 id="tcc">TCC</h5>
-<p>可靠消息服务方案适合于对数据隔离型要求不高的业务，但是如果对于隔离型要求高的业务，比如数据不符合条件需要让事务失败而不是像消息方案一样必须要一直重试到成功为止。</p>
-<p>TCC是指三个步骤，Try、Confirm、Cancel三个操作。</p>
-<ul>
-<li><strong>Try：</strong> 让各个子事务对需要修改的资源进行锁定。这样可以让其他事务再进来的时候进行检查，不符合条件就可以直接终止事务。</li>
-<li><strong>Confirm：</strong> 让所有的子事务使用Try阶段锁定的资源进行事务操作，并且提交。同样的这个阶段的操作也需要服务保证操作的幂等性，因为即使某个服务的Confirm执行失败，也要不断的进行重试直到成功为止。</li>
-<li><strong>Cancel：</strong> 让事务释放自己锁定的资源。如果Try阶段有任何子事务返回锁定资源失败，那么就会执行所有子事务的Cancel释放掉资源。有点像二阶段提交的提交阶段，一旦有人失败就全员回滚。</li>
-</ul>
-<p>TCC一般需要在数据库表上进行改造，例如扣款服务在用户金钱表需要添加一个冻结资金字段，表示Try阶段锁定的金额，后续可以在Confirm阶段和Cancel阶段释放掉冻结的资金并且扣款或者什么都不做。</p>
-<h5 id="saga">SAGA</h5>
-<p>前面介绍的两种最终一致性方案都要求一旦有子事务成功提交了，那么其他的子事务必须要成功处理无论重试多少次。SAGA是一种补偿式的分布式事务方案。相比于TCC的锁定资源对事务进行补偿要更容易，例如锁定操作需要其他第三方配合的话就很麻烦。</p>
-<p>SAGA将一个大的事务拆分成很多的子事务，一样就是多个服务调用。每个事务有对应的补偿机制（将数据恢复到之前的状态），补偿机制要求一定可以执行成功绝对不可以失败。SAGA分为两种恢复机制。</p>
-<ul>
-<li><strong>正向恢复：</strong> 这种方式不需要上面提到的反向补偿，它和TCC的Confirm和消息服务方案类似，如果有子事务执行失败就一直重试直到成功为止。</li>
-<li><strong>反向恢复：</strong> 这种方式就是上面提到的补偿，例如有T1、T2…Tn这些子事务，比如执行到T3时候失败了，那么就需要调用T1和T2的补偿代码进行数据的恢复，之后事务结束。</li>
-</ul>
-<h4 id="后续">后续</h4>
-<p>有时间了解一下Seata。</p>
+<h2 id="gossip协议">Gossip协议</h2>
+<p>前面强调过Raft之类的算法都是分布式共识算法，但是在国内它们也会被称为“强一致的”共识算法，它指的是系统内存在的不一致状态无法被外部所查看到（写入返回成功之前一定会被超过半数的节点写入）。那么对应就会有“最终一致性”共识算法，就是本节的Gossip协议，指的是系统内节点的数据不一致状态在一段时间内是可以被外部查看到的，也就是说一次写入并不会保证返回成功之前被半数节点记录，而是在一段时间之后所有的节点都会知道这次修改。</p>
+<p>Gossip协议可以运行在如下图所示的系统中，其中一些节点和其他一部分之间是间接联通的。节点会周期性的重复如下操作，收到请求后，会给它相邻的K个邻居发送消息，邻居收到后会再给相邻的K个邻居发送消息，这样周而复始最终所有的节点都会被传播到这条消息，从而达到最终一致的状态。</p>
+<p><img src="https://icyfenix.cn/assets/img/gossip.0eb19e80.gif" alt="image-20211214153202671"></p>
+<p>Gossip协议的缺点是必然在网络中存在不一致状态，而且无法精确预估多久才能达到全部一致。再就是消息冗余，无法避免给发送过的节点发送重复的消息，增加了网络压力。</p>
+<h1 id="后续">后续</h1>
+<p>当前对于Raft算法还有很多细节不是很清楚，后续会在研究明白后写一篇</p>
+<h1 id="参考">参考</h1>
+<p><a href="https://icyfenix.cn/distribution/consensus/" target="_blank" rel="noopener">https://icyfenix.cn/distribution/consensus/</a></p>
 
                 
 
@@ -300,13 +303,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/分布式/分布式的基石-共识算法/" data-toggle="tooltip" data-placement="top" title="分布式的基石-共识算法">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/article/简介/" data-toggle="tooltip" data-placement="top" title="简介">Next Post &rarr;</a>
+                            <a href="/分布式/分布式理论与事务/" data-toggle="tooltip" data-placement="top" title="分布式理论与事务">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -356,7 +355,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分布式理论和分布式事务"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x5206;&#x5E03;&#x5F0F;&#x7406;&#x8BBA;&#x548C;&#x5206;&#x5E03;&#x5F0F;&#x4E8B;&#x52A1;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#cap定理"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">CAP&#x5B9A;&#x7406;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#刚性事务"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x521A;&#x6027;&#x4E8B;&#x52A1;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#两阶段提交"><span class="toc-nav-number">1.2.1.</span> <span class="toc-nav-text">&#x4E24;&#x9636;&#x6BB5;&#x63D0;&#x4EA4;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#三阶段提交"><span class="toc-nav-number">1.2.2.</span> <span class="toc-nav-text">&#x4E09;&#x9636;&#x6BB5;&#x63D0;&#x4EA4;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#base理论"><span class="toc-nav-number">1.2.3.</span> <span class="toc-nav-text">BASE&#x7406;&#x8BBA;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#柔性事务"><span class="toc-nav-number">1.2.3.1.</span> <span class="toc-nav-text">&#x67D4;&#x6027;&#x4E8B;&#x52A1;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#可靠消息队列方案"><span class="toc-nav-number">1.2.3.1.1.</span> <span class="toc-nav-text">&#x53EF;&#x9760;&#x6D88;&#x606F;&#x961F;&#x5217;&#x65B9;&#x6848;</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#tcc"><span class="toc-nav-number">1.2.3.1.2.</span> <span class="toc-nav-text">TCC</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#saga"><span class="toc-nav-number">1.2.3.1.3.</span> <span class="toc-nav-text">SAGA</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#后续"><span class="toc-nav-number">1.2.3.2.</span> <span class="toc-nav-text">&#x540E;&#x7EED;</span></a></li></ol></li></ol></li></ol></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#分布式共识算法"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x5206;&#x5E03;&#x5F0F;&#x5171;&#x8BC6;&#x7B97;&#x6CD5;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#容易理解错的概念"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x5BB9;&#x6613;&#x7406;&#x89E3;&#x9519;&#x7684;&#x6982;&#x5FF5;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#paxos算法"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">Paxos&#x7B97;&#x6CD5;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#准备阶段"><span class="toc-nav-number">1.2.1.</span> <span class="toc-nav-text">&#x51C6;&#x5907;&#x9636;&#x6BB5;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#批准阶段"><span class="toc-nav-number">1.2.2.</span> <span class="toc-nav-text">&#x6279;&#x51C6;&#x9636;&#x6BB5;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#活锁问题"><span class="toc-nav-number">1.2.3.</span> <span class="toc-nav-text">&#x6D3B;&#x9501;&#x95EE;&#x9898;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#multi-paxos"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">Multi Paxos</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#raft算法"><span class="toc-nav-number">1.4.</span> <span class="toc-nav-text">Raft&#x7B97;&#x6CD5;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#gossip协议"><span class="toc-nav-number">1.5.</span> <span class="toc-nav-text">Gossip&#x534F;&#x8BAE;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#后续"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x540E;&#x7EED;</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#参考"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">&#x53C2;&#x8003;</span></a></li></ol>
         
         </div>
       </aside>
