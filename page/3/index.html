@@ -18,7 +18,7 @@
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/archives/4/">
+    <link rel="canonical" href="http://www.corgiboy.com/page/3/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -141,14 +141,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -211,29 +211,131 @@
 
 <div class="post-preview">
 
-    <a href="/Java基础/Java-IO/">
+    <a href="/InnoD引擎/InnoDB-数据页/">
         <h2 class="post-title">
                                  
-            BIO、NIO、AIO模型区别
+            InnoDB-数据页
         </h2>
         <h3 class="post-subtitle">
-            本文介绍IO模型以及它们的区别
+            介绍InnoDB数据页面的组织方式
         </h3>
         <div class="post-content-preview">
             
-什么是IO，一般典型的如网络，磁盘文件等带有输入输出的，需要从程序到操作系统的数据传输等都算是IO，本文主要讲解几种IO模型的对比，以及举例帮助理解不同IO模型的差别，并没有大篇幅说集中模型的详细使用。
+InnoDB的数据是保存在磁盘上的，操作时如果将数据一条一条读取到内存修改后再刷新回去的话，效率是十分底下的。InnoDB通过大小为16kb的数据页来管理数据行。数据页是InnoDB和磁盘交互的基本单位，一次最少读取一个数据页，同步磁盘也是最少一个数据页。
 
+页结构
 
-Java IO模型
-想要理解IO模型首先要先明白同步、异步、阻塞、非阻塞他们的意思以及他们之间的区别，因为IO模型无非是他们四个之间的两两组合。
-同步与异步
-同步： 多个操作按照顺序处......
+这里我们只关心行记录部分。infimun+supermum部分是数据页自带的。UserRecords部分存储用户操作的数据......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2019-10-21
+            2020-09-29
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Redis/缓存雪崩、穿透、击穿/">
+        <h2 class="post-title">
+                                 
+            缓存雪崩、穿透、击穿
+        </h2>
+        <h3 class="post-subtitle">
+            本文简单介绍Redis常见问题的解决方案
+        </h3>
+        <div class="post-content-preview">
+            流程
+正常使用Redis做缓存时，一个请求的访问顺序一般为：
+（1）访问缓存是否存在数据，存在则直接通过缓存返回。
+（2）缓存不存在则去DB加载数据
+（3）将数据写入缓存，之后将数据返回给客户端。
+缓存击穿
+缓存击穿指的是大量的请求访问一个key，而恰巧key的过期时间到了。这时大量的请求都会去DB去加载数据，因为DB相对于Redis这种是十分薄弱的，可能会出现问题。
+解决方案
+通过互斥锁的......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-09-21
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Redis" title="Redis">Redis</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/分布式/分布式锁/">
+        <h2 class="post-title">
+                                 
+            分布式锁
+        </h2>
+        <h3 class="post-subtitle">
+            本文主要讲解基于数据库、Zookeeper、Redis三种中间件实现分布式锁的操作，以及它们的比较。
+        </h3>
+        <div class="post-content-preview">
+            
+现在的架构都是分布式架构，服务部署在多个服务器上，因此他们的虚拟机不共享也不是同一个进程，所以jdk原生的Synchronized和并发包提供的锁都无法满足共享资源的单独占用。因此出现了分布式场景下的分布式锁。
+
+分布式锁
+分布式锁是为了解决分布式场景下对共享资源的访问问题。比如查询库存并且消费，两个请求都查询出为1，之后A对库存-1，之后B也对库存-1，就会发生超卖现象。这时就需要将查库......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-08-11
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#分布式" title="分布式">分布式</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/对象逃逸分析/">
+        <h2 class="post-title">
+                                 
+            对象逃逸分析
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍为什么对象不全都是分配到堆上的。
+        </h3>
+        <div class="post-content-preview">
+            
+Java对象是否都分配到堆上？答案是否定的，通过逃逸分析可以将不会被外界引用的对象分配在栈上，可以随着栈一起被回收，同时减少了堆的压力也就减少了gc次数，达到了优化程序执行时间的目的。
+
+
+什么是逃逸分析
+逃逸分析通过分析对象的作用域来判断对象是否会被分配方法之外的地方所引用和持有。逃逸分析可以有效的减少线程同步开销和堆内存分配的压力。通过分析如果发现了没有发生逃逸的对象，则可以将对象直接......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-08-11
         </p>
         <div class="tags">
             
@@ -247,27 +349,65 @@ Java IO模型
 
 <div class="post-preview">
 
-    <a href="/Java基础/Java基础-AQS源码分析/">
+    <a href="/InnoD引擎/InnoDB引擎-行格式/">
         <h2 class="post-title">
                                  
-            AbstractQueuedSynchronizer源码分析
+            InnoDB-数据行
         </h2>
         <h3 class="post-subtitle">
-            本文详细解读了AQS框架控制并发的原理，以及基于AQS怎么实现不同的锁
+            本文简单介绍InnoDB数据行的构成
         </h3>
         <div class="post-content-preview">
             
-Java并发包中的锁工具都是基于AQS来实现的。AQS是并发包的核心，它是一个加强版的CLH队列，它实现了线程阻塞唤醒、取消节点、支持重入、支持独占、共享锁等多种基础功能，其他并发工具直接基于AQS实现自己的特殊的功能即可。
+InnoDB与磁盘的交互单位是数据页，一个数据页16kb。也就是说一次将16kb的数据刷到磁盘或者从磁盘读取16kb数据到内存，数据页中包含的就是数据行。InnoDB一共提供了四种行结构，分别是Compact、Redundant、Dynamic和Compressed行格式，现在mysql从5.7之后默认使用的行结构是Dynamic。
 
-
-什么是CLH队列
-CLH队列是一个先进先出队列，本质是通过队列与节点的状态控制节点的阻塞与唤醒。其中每一个线程代表队列中的一个节点，它不断自旋监听前驱节点的状态（......
+行结构
+一行数据是由两个部分组成：实际数据、记录额外信......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2019-10-12
+            2020-07-16
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/Java基础/Java基础-线程池/">
+        <h2 class="post-title">
+                                 
+            线程池
+        </h2>
+        <h3 class="post-subtitle">
+            本文介绍了线程池的执行流程，并且基于源码解析了不同种类线程池的区别。
+        </h3>
+        <div class="post-content-preview">
+            
+因为线程是珍惜资源，无论创建还是销毁都很消耗时间和资源，所以出现线程池来管理线程，执行完任务不会销毁，而是等待新的任务或者处理别的任务。
+1、线程池解决了线程的频繁创建和销毁的代价。
+2、线程池可以对线程进行管理和监控。
+3、线程池处理新任务响应速度快，因为可以不用创建新线程。
+
+
+线程池参数
+
+corePoolSize：核心线程数量
+maximumPoolSize：核心线程数量+非核心线......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2020-07-15
         </p>
         <div class="tags">
             
@@ -281,31 +421,30 @@ CLH队列是一个先进先出队列，本质是通过队列与节点的状态�
 
 <div class="post-preview">
 
-    <a href="/Java基础/Java-Synchronized原理/">
+    <a href="/Java基础/Java基础-ConcurrentHashMap源码解析/">
         <h2 class="post-title">
                                  
-            Synchronized关键字原理
+            ConcurrentHashMap源码解析
         </h2>
         <h3 class="post-subtitle">
-            本文介绍Synchronized关键字的实现原理，以及Java对它的优化
+            本文解读了JDK8中ConcurrentHashMap源码，如何保证并发安全，并且探究了其设计的精妙之处。
         </h3>
         <div class="post-content-preview">
             
-在多线程情况下，共享资源的写操作可能会出现数据不准确的问题，锁是控制并发情况下资源访问的重要工具。本文讲述我个人理解的Synchronized的原理。
+之前我们说过HashMap无论是1.7还是1.8，在并发情况下都会出现各种各样的问题。虽然JDK中提供了同步集合包装器和HashTable，但是他们都是简单的对方法进行上锁，锁的粒度很粗，因此他们在高并发下的性能都不会很好。本文章都是围绕JDK1.8来说的。
 
 
-Synchronized的使用
+Java中如何使用线程安全的Map
+HashTable
 
-同步代码块
-
-12345public void doSomething()&#123;	synchronized(obj)&#123;		//doSomething...	&#125;&#125;
-用于......
+HashTable不支持null的key和value。
+HashTab......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2019-10-09
+            2020-07-15
         </p>
         <div class="tags">
             
@@ -319,37 +458,28 @@ Synchronized的使用
 
 <div class="post-preview">
 
-    <a href="/Java基础/Java-包装类/">
+    <a href="/Java基础/Java基础-动态代理/">
         <h2 class="post-title">
                                  
-            Java包装类
+            Java动态代理
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍动态代理模式的设计，以及动态代理在实际项目的应用
         </h3>
         <div class="post-content-preview">
             
-包装类是Java使用极其频繁的类型，他们代表着基本类型的引用形式，并且提供了丰富的方法。
+代理就是给对象的方法增加新的逻辑。代理类代替委托类接受请求，但是实际处理请求的还是委托类，在委托类处理的前后可以添加新的逻辑以达到对对象行为的增强。
+比如我希望给一个对象或者某一类的对象的方法记录执行的时间，这时可以使用代理模式。代理模式分为静态代理和动态代理。
 
 
-Java数据类型
-
-基本数据类型
-引用数据类型
-
-基本数据类型
-基本数据类型有8种，分别是byte，short，int，float，double，long，char，boolean。
-占用大小和范围请自行搜索。
-引用类型
-
-非基本数据类型的对象都是引用类型的，存储在堆中。
-引用类型的变量类似于指针......
+静态代理
+静态代理是由程序员手动编写代理类，在程序编译之后这个代理类的class文件已经确实的存在了。下面例子是需要记录一个......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2019-10-08
+            2020-06-28
         </p>
         <div class="tags">
             
@@ -363,32 +493,25 @@ Java数据类型
 
 <div class="post-preview">
 
-    <a href="/Java基础/Java-HashMap-jdk8/">
+    <a href="/Java基础/Exception和Error的区别/">
         <h2 class="post-title">
                                  
-            HashMap源码分析
+            Exception和Error的区别
         </h2>
         <h3 class="post-subtitle">
-            本文解析JDK8的HashMap的源码
+            介绍Java中Exception的基本使用原则
         </h3>
         <div class="post-content-preview">
-            
-HashMap是平时使用非常广泛的集合工具之一。其内部的数据结构是哈希表，哈希表的查找效率是O（1），效率很高。本文通过增删改查的顺序阅读源码，并且分析了一下并发情况的问题和其他的拓展。JDK版本是1.8。
+            典型回答
 
-
-HashMap数据结构
-解决哈希冲突的方式
-
-开放定址法
-链地址法
-
-HashMap内部是一个哈希表的数据结构，存储的是键值对，通过key的hash值与数组长度取模计算出value......
+它们在Java中都代表了异常情况。Exception和Error都是继承于Throwable接口，只有Throwable的类是可以抛出。
+Exception和Error的区别：Exception是一种可以提前预想到的异常情况，通过捕获对应的异常并且提供相应的处理方案可以使程序恢复正常工作，比如操作的文件不存在就会出现FileNotFoundException，这时我们可以选择创建......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2019-09-23
+            2020-06-22
         </p>
         <div class="tags">
             
@@ -402,26 +525,27 @@ HashMap内部是一个哈希表的数据结构，存储的是键值对，通过k
 
 <div class="post-preview">
 
-    <a href="/Java基础/Java-ArrayList-jdk8/">
+    <a href="/Java基础/Java基础-线程中断/">
         <h2 class="post-title">
                                  
-            ArrayList源码分析
+            线程中断
         </h2>
         <h3 class="post-subtitle">
-            
+            本文介绍了线程中断的作用，以及如何响应中断。
         </h3>
         <div class="post-content-preview">
             
-ArrayList是平时特别常用的java集合类，非常适合做随机读取，本文对java8中的ArrayList源码进行分析。
+一个运行中的线程如何停止它呢，我们可能会想到stop方法，但是stop方法已经被弃用了。因为stop方法会强制释放掉线程的锁资源，给数据的一致性带来问题。stop是一种独占模式，直接将线程杀死，而中断是一种协作模式。
 
-属性
-12345678910//默认容量private static final int DEFAULT_CAPACITY = 10;//空数组，当指定数组长度为0的时候使用。private static final Object[] EMPTY_ELEMENTDA......
+
+什么是线程中断
+每个线程都维护了一个boolean类型的中断状态，通过调用该线程的interrupt方法，将这个线程设置为中断状态，后续该线程可以isInterrupte......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2019-09-20
+            2020-05-15
         </p>
         <div class="tags">
             
@@ -440,9 +564,13 @@ ArrayList是平时特别常用的java集合类，非常适合做随机读取，�
 <ul class="pager">
     
         <li class="previous">
-            <a href="/archives/3/">&larr; Newer Posts</a>
+            <a href="/page/2/">&larr; Newer Posts</a>
         </li>
     
+    
+        <li class="next">
+            <a href="/page/4/">Older Posts &rarr;</a>
+        </li>
     
 </ul>
 
