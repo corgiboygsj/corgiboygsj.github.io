@@ -141,14 +141,14 @@
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -250,6 +250,40 @@ JDK源码、基础、JVM持续更新中
             2021-07-30
         </p>
         <div class="tags">
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/分布式/Raft分布式共识算法/">
+        <h2 class="post-title">
+                                 
+            Raft分布式共识算法
+        </h2>
+        <h3 class="post-subtitle">
+            研究了Raft算法详细运行过程
+        </h3>
+        <div class="post-content-preview">
+            
+本篇为个人研究Raft算法的总结文章，没有过多的去组织文章内容。可能有很多重复的话被反复说，读者要提前做好准备。
+
+Raft共识算法
+在分布式系统中节点出现故障或者网络分区的可能是存在的，那么当真的出现了这些问题，如何保证系统的可用性呢？那就是给节点建立数据副本，当出现故障或者分区时使用其他副本节点来提供服务，从而保证数据的不丢失和服务的可用性。
+那么如何保证数据能被安全的复制到其他节点上......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2021-12-19
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#分布式" title="分布式">分布式</a>
             
         </div>
     
@@ -529,41 +563,6 @@ Redis主从复制了提供了故障转移的基础。Sentinel模式提供了自�
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB-缓冲池/">
-        <h2 class="post-title">
-                                 
-            InnoDB-缓冲池
-        </h2>
-        <h3 class="post-subtitle">
-            介绍InnoDB的缓冲池内部结构，以及如何管理内存数据，和其他特性。
-        </h3>
-        <div class="post-content-preview">
-            缓冲池
-InnoDB的数据是持久化在磁盘上的，工作时从磁盘读取数据到内存中。但是磁盘的读写效率很低，而内存的读写效率很高，所以InnoDB选择将一些数据页、索引页缓存在，用来提高读写效率。
-所以InnoDB会通过一定的机制，让一些最热的数据保存在缓冲池中，加速请求的响应。
-
-缓冲池中数据组织方式
-Free List
-数据库启动时InnoDB向操作系统申请一片内存区域，之后InnoDB会将这个......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-11-13
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -609,11 +608,15 @@ Free List
             
         
             
+            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
+            
+        
+            
             <a href="/tags/#Java" title="Java" rel="12">Java</a>
             
         
             
-            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
+            <a href="/tags/#分布式" title="分布式" rel="5">分布式</a>
             
         
             
@@ -622,10 +625,6 @@ Free List
         
             
             <a href="/tags/#SpringBoot" title="SpringBoot" rel="1">SpringBoot</a>
-            
-        
-            
-            <a href="/tags/#分布式" title="分布式" rel="4">分布式</a>
             
         
             
@@ -685,6 +684,10 @@ Free List
     <ul>
       
         <li>
+          <a href="/分布式/Raft分布式共识算法/">Raft分布式共识算法</a>
+        </li>
+      
+        <li>
           <a href="/分布式/分布式的基石-共识算法/">分布式的基石-共识算法</a>
         </li>
       
@@ -698,10 +701,6 @@ Free List
       
         <li>
           <a href="/操作系统/操作系统内存管理/">操作系统内存管理</a>
-        </li>
-      
-        <li>
-          <a href="/操作系统/操作系统进程/">操作系统进程</a>
         </li>
       
     </ul>
@@ -726,7 +725,7 @@ Free List
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">December 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">December 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">2</span></li></ul>
     </div>
 
         <hr>

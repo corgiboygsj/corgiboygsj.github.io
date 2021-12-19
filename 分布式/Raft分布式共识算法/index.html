@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/keji_favicon.ico">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          Raft分布式共识算法 - 郭守敬 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="http://www.corgiboy.com/分布式/Raft分布式共识算法/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('http://guoshoujing.gitee.io/mark-down-photo/blog/2020-11-5/天空 云 少女 草地 唯美人物风景4k动漫壁纸3840x2160_彼岸图网.jpg')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#分布式" title="分布式">分布式</a>
+                            
+                        </div>
+                        <h1>Raft分布式共识算法</h1>
+                        <h2 class="subheading">研究了Raft算法详细运行过程</h2>
+                        <span class="meta">
+                            Posted by 郭守敬 on
+                            2021-12-19
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">郭守敬</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>本篇为个人研究Raft算法的总结文章，没有过多的去组织文章内容。可能有很多重复的话被反复说，读者要提前做好准备。</p>
+</blockquote>
+<h1 id="raft共识算法">Raft共识算法</h1>
+<p>在分布式系统中节点出现故障或者网络分区的可能是存在的，那么当真的出现了这些问题，如何保证系统的可用性呢？那就是给节点建立数据副本，当出现故障或者分区时使用其他副本节点来提供服务，从而保证数据的不丢失和服务的可用性。</p>
+<p>那么如何保证数据能被安全的复制到其他节点上（不丢失）？简单想可以在处理节点返回给客户端成功之前，先把数据变动复制到所有的副本节点上，但是这样会随着副本节点的增多造成响应变慢或者甚至当副本节点出现问题时发生复制阻塞。因此，出现了分布式共识算法，例如Paxos、Zab、Raft，其中Paxos因为十分复杂且难以落地就出现Multi Paxos，Raft就是它的派生实现。Raft采用少数服从多数的方式当数据变更在集群中半数以上的节点写入成功后，就认为数据安全被保存了。这样整个系统可以容忍出现半数以下节点出现故障或者网络分区。</p>
+<h2 id="必备知识">必备知识</h2>
+<p>这里会简介一下Raft中需要使用到的知识，不了解的东西可以先记下来往后看，本节结尾会有一个Raft的基本执行流程将以下小节都串起来。</p>
+<h3 id="状态机">状态机</h3>
+<p>Raft采用记录操作日志，之后同步操作日志的方式来实现状态转移。状态机指的是一个明确的操作可以让机器转换为一种明确的状态的计算模型。</p>
+<p>复制状态机指的是。一些服务器初始状态相同的情况下，采用一系列相同的操作日志，可以让他们到达一致的状态。</p>
+<p>Raft中一个Log大概包含了三个组成：（1）Term：产生该Log的Leader服务器当时的任期（2）Index：该日志在日志列表的下标（3）Entry：Log记录的实体内容。</p>
+<h3 id="节点角色">节点角色</h3>
+<p>在Raft算法中，节点一共有三种角色，同时每个节点只能承担一种角色。</p>
+<ul>
+<li>领导者Leader：在Raft中只有Leader负责处理客户端的变更请求，Leader将请求写入日志后发送给其他的Follower，如果收到了超过半数Follower的确认响应，该条日志就会被提交并且将应用到状态机上。</li>
+<li>跟随者Follower：Follower只能被动的从Leader接收日志，但是Follower可以根据规则选择接收或者拒绝Leader发来的日志（规则在后面会讲），Leader会与Follower沟通提交的日志的索引位置，之后Follower会把这个索引和之前的日志都应用到状态机。</li>
+<li>候选者Condidate：当Follower在超时时间之内没有接收到来自Leader的消息，就认为Leader宕机就会转换为Condidate。Condidate会向集群中其他的节点发送投票请求，让它们投自己为Leader，一旦收到了半数以上的同意票就会成为Leader。</li>
+</ul>
+<p><img src="http://guoshoujing.gitee.io/mark-down-photo/%E5%88%86%E5%B8%83%E5%BC%8F/image-20211214180139819.png" alt="Raft角色转换"></p>
+<h3 id="任期">任期</h3>
+<p>任期（Term）是每个节点都会记录的状态值，Term是一个递增的值。Raft算法整个周期被划分为一个个连续递增的Term，Term在Raft算法中充当逻辑时钟的作用，在一个Term中由一个Leader负责接收客户端请求和复制日志给其他服务器。Raft保证在每一个任期之内只会选出一个Leader。</p>
+<p>Leader发出的日志都会携带自己的Term，该数据也会被保存在日志中。</p>
+<p>服务器的任期会在以下两种情况下发生变化</p>
+<ul>
+<li>当Follower变成Condidate时，Condidate会提升自己的任期号，并发送投票请求。</li>
+<li>当服务器收到了Term大于自己的RPC时，那么服务器会把自己的Term更新为这个较大的Term值，并且会转换为Follower角色（包括Leader）。</li>
+</ul>
+<h3 id="两种超时时间和角色转换">两种超时时间和角色转换</h3>
+<p>在Raft中存在两种超时时间</p>
+<ul>
+<li>Follower心跳超时：如果Follower在一段时间内没有接收到来自于Leader的消息，那么Follower就会认为Leader宕机了。并且认为当前Leader的任期已经结束，之后它会转换为Condidate角色，提升自己的Term之后给所有的服务器发送选举投票。</li>
+<li>Condidate选举超时：如果Condidate发送选举投票后一段时间内没有收到超过半数的同意票，那么它会再次提升自己的Term，再一次向所有的机器发送选举投票。</li>
+</ul>
+<p>服务器角色变化的时机</p>
+<ul>
+<li>Follower -&gt; Condidate：发生Follower心跳超时。</li>
+<li>Condidate -&gt; Leader：Condidate收到了超过半数的同意响应。</li>
+<li>Leader -&gt; Follower：Leader收到了Term大于自己的RPC请求。</li>
+<li>Condidate -&gt; Follower：Condidate收到了Term大于自己的RPC请求。</li>
+</ul>
+<h3 id="两种rpc请求">两种RPC请求</h3>
+<p>Raft中有两种RPC请求</p>
+<ul>
+<li>Append RPC：用于Leader给其他的服务器同步日志、维持自己的Leader地位更新Follower的超时时间。</li>
+<li>Vote RPC：用于Condidate给其他的服务器发送投票请求。</li>
+</ul>
+<p>对于所有的服务器（任意角色）来说，如果收到的RPC的Term大于自己的Term，则将自己的Term更新成RPC的Term并且将自己转换为Follower。</p>
+<h3 id="一个基本的执行流程">一个基本的执行流程</h3>
+<p>这里讲述一下Raft正常执行的流程，将前面介绍的基础知识串起来。一些细节性的问题将在后面<strong>领导选举</strong>和<strong>日志复制</strong>讲到。</p>
+<ol>
+<li>首先集群节点启动，所有的服务器全都是Follower状态。</li>
+<li>当到达了Follower心跳超时时间后，Follower会提升自己的Term并且立即转换成Condidate，之后给所有的服务器并行发送Vote RPC。</li>
+<li>接下来Condidate节点会有以下三种情况发生。（1）如果Condidate收到了超过半数的投票同意，那么Condidate会转变为Leader并立刻向集群中发送Append RPC（Log为空，实际这个请求叫做No-op日志后面会讲到，目的是为了提交之前任期Leader的日志），宣布集群中出现新的Leader并且阻止新的Leader被选举出来。（2）如果Candidate在等待响应期间有新的Leader被选举出来，之后收到了新Leader发来的Append RPC。如果新Leader的Term大于自己则转变为Follower并将自己机器的Term更新为Leader的Term，如果小于自己则拒绝继续保持Condidate身份。（3）如果在选举超时之前都没有出现前两种情况，则将Term增大重新发起一轮新的投票，继续保持Condidate身份。</li>
+<li>Leader会给其他机器发送Append RPC，分为以下两种情况。（1）Leader会定时发送心跳包（Log为空的Append RPC），目的是为了让Follower更新自己的超时计时器，让Follower继续维持Follower状态。（2）当接收到客户端的变更请求后，Leader会先在本地记录Log但是并不会提交，之后发送Append RPC（携带新的Log）给Follower。Leader如果收到了超过半数的复制成功回应，就会提交本地的新日志并且应用到自己的状态机。在后续的Append RPC中Leader会告诉Follower该日志已提交。</li>
+</ol>
+<h2 id="领导选举">领导选举</h2>
+<p>Vote RPC结构如下表。</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Term</td>
+<td>候选者的当前Term</td>
+</tr>
+<tr>
+<td>LastLogTerm</td>
+<td>候选者日志列表中最后一条的Term，用于其他节点判断是否该返回同意。</td>
+</tr>
+<tr>
+<td>LastLogIndex</td>
+<td>候选者日志列表中最后一条的Index，用于其他节点判断是否该返回同意。</td>
+</tr>
+<tr>
+<td>Condidate ID</td>
+<td>候选者机器的ID</td>
+</tr>
+</tbody>
+</table>
+<p>收到Vote RPC的服务器会按照先来先服务的原则，收到Vote RPC的服务器对于一个Term号只会给先收到的那台服务器返回同意，后续如果再有相同Term的Vote RPC就不会再返回同意了。这样就保证了对于一个Term最多只能有一个Condidate收到超过半数的赞同票。</p>
+<p>选举规则如下：</p>
+<ol>
+<li>判断Vote RPC的Term和机器当前Term的大小，如果小于当前Term则直接返回false。</li>
+<li>如果Vote RPC的Term大于当前Term，判断自己是否给该Term投过票，投过则直接返回拒绝。如果没有投过则判断候选者日志是否足够新。是否足够新判断规则如下，使用自己日志列表最后一条日志的Term和Index分别与Vote RPC的LastLogTerm和LastLogIndex比较。首先比较Term，如果Term大于LastLogTerm则返回拒绝，如果小于等于则判断Index，如果Index大于LastLogIndex则返回拒绝。如果条件都满足那么就会给该Condidate投出一票。</li>
+</ol>
+<p><strong>第二点LastLogTerm和LastLogIndex的比较限制是为了让Condidate的日志必须足够新（原论文中安全性小节的选举限制）。足够新是说这个被选举成功的Condidate必须要包含集群中所有被提交了的日志</strong>，通过这种比较方式就阻止了没包含所有已提交日志的机器不可能被选举成Leader。</p>
+<p>这里解释一下为什么这种方式选举出的新Leader一定包含了所有的已提交日志。因为一条已提交的日志一定已经复制到了超过半数的机器上，所以该集群中任意超过半数的机器中一定至少有一台机器包含了所有的已提交日志。那么该Condidate还可以获得了超过半数的选票则代表它自己也一定包含了所有已提交的日志。</p>
+<p>选举超时的时间是随机的，如果不随机可能会出现选票被几个Condidate无限瓜分而陷入死循环的情况。</p>
+<h3 id="提交之前任期的日志">提交之前任期的日志</h3>
+<p>新的Leader选出来之后，Leader日志列表中会包含之前任期Leader的日志，此时Leader会去把这些老日志也复制到其他的机器上，但是这些老日志即使被新Leader复制到了超过半数的机器上，Leader也无法对其进行提交，因为老日志可能会被后续的Leader覆盖掉。</p>
+<p>下图来自论文，列举了一种即使日志成功复制到了半数以上服务器，但是仍然可能会被后续的新Leader给覆盖掉。</p>
+<p><img src="https://github.com/maemual/raft-zh_cn/raw/master/images/raft-%E5%9B%BE8.png" alt="image"></p>
+<p>解释一下上图：首先（a）中S1被选举为Leader，将日志写到S2就宕机了。之后（b）中S5通过S3、S4、S5的三张选票成为了Leader，写入了新的一条日志后宕机。在（c）中S1再次被选举成为Leader，此时S1的Term是4，但是它要把Term2的老日志复制到其他节点上，之后S1成功把Term=2的老日志复制给了S3，此时日志已经被复制到了超过半数的机器上了（S1、S2、S3），之后S1又宕机。时间来到（d），S5再次被S5和S2、S3、S4中任意两台选成Leader（因为S5的最后一条日志的Term和Index都不小于三台服务器，所以可以被投同意票）。此时S5的Term变为了5，这时他会把Term=3的老日志复制给其他的服务器，最终之前Term=2的日志就会被覆盖掉。</p>
+<p>上面问题的原因是新的Leader无法对之前任期的日志进行提交，即使这条日志被复制到了半数以上的服务器，Leader只能对自己任期的日志进行提交。</p>
+<p>解决上面问题的方法就是在（b）中阻止S5被选举成Leader。那么如何阻止呢？试想如果Term=2的这条日志在S1宕机之前被S1复制到了半数节点上，那么S5就将无法得到半数以上的投票就无法被选举成Leader了。也就是说，我们可以在让Leader选出来之后，在接收客户端变更请求之前就先提交一条新日志，通过这条日志间接提交之前的老日志，这样就阻止了（b）中S5被选出的情况。之后当这条新日志提交成功后再写其他的该任期的日志，就可以保证之前的老日志不会被覆盖掉了。</p>
+<p>因此Raft规定，新Leader被选举出来之后要立刻往集群里提交一条Term为自己任期号的No-op日志，用来提交之前的老任期的日志。例如上图在（a）中S1被选举成Leader后，立刻在Term=2的日志写入之前先提交一条Term2的No-op日志，成功复制到了S1、S2、S3中，之后再写入上面的Term=2的日志，只写入到S1、S2中宕机。之后时间来到（b），此时S5将不会再被选举成为Leader，因为S5的最后一条日志和Term都是1。</p>
+<h2 id="日志复制">日志复制</h2>
+<h3 id="append-rpc结构">Append RPC结构</h3>
+<p>一个日志的结构由三个部分组成（写入该日志的Leader的Term，该日志在日志列表的Index，变更操作的内容）</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Term</td>
+<td>Leader当前的Term</td>
+</tr>
+<tr>
+<td>Leader ID</td>
+<td>Leader的ID，Follower可以记录此ID，之后如果变更请求被发送给了Follower，那么Follower可以做请求的转发</td>
+</tr>
+<tr>
+<td>PrevLogTerm</td>
+<td>目标服务器紧邻要写入的新日志的前一条日志的Term，用于让Follower判断是否可以接受这次发送的Log</td>
+</tr>
+<tr>
+<td>PreLogIndex</td>
+<td>目标服务器紧邻要写入的新日志的前一条日志的Index，用于让Follower判断是否可以接受这次发送的Log</td>
+</tr>
+<tr>
+<td>LogEntries[]</td>
+<td>发送的日志列表</td>
+</tr>
+<tr>
+<td>LeaderCommit</td>
+<td>领导人已提交日志的Index</td>
+</tr>
+</tbody>
+</table>
+<p>接收服务器的返回结果（RPC Term为Leader发送RPC中的Term，Current Term为当前接收服务器的Term）</p>
+<ul>
+<li>Current Term &gt; RPC Term则返回false，认为日志不够新。</li>
+<li>如果在在本地的Log中没有找到Append RPC中的PrevLogTerm和PreLogIndex对应的日志条目，则返回false。</li>
+<li>如果找到了PrevLogTerm和PervLogIndex对应的日志，但是该机器上这条日志之后的日志和RPC中的LogEntries发生冲突，那么直接使用新的覆盖老的日志，保持与Leader同步。返回true。</li>
+</ul>
+<p>Leader本地会维护NextIndex数组用于记录下一条该发给对应服务器的Log的Index。在Leader被选举出来的时候会把Index数组的值都初始化成自己最后一条日志的Index+1，在后续发送Append RPC时，跟随者如果在自己的日志列表找不到PreLogTerm和PreLogIndex，那么Leader会减小对应跟随者的NextIndex，之后重新发送Append RPC，直到匹配为止。如果Leader成功把日志复制给了Follower，会去更新对应服务器的NextIndex的值。</p>
+<p>当Leader收到了一条Log的半数以上的复制成功回应后，Leader就会将这条Log提交，推进自己的CommitIndex，在后续的Append RPC中Follower才能知道新的LeaderCommit的位置，也就是说Follower的日志应用到状态机要慢Leader一步。</p>
+<p>从前面介绍的内容来看，可以理解出Raft中服务器上日志的一些特性：</p>
+<ul>
+<li>如果两台服务器的任意日志的Term和Index相同，那么这两条Log存储的内容一定相同。</li>
+<li>如果两台服务器的某个日志相同，那么这条日志之前的日志也一定相同。</li>
+<li>如果服务器上的一条日志已经提交，那么这条日志之前的日志也一定提交了。</li>
+</ul>
+<p>简单讲解一下：Leader会发送日志给Follower，如果Follower接受了日志，那么一定会匹配上Leader发来的PreLogIndex和PreLogTerm，同时如果Follower和Leader的日志不同步，采用的是使用Leader的日志强制覆盖Follower的日志，因此可以保证前两点特性。Leader写入的日志是不可变的，不可覆盖，不可更改，所以如果一条日志提交了，那么之前的日志一定也已经复制到了半数节点上，也已经被提交了。</p>
+<h2 id="总结">总结</h2>
+<ul>
+<li>所有的服务器如果收到了Term大于自己的RPC，则更新自己Term为该值，之后转化为Follower角色。</li>
+<li>Append RPC接受条件：对方的Term比自己Term大，并且自己日志列表中存在一条日志能匹配RPC中的PreLogIndex和PreLogTerm。</li>
+<li>Vote RPC接受条件：对方Term比自己大，RPC的LastLogTerm和LastLogIndex至少和自己的最后一条日志一样新，并且自己没有对该Term发出过同意回复。</li>
+<li>Follower只能被动的接受RPC请求，Leader和Condidate分别可以发送Append RPC和Vote RPC。</li>
+<li>Follower采用使用Leader日志覆盖自己的本地日志的方式来解决日志冲突（前提满足Append RPC接受条件）。</li>
+</ul>
+<h3 id="follower">Follower</h3>
+<p>所有服务器起初都是Follower，等待Leader发送心跳超时后会变成Condidate。变成Condidate之后要发送Vote Request给所有的服务器，如果收到半数以上的选票就会被选举成Leader。</p>
+<p>Follower如果接收到Condidate的Vote RPC的话，首先判断Condidate的Term是否比自己大。如果比自己大则更新自己的Term之后查看Vote RPC中的lastIndex和lastTerm跟自己的最后一条日志比哪个更新，如果Condidate更新则看自己是否给Vote RPC的Term给出过投票，如果没有投过则按照先到先服务原则给出选票，任何一条不符合都不给出选票。</p>
+<p>Follower如果接收到了Leader的Append RPC的话，首先判断Leader的Term是否比自己大。如果比自己大则更新自己的Term之后查看能不能在本地Log列表中找到对应Append RPC中PreLogIndex和PreLogTerm的日志，如果找到则清空该位置之后的日志，写入Leader发来的日志。任一条不符合都会返回false。</p>
+<h3 id="condidate">Condidate</h3>
+<p>Follower转变为Condidate后会提升自己的Term并且给所有的服务器发送Vote RPC（当前Term、最后一条日志的Index和Term）。如果收到了半数以上的投票则转变为Leader，否则在选举超时之后会提升Term重新发起新一轮选票。选举超时时长是随机值，目的是防止出现Condidate之前无限瓜分选票的情况。</p>
+<p>Condidate会收到Leader的Append RPC，与Follower的判断方式一样，如果满足条件则直接转换为Follower状态。</p>
+<h3 id="leader">Leader</h3>
+<p>Condidate收到半数以上选票时会转变为Leader，Leader选举之后会立刻向所有的服务器发送一条No-op日志，目的是为了提交本地之前任期Leader所写入的日志，防止老日志被后续的新Leader覆盖掉。如果No-op没有复制到半数以上的节点上Leader就挂掉了，顶多也是被后续Leader覆盖掉No-op日志而已。</p>
+<p>Leader在任职期间可能会收到其他任期Leader的Append RPC，如果对方任期比自己大，则自己直接转换成Follower状态，同样进行Append RPC的条件判断，如果不满足则拒绝接收日志。</p>
+<p>Leader可能收到其他Condidate的Vote RPC，如果对方任期大于自己，则转换成Follower角色，判断Vote RPC最后一条日志是否和自己一样新，如果一样新则给出选票。</p>
+<blockquote>
+<p>先写到这吧，后面集群节点增减、客户端之类的后面新起一篇再说吧。</p>
+</blockquote>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://github.com/maemual/raft-zh_cn/blob/master/raft-zh_cn.md" target="_blank" rel="noopener">Raft论文中文翻译</a></li>
+<li><a href="https://raft.github.io/" target="_blank" rel="noopener">Raft算法动画</a></li>
+<li><a href="https://icyfenix.cn/distribution/consensus/" target="_blank" rel="noopener">凤凰架构</a></li>
+</ul>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/分布式/分布式的基石-共识算法/" data-toggle="tooltip" data-placement="top" title="分布式的基石-共识算法">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
+<!--                  -->
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#raft共识算法"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">Raft&#x5171;&#x8BC6;&#x7B97;&#x6CD5;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#必备知识"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x5FC5;&#x5907;&#x77E5;&#x8BC6;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#状态机"><span class="toc-nav-number">1.1.1.</span> <span class="toc-nav-text">&#x72B6;&#x6001;&#x673A;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#节点角色"><span class="toc-nav-number">1.1.2.</span> <span class="toc-nav-text">&#x8282;&#x70B9;&#x89D2;&#x8272;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#任期"><span class="toc-nav-number">1.1.3.</span> <span class="toc-nav-text">&#x4EFB;&#x671F;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#两种超时时间和角色转换"><span class="toc-nav-number">1.1.4.</span> <span class="toc-nav-text">&#x4E24;&#x79CD;&#x8D85;&#x65F6;&#x65F6;&#x95F4;&#x548C;&#x89D2;&#x8272;&#x8F6C;&#x6362;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#两种rpc请求"><span class="toc-nav-number">1.1.5.</span> <span class="toc-nav-text">&#x4E24;&#x79CD;RPC&#x8BF7;&#x6C42;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#一个基本的执行流程"><span class="toc-nav-number">1.1.6.</span> <span class="toc-nav-text">&#x4E00;&#x4E2A;&#x57FA;&#x672C;&#x7684;&#x6267;&#x884C;&#x6D41;&#x7A0B;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#领导选举"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x9886;&#x5BFC;&#x9009;&#x4E3E;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#提交之前任期的日志"><span class="toc-nav-number">1.2.1.</span> <span class="toc-nav-text">&#x63D0;&#x4EA4;&#x4E4B;&#x524D;&#x4EFB;&#x671F;&#x7684;&#x65E5;&#x5FD7;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#日志复制"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">&#x65E5;&#x5FD7;&#x590D;&#x5236;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#append-rpc结构"><span class="toc-nav-number">1.3.1.</span> <span class="toc-nav-text">Append RPC&#x7ED3;&#x6784;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#总结"><span class="toc-nav-number">1.4.</span> <span class="toc-nav-text">&#x603B;&#x7ED3;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#follower"><span class="toc-nav-number">1.4.1.</span> <span class="toc-nav-text">Follower</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#condidate"><span class="toc-nav-number">1.4.2.</span> <span class="toc-nav-text">Condidate</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#leader"><span class="toc-nav-number">1.4.3.</span> <span class="toc-nav-text">Leader</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#参考"><span class="toc-nav-number">1.5.</span> <span class="toc-nav-text">&#x53C2;&#x8003;</span></a></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-9 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#分布式" title="分布式">分布式</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://www.jianshu.com/u/100b3e7a68b5" target="_blank">老高的博客</a></li>
+                    
+                        <li><a href="http://www.jiaxuanxuan.cn" target="_blank">英杰大佬的博客</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+<!-- chrome Firefox 中文锚点定位失效-->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<!-- smooth scroll behavior polyfill  -->
+<script type="text/javascript" src="/js/smoothscroll.js"></script>
+<script>
+        $('#toc').on('click','a',function(a){
+            // var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+            // console.log(window.navigator.userAgent,isChrome)
+                // if(isChrome) {
+                    // console.log(a.currentTarget.outerHTML);
+                    // console.log($(a.currentTarget).attr("href"));
+                    //跳转到指定锚点
+                    // document.getElementById(a.target.innerText.toLowerCase()).scrollIntoView(true);
+                    document.getElementById($(a.currentTarget).attr("href").replace("#","")).scrollIntoView({behavior: 'smooth' });
+                // }
+        })  
+</script>
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/corgiboygsj">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("http://www.corgiboy.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = 'xxx';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="http://www.corgiboy.com/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
