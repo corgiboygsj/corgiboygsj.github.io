@@ -149,14 +149,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -308,7 +308,7 @@
 <h3 id="提交之前任期的日志">提交之前任期的日志</h3>
 <p>新的Leader选出来之后，Leader日志列表中会包含之前任期Leader的日志，此时Leader会去把这些老日志也复制到其他的机器上，但是这些老日志即使被新Leader复制到了超过半数的机器上，Leader也无法对其进行提交，因为老日志可能会被后续的Leader覆盖掉。</p>
 <p>下图来自论文，列举了一种即使日志成功复制到了半数以上服务器，但是仍然可能会被后续的新Leader给覆盖掉。</p>
-<p><img src="https://github.com/maemual/raft-zh_cn/raw/master/images/raft-%E5%9B%BE8.png" alt="image"></p>
+<p><img src="http://guoshoujing.gitee.io/mark-down-photo/%E5%88%86%E5%B8%83%E5%BC%8F/raft-8.png" alt="raft论文-图8"></p>
 <p>解释一下上图：首先（a）中S1被选举为Leader，将日志写到S2就宕机了。之后（b）中S5通过S3、S4、S5的三张选票成为了Leader，写入了新的一条日志后宕机。在（c）中S1再次被选举成为Leader，此时S1的Term是4，但是它要把Term2的老日志复制到其他节点上，之后S1成功把Term=2的老日志复制给了S3，此时日志已经被复制到了超过半数的机器上了（S1、S2、S3），之后S1又宕机。时间来到（d），S5再次被S5和S2、S3、S4中任意两台选成Leader（因为S5的最后一条日志的Term和Index都不小于三台服务器，所以可以被投同意票）。此时S5的Term变为了5，这时他会把Term=3的老日志复制给其他的服务器，最终之前Term=2的日志就会被覆盖掉。</p>
 <p>上面问题的原因是新的Leader无法对之前任期的日志进行提交，即使这条日志被复制到了半数以上的服务器，Leader只能对自己任期的日志进行提交。</p>
 <p>解决上面问题的方法就是在（b）中阻止S5被选举成Leader。那么如何阻止呢？试想如果Term=2的这条日志在S1宕机之前被S1复制到了半数节点上，那么S5就将无法得到半数以上的投票就无法被选举成Leader了。也就是说，我们可以在让Leader选出来之后，在接收客户端变更请求之前就先提交一条新日志，通过这条日志间接提交之前的老日志，这样就阻止了（b）中S5被选出的情况。之后当这条新日志提交成功后再写其他的该任期的日志，就可以保证之前的老日志不会被覆盖掉了。</p>
