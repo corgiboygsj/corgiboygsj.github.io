@@ -18,7 +18,7 @@
         
     </title>
 
-    <link rel="canonical" href="http://www.corgiboy.com/archives/2/">
+    <link rel="canonical" href="http://www.corgiboy.com/page/4/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -134,6 +134,13 @@
 
                         
                         <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/about/">About</a>
                         </li>
                         
@@ -142,13 +149,6 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -211,32 +211,31 @@
 
 <div class="post-preview">
 
-    <a href="/InnoD引擎/InnoDB-缓冲池/">
+    <a href="/Java基础/Java基础-线程中断/">
         <h2 class="post-title">
                                  
-            InnoDB-缓冲池
+            线程中断
         </h2>
         <h3 class="post-subtitle">
-            介绍InnoDB的缓冲池内部结构，以及如何管理内存数据，和其他特性。
+            本文介绍了线程中断的作用，以及如何响应中断。
         </h3>
         <div class="post-content-preview">
-            缓冲池
-InnoDB的数据是持久化在磁盘上的，工作时从磁盘读取数据到内存中。但是磁盘的读写效率很低，而内存的读写效率很高，所以InnoDB选择将一些数据页、索引页缓存在，用来提高读写效率。
-所以InnoDB会通过一定的机制，让一些最热的数据保存在缓冲池中，加速请求的响应。
+            
+一个运行中的线程如何停止它呢，我们可能会想到stop方法，但是stop方法已经被弃用了。因为stop方法会强制释放掉线程的锁资源，给数据的一致性带来问题。stop是一种独占模式，直接将线程杀死，而中断是一种协作模式。
 
-缓冲池中数据组织方式
-Free List
-数据库启动时InnoDB向操作系统申请一片内存区域，之后InnoDB会将这个......
+
+什么是线程中断
+每个线程都维护了一个boolean类型的中断状态，通过调用该线程的interrupt方法，将这个线程设置为中断状态，后续该线程可以isInterrupte......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-11-13
+            2020-05-15
         </p>
         <div class="tags">
             
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -246,31 +245,33 @@ Free List
 
 <div class="post-preview">
 
-    <a href="/分布式/分布式ID生成方案/">
+    <a href="/Java基础/Java-IO/">
         <h2 class="post-title">
                                  
-            分布式ID生成方案
+            BIO、NIO、AIO模型区别
         </h2>
         <h3 class="post-subtitle">
-            本文介绍了常见的几种分布式ID生成方案和他们的优缺点
+            本文介绍IO模型以及它们的区别
         </h3>
         <div class="post-content-preview">
-            为什么需要分布式ID
-随着系统数据量越来越大，单数据库压力太大无法维持性能，所以可能就需要变成一主多从这样读写分离，随着继续扩大一主多从也无法支撑了。这时就需要分库分表，这样的话就会出现不同库表之间的数据id不能再依赖数据库自增的id，而需要外部一种方式生成全局统一的唯一id。
-分布式ID需要满足什么条件
+            
+什么是IO，一般典型的如网络，磁盘文件等带有输入输出的，需要从程序到操作系统的数据传输等都算是IO，本文主要讲解几种IO模型的对比，以及举例帮助理解不同IO模型的差别，并没有大篇幅说集中模型的详细使用。
 
-唯一性，全局必须唯一。
-高性能，不能在生成id上浪费过多的时间，使其成为功能的性能瓶......
+
+Java IO模型
+想要理解IO模型首先要先明白同步、异步、阻塞、非阻塞他们的意思以及他们之间的区别，因为IO模型无非是他们四个之间的两两组合。
+同步与异步
+同步： 多个操作按照顺序处......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-11-05
+            2019-10-21
         </p>
         <div class="tags">
             
-              <a href="/tags/#分布式" title="分布式">分布式</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -280,33 +281,31 @@ Free List
 
 <div class="post-preview">
 
-    <a href="/Redis/Redis哨兵模式/">
+    <a href="/Java基础/Java基础-AQS源码分析/">
         <h2 class="post-title">
                                  
-            Redis哨兵模式
+            AbstractQueuedSynchronizer源码分析
         </h2>
         <h3 class="post-subtitle">
-            本文Redis哨兵模式故障发现、故障转移的原理
+            本文详细解读了AQS框架控制并发的原理，以及基于AQS怎么实现不同的锁
         </h3>
         <div class="post-content-preview">
             
-Redis主从模式就是为了提高Redis的可用性，当主节点异常后需要人为进行故障转移十分麻烦而且不及时，为了保证高可用就出现了Redis Sentinel。
+Java并发包中的锁工具都是基于AQS来实现的。AQS是并发包的核心，它是一个加强版的CLH队列，它实现了线程阻塞唤醒、取消节点、支持重入、支持独占、共享锁等多种基础功能，其他并发工具直接基于AQS实现自己的特殊的功能即可。
 
-为什么需要Redis Sentinel
-一个主从结构的Redis服务，当Master故障之后都要做什么？
-1、要挑选出一个slave节点手动设置为master节点。
-2、改变其他slave节点的master指向。
-3、通知客户端ma......
+
+什么是CLH队列
+CLH队列是一个先进先出队列，本质是通过队列与节点的状态控制节点的阻塞与唤醒。其中每一个线程代表队列中的一个节点，它不断自旋监听前驱节点的状态（......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-18
+            2019-10-12
         </p>
         <div class="tags">
             
-              <a href="/tags/#Redis" title="Redis">Redis</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -316,31 +315,35 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
 
 <div class="post-preview">
 
-    <a href="/Redis/Redis主从复制/">
+    <a href="/Java基础/Java-Synchronized原理/">
         <h2 class="post-title">
                                  
-            Redis主从复制
+            Synchronized关键字原理
         </h2>
         <h3 class="post-subtitle">
-            本文介绍了Redis主从复制的原理
+            本文介绍Synchronized关键字的实现原理，以及Java对它的优化
         </h3>
         <div class="post-content-preview">
             
-单个Redis节点会存在单点问题。Redis节点需要承担读写压力，当Redis宕机后服务将不可用，没有数据备份。所以Redis提供了主从复制功能，用于将节点作为主节点的备份，可以做到读写分离、故障切换功能。同时主从复制是实现哨兵模式、集群模式的基石。
+在多线程情况下，共享资源的写操作可能会出现数据不准确的问题，锁是控制并发情况下资源访问的重要工具。本文讲述我个人理解的Synchronized的原理。
 
-主从复制
-指定主从关系
-通过slaveof {host} {port}可以让一个Redis节点成为另一个Redis节点的从节点。成功建立连......
+
+Synchronized的使用
+
+同步代码块
+
+12345public void doSomething()&#123;	synchronized(obj)&#123;		//doSomething...	&#125;&#125;
+用于......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-16
+            2019-10-09
         </p>
         <div class="tags">
             
-              <a href="/tags/#Redis" title="Redis">Redis</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -350,31 +353,41 @@ Redis主从模式就是为了提高Redis的可用性，当主节点异常后需�
 
 <div class="post-preview">
 
-    <a href="/Redis/Redis持久化/">
+    <a href="/Java基础/Java-包装类/">
         <h2 class="post-title">
                                  
-            Redis持久化
+            Java包装类
         </h2>
         <h3 class="post-subtitle">
-            本文Redis中aof、rdb两种持久化的原理，以及它们的区别。
+            
         </h3>
         <div class="post-content-preview">
             
-Redis的数据存储于内存中。当Redis重启后，内存中的数据就会丢失。为了保证重新启动后之前的数据还存在，就需要提供一种持久化机制。Redis为使用者提供了RDB、AOF两种持久化功能。
+包装类是Java使用极其频繁的类型，他们代表着基本类型的引用形式，并且提供了丰富的方法。
 
-RDB持久化
-什么是RDB持久化
-RDB持久化通过保存当时的内存快照文件（二进制文件）来完成持久化。当Redis再次启动的时候会去加载RDB文件，用于恢复内存的数据。因为是二进制文件，所以恢复的速度很......
+
+Java数据类型
+
+基本数据类型
+引用数据类型
+
+基本数据类型
+基本数据类型有8种，分别是byte，short，int，float，double，long，char，boolean。
+占用大小和范围请自行搜索。
+引用类型
+
+非基本数据类型的对象都是引用类型的，存储在堆中。
+引用类型的变量类似于指针......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-15
+            2019-10-08
         </p>
         <div class="tags">
             
-              <a href="/tags/#Redis" title="Redis">Redis</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -384,31 +397,36 @@ RDB持久化通过保存当时的内存快照文件（二进制文件）来完�
 
 <div class="post-preview">
 
-    <a href="/Redis/Redis是什么/">
+    <a href="/Java基础/Java-HashMap-jdk8/">
         <h2 class="post-title">
                                  
-            Redis概览
+            HashMap源码分析
         </h2>
         <h3 class="post-subtitle">
-            本文介绍Redis的基本架构以及优势，另外还说了它具备的特性。
+            本文解析JDK8的HashMap的源码
         </h3>
         <div class="post-content-preview">
             
-Redis是基于内存的KV数据库。Redis拥有极高的吞吐量，单点可以达到10W/s的读取。同时Redis支持多种数据类型的值，可以实现各种不同的功能。同时Redis可以保证实现读写分离、高可用架构、集群模式等。
+HashMap是平时使用非常广泛的集合工具之一。其内部的数据结构是哈希表，哈希表的查找效率是O（1），效率很高。本文通过增删改查的顺序阅读源码，并且分析了一下并发情况的问题和其他的拓展。JDK版本是1.8。
 
-Redis为什么快
 
-Redis是单线程的（请求处理方面是单线程，命令排队处理），防止了多线程模式线程状态的切换引起的性能消耗。另外Redis是非CPU密集型的，它的瓶颈在于内......
+HashMap数据结构
+解决哈希冲突的方式
+
+开放定址法
+链地址法
+
+HashMap内部是一个哈希表的数据结构，存储的是键值对，通过key的hash值与数组长度取模计算出value......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-13
+            2019-09-23
         </p>
         <div class="tags">
             
-              <a href="/tags/#Redis" title="Redis">Redis</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -418,134 +436,30 @@ Redis是单线程的（请求处理方面是单线程，命令排队处理），
 
 <div class="post-preview">
 
-    <a href="/SpringBoot/SpringBoot自动配置/">
+    <a href="/Java基础/Java-ArrayList-jdk8/">
         <h2 class="post-title">
                                  
-            SpringBoot自动配置
+            ArrayList源码分析
         </h2>
         <h3 class="post-subtitle">
-            本文介绍SpringBoot版本2.3.4.RELEASE的自动配置原理
+            
         </h3>
         <div class="post-content-preview">
-            @Import注入对象的三种方式
-https://juejin.im/post/6844903946155212813
-自动配置原理
-@SpringBootApplication是SpringBoot启动类的注解，如下图。
+            
+ArrayList是平时特别常用的java集合类，非常适合做随机读取，本文对java8中的ArrayList源码进行分析。
 
-自动配置就是通过其内部的@EnableAutoConfiguration注解来实现，EnableAutoConfiguration的内部如下图。
-
-上图重要的部分是其内......
+属性
+12345678910//默认容量private static final int DEFAULT_CAPACITY = 10;//空数组，当指定数组长度为0的时候使用。private static final Object[] EMPTY_ELEMENTDA......
         </div>
     </a>
     
         <p class="post-meta" style="margin: 10px 0;">
             Posted by 郭守敬 on
-            2020-10-13
+            2019-09-20
         </p>
         <div class="tags">
             
-              <a href="/tags/#SpringBoot" title="SpringBoot">SpringBoot</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB-Redo-Log/">
-        <h2 class="post-title">
-                                 
-            InnoDB Redo Log
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍InnoDB中保证事务持久性的重做日志
-        </h3>
-        <div class="post-content-preview">
-            
-InnoDB操作的都是内存中的数据，那么为什么数据库宕机后重新启动还可以恢复之前提交的数据呢，而且一条sql语句可能更改很多在磁盘上不在同一个位置的数据，那么数据同步回磁盘的随机io开销InnoDB是怎么避免的呢？Redo Log的设计解决了这部分问题，在故障恢复中和数据页落盘策略上它起到了很大的作用。
-
-什么是redo log？
-redo log是用来持久化事务的，记录数据的物理更改。因......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-11
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/Redis/Redis内存管理/">
-        <h2 class="post-title">
-                                 
-            Redis内存回收
-        </h2>
-        <h3 class="post-subtitle">
-            本文介绍Redis内存淘汰策略、过期键回收等
-        </h3>
-        <div class="post-content-preview">
-            过期键回收策略
-由于内存中存在大量的键，如果精准维护过期时间会很耗费cpu资源。因此Redis通过定时删除和惰性删除来解决过期键的淘汰。
-定时删除
-Redis随机获取部分的键，并且删除其中过期的键值对。根据过期键的比例，回收分为快模式和慢模式。流程如下
-（1）首先通过慢模式进行回收，Redis默认每10秒随机获取20个键。
-（2）其中如果25%的键是过期的，那么Redis会执行顺序回收，直到......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-05
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Redis" title="Redis">Redis</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/InnoD引擎/InnoDB-执行计划/">
-        <h2 class="post-title">
-                                 
-            InnoDB-执行计划
-        </h2>
-        <h3 class="post-subtitle">
-            本文主要介绍怎么查看Sql语句的执行计划，看自己sql的性能
-        </h3>
-        <div class="post-content-preview">
-            什么是执行计划
-一条sql会经过mysql优化器的优化后变成一个所谓的执行计划，这个执行计划可以看出来这条sql是如何被mysql来使用的。explain可以帮助我们来查看执行计划，从而我们可以通过执行计划对sql进行优化来提升性能。
-explain各个列的含义
-
-建立一张表来举例
-123456789101112131415CREATE TABLE single_table (    id ......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2020-10-02
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#InnoD引擎" title="InnoD引擎">InnoD引擎</a>
+              <a href="/tags/#Java" title="Java">Java</a>
             
         </div>
     
@@ -560,13 +474,9 @@ explain各个列的含义
 <ul class="pager">
     
         <li class="previous">
-            <a href="/">&larr; Newer Posts</a>
+            <a href="/page/3/">&larr; Newer Posts</a>
         </li>
     
-    
-        <li class="next">
-            <a href="/archives/3/">Older Posts &rarr;</a>
-        </li>
     
 </ul>
 
@@ -598,15 +508,15 @@ explain各个列的含义
     <div class="tags">
         
             
+            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
+            
+        
+            
             <a href="/tags/#Java" title="Java" rel="12">Java</a>
             
         
             
             <a href="/tags/#ElasticSearch" title="ElasticSearch" rel="1">ElasticSearch</a>
-            
-        
-            
-            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
             
         
             

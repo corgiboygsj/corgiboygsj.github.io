@@ -134,6 +134,13 @@
 
                         
                         <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/about/">About</a>
                         </li>
                         
@@ -142,13 +149,6 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -211,6 +211,54 @@
 
 <div class="post-preview">
 
+    <a href="/article/简介/">
+        <h2 class="post-title">
+            
+                <i class="fa fa-thumb-tack" style="color:#F4711F" ></i>
+                <!-- <i class="fa fa-thumb-tack" style="color:#F89E8C" ></i> -->
+                <!-- <i class="fa fa-thumb-tack" style="color:#1CB7ED" ></i> -->
+                <font color=#F4711F>置顶</font>
+                <!-- <font color=#F89E8C>置顶</font>  -->
+                <!-- <font color=#1CB7ED>置顶</font>  -->
+                                 
+            简介
+        </h2>
+        <h3 class="post-subtitle">
+            关于本博客的简介，持续更新。
+        </h3>
+        <div class="post-content-preview">
+            阅读须知
+
+本博客内容为我个人学习总结，因为总忘所以写成博文讲给自己来看。可能有些点没有详细展开，所以阅读时最好有一些相关的基础。
+阅读系列文章可通过右上方Tags找到对应系列。
+
+系列文章更新情况
+
+
+InnoDB引擎系列完成
+Redis系列完成
+JDK源码、基础、JVM持续更新中
+分布式相关更新中
+
+
+...
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 郭守敬 on
+            2021-07-30
+        </p>
+        <div class="tags">
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/分布式/Raft分布式共识算法/">
         <h2 class="post-title">
                                  
@@ -255,11 +303,11 @@ Raft共识算法
         </h3>
         <div class="post-content-preview">
             
-本文为《凤凰架构》学习文章，图片和内容基本都出自于《凤凰架构》
+图片和内容基本都出自于《凤凰架构》，加了一些自己的调研和理解。
 
 分布式共识算法
-如何在系统中保证一份数据不丢失？那就是对数据进行冗余备份。对于静态的数据我们可以手动使用磁盘之类的东西进行拷贝备份。但是在分布式系统之中，我们的数据是动态的，如何保证数据的实时备份？
-比较容易想到的一种方式就是节点收到变更之后，同步给所有的副本节点。当所有的副本节点都返回写入成功之后主节点再向客户端返回写入成......
+如何在系统中保证一份数据不丢失？那就是对数据进行冗余备份。但是网络和机器都是不可靠的，所以需要一种数据同步算法让集群内的机器们对变更达成共识，让变更安全的保存在集群中。这就是共识算法要做的事情，让整个集群对于数据的变更达成一致，好像只有一台机器在负责写入，保证原子性和顺序性。
+比较容易想到的一种方式就是节点收......
         </div>
     </a>
     
@@ -292,8 +340,7 @@ Raft共识算法
 CAP定理
 CAP定理字母分别对应的是C（一致性）、A（可用性）、（P）分区容忍性，它是经过严格数学证明的定理而不是理论。它表示一个分布式的系统，同时只能满足上面两种特性。
 
-C一致性： 表示一个请求被系统处理成功后造成的修改，在后续的请求中无论被哪一台机器处理都能看到之前请求的变动。
-A可用性： 表示即使分布式系统中有一部分结点宕机，其他可用的节点还是可以接收请求并......
+C一致性： 表示一个变更操作一旦被系统处理，那么再下次访问一定能看到之前操作的变更结果。（这个一致性是很容易理解错的。它并不是指在返回成功后强制要求所有的机器都拥有相同的数据，而是说将整个系统当......
         </div>
     </a>
     
@@ -304,54 +351,6 @@ A可用性： 表示即使分布式系统中有一部分结点宕机，其他可
         <div class="tags">
             
               <a href="/tags/#分布式" title="分布式">分布式</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/article/简介/">
-        <h2 class="post-title">
-            
-                <i class="fa fa-thumb-tack" style="color:#F4711F" ></i>
-                <!-- <i class="fa fa-thumb-tack" style="color:#F89E8C" ></i> -->
-                <!-- <i class="fa fa-thumb-tack" style="color:#1CB7ED" ></i> -->
-                <font color=#F4711F>置顶</font>
-                <!-- <font color=#F89E8C>置顶</font>  -->
-                <!-- <font color=#1CB7ED>置顶</font>  -->
-                                 
-            简介
-        </h2>
-        <h3 class="post-subtitle">
-            关于本博客的简介，持续更新。
-        </h3>
-        <div class="post-content-preview">
-            阅读须知
-
-本博客内容为我个人学习总结，因为总忘所以写成博文讲给自己来看。可能有些点没有详细展开，所以阅读时最好有一些相关的基础。
-阅读系列文章可通过右上方Tags找到对应系列。
-
-系列文章更新情况
-
-
-InnoDB引擎系列完成
-Redis系列完成
-JDK源码、基础、JVM持续更新中
-分布式相关更新中
-
-
-...
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 郭守敬 on
-            2021-07-30
-        </p>
-        <div class="tags">
             
         </div>
     
@@ -571,7 +570,7 @@ Redis主从复制了提供了故障转移的基础。Sentinel模式提供了自�
     
     
         <li class="next">
-            <a href="/archives/2/">Older Posts &rarr;</a>
+            <a href="/page/2/">Older Posts &rarr;</a>
         </li>
     
 </ul>
@@ -604,15 +603,15 @@ Redis主从复制了提供了故障转移的基础。Sentinel模式提供了自�
     <div class="tags">
         
             
+            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
+            
+        
+            
             <a href="/tags/#Java" title="Java" rel="12">Java</a>
             
         
             
             <a href="/tags/#ElasticSearch" title="ElasticSearch" rel="1">ElasticSearch</a>
-            
-        
-            
-            <a href="/tags/#InnoD引擎" title="InnoD引擎" rel="8">InnoD引擎</a>
             
         
             
